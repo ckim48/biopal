@@ -160,6 +160,60 @@
       width:1.05rem; height:1.05rem;
     }
 
+    /* ===================== NEW: Condition Report FAB + Modal ===================== */
+    .report-fab{
+      position: fixed;
+      right: 24px;
+      bottom: 98px; /* sits above profile button */
+      z-index: 1101;
+      width: 62px; height: 62px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #0b1220, #101a33);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 22px 44px -30px rgba(2,6,23,.55);
+      border:none;
+    }
+    .report-fab:disabled{ opacity:.55; cursor:not-allowed; }
+    .report-loading{
+      display:flex; align-items:center; gap:12px;
+      padding: 12px 14px;
+      border: 1px solid rgba(14,165,233,.14);
+      background: rgba(14,165,233,.06);
+      border-radius: 16px;
+    }
+    .report-chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(14,165,233,.08);
+      border: 1px solid rgba(14,165,233,.16);
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--ink);
+    }
+    .report-block{
+      border:1px solid rgba(2,6,23,.08);
+      border-radius: 18px;
+      padding: 14px;
+      background: #fff;
+      margin-top: 12px;
+    }
+    .report-block h6{
+      margin:0 0 8px;
+      font-weight: 950;
+      letter-spacing: -.2px;
+    }
+    .report-block p{
+      margin:0;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    /* ========================================================================== */
+
     @media (max-width:768px){ .inline-2{grid-template-columns:1fr;} }
   </style>
 </head>
@@ -231,29 +285,125 @@
     </div>
     <div class="drawer-body">
       <form id="profileEditForm">
-        <div class="field-group"><label>Gender</label><select id="edit_gender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
+        <!-- Basics -->
+        <div class="field-group">
+          <label>Gender</label>
+          <select id="edit_gender">
+            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
+          </select>
+        </div>
         <div class="inline-2">
           <div class="field-group"><label>Weight (kg)</label><input type="number" id="edit_weight" step="0.1"></div>
           <div class="field-group"><label>Height (cm)</label><input type="number" id="edit_height" step="0.1"></div>
         </div>
+
         <hr>
-        <h6 style="font-weight:900;">Medication Routine</h6>
-        <div class="field-group"><label>Times per Day</label><select id="edit_medFreq"><option value="0">No medication</option><option value="1">1 time</option><option value="2">2 times</option><option value="3">3 times</option></select></div>
-        <div id="edit_medTimesContainer" class="inline-2"></div>
+
+        <!-- NEW: Treatment Phase -->
+        <h6 style="font-weight:900;">Treatment Phase</h6>
+        <div class="field-group">
+          <label>Phase</label>
+          <select id="edit_treatmentPhase">
+            <option value="">Not set</option>
+            <option value="pre_treatment">Pre-treatment</option>
+            <option value="active_treatment">Active treatment</option>
+            <option value="recovery">Recovery</option>
+            <option value="maintenance">Maintenance</option>
+            <option value="survivorship">Survivorship</option>
+            <option value="other">Other</option>
+          </select>
+          <div class="hint">Used to tailor guidance and custom missions.</div>
+        </div>
+
         <hr>
-        <h6 style="font-weight:900;">Dressing Schedule</h6>
-        <div class="field-group"><label>Frequency</label><select id="edit_dressFreq"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div>
+
+        <!-- NEW: Medical Conditions / Allergies -->
+        <h6 style="font-weight:900;">Medical Conditions / Allergies</h6>
+        <div class="field-group">
+          <label>Medical conditions (optional)</label>
+          <textarea id="edit_medicalConditions" rows="3" placeholder="e.g., asthma, diabetes, hypertension"></textarea>
+          <div class="hint">Free text. Keep it short and practical.</div>
+        </div>
+        <div class="field-group">
+          <label>Allergies (optional)</label>
+          <textarea id="edit_allergies" rows="2" placeholder="e.g., penicillin, peanuts"></textarea>
+        </div>
+
+        <hr>
+
+        <!-- NEW: Activity Baseline -->
+        <h6 style="font-weight:900;">Activity Baseline</h6>
+        <div class="field-group">
+          <label>Baseline</label>
+          <select id="edit_activityBaseline">
+            <option value="">Not set</option>
+            <option value="low">Low (mostly resting)</option>
+            <option value="light">Light (short walks, light chores)</option>
+            <option value="moderate">Moderate (regular daily activity)</option>
+            <option value="active">Active (exercise most days)</option>
+          </select>
+          <div class="hint">Helps determine safe mission intensity.</div>
+        </div>
+
+        <hr>
+
+        <!-- NEW: Emergency Contact -->
+        <h6 style="font-weight:900;">Emergency Contact</h6>
+        <div class="field-group">
+          <label>Name (optional)</label>
+          <input id="edit_emgName" type="text" placeholder="Contact name">
+        </div>
         <div class="inline-2">
-          <div class="field-group"><label>Day of week (weekly)</label>
+          <div class="field-group">
+            <label>Relationship (optional)</label>
+            <input id="edit_emgRelation" type="text" placeholder="e.g., Parent, Spouse, Friend">
+          </div>
+          <div class="field-group">
+            <label>Phone (optional)</label>
+            <input id="edit_emgPhone" type="tel" placeholder="e.g., 010-1234-5678">
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Medication (existing) -->
+        <h6 style="font-weight:900;">Medication Routine</h6>
+        <div class="field-group">
+          <label>Times per Day</label>
+          <select id="edit_medFreq">
+            <option value="0">No medication</option>
+            <option value="1">1 time</option>
+            <option value="2">2 times</option>
+            <option value="3">3 times</option>
+          </select>
+        </div>
+        <div id="edit_medTimesContainer" class="inline-2"></div>
+
+        <hr>
+
+        <!-- Dressing (existing) -->
+        <h6 style="font-weight:900;">Dressing Schedule</h6>
+        <div class="field-group">
+          <label>Frequency</label>
+          <select id="edit_dressFreq">
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+        <div class="inline-2">
+          <div class="field-group">
+            <label>Day of week (weekly)</label>
             <select id="edit_dressDay">
               <option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option>
-              <option value="thu">Thu</option><option value="fri">Fri</option>
-              <option value="sat">Sat</option><option value="sun">Sun</option>
+              <option value="thu">Thu</option><option value="fri">Fri</option><option value="sat">Sat</option>
+              <option value="sun">Sun</option>
             </select>
             <div class="hint">Used only when Frequency = Weekly.</div>
           </div>
           <div class="field-group"><label>Time</label><input type="time" id="edit_dressTime"></div>
         </div>
+
         <button type="submit" class="btn btn-primary w-100 mt-3">Save Profile</button>
       </form>
     </div>
@@ -378,7 +528,34 @@
     </div>
   </div>
 
+  <!-- ===================== NEW: Condition Report Modal ===================== -->
+  <div class="overlay" id="reportOverlay" aria-hidden="true">
+    <div class="modalX">
+      <div class="modal-headerX">
+        <div>
+          <h2 style="margin:0; font-size:20px; font-weight:900;">Condition Report</h2>
+          <span id="reportSubhead" style="font-size:12px; color:var(--muted); font-weight:800;">Last 7 days summary</span>
+        </div>
+        <button id="closeReportBtn" class="btn btn-ghost" type="button">✕</button>
+      </div>
+      <div class="modal-bodyX" id="reportBody">
+        <!-- content injected dynamically -->
+      </div>
+      <div class="modal-footerX">
+        <button type="button" id="refreshReportBtn" class="btn btn-ghost"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+        <button type="button" id="closeReportBtn2" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+  <!-- ===================================================================== -->
+
   <div class="mock-clock"><i class="bi bi-cpu"></i> <span id="ui-now">00:00</span></div>
+
+  <!-- NEW floating button -->
+  <button id="openReportBtn" class="report-fab" title="Condition Report" disabled>
+    <i class="bi bi-clipboard-data" style="font-size:24px;"></i>
+  </button>
+
   <button id="openProfileBtn" class="profile-fab"><i class="bi bi-person-badge" style="font-size:24px;"></i></button>
 
   <div class="debug-panel">
@@ -401,6 +578,9 @@
 
   // call your Flask route
   const API_GENERATE_MISSION_URL = "/api/generate_mission";
+
+  // NEW: condition report endpoint
+  const API_CONDITION_REPORT_URL = "/api/condition_report";
 
   // DEBUG: mission request tracing
   const AI_DEBUG = {
@@ -432,10 +612,6 @@
   const REVEAL_DELAY_MS = 60 * 60 * 1000;
 
   /* -------------------- Cross-device persistence (NEW) -------------------- */
-  // We persist:
-  // - intervalSnapshot[intervalId].visibleMissions: the 2 cards currently shown (so other devices render exactly the same)
-  // - intervalSnapshot[intervalId].status: current status label/pct/done/total
-  // This only writes when the snapshot actually changes (hash guard), so it won't spam writes every minute.
   let lastSnapshotHash = "";
   function stableStringify(obj){
     try{
@@ -445,7 +621,6 @@
     }
   }
   function hashSnapshot(snapshot){
-    // quick deterministic hash (string based)
     const s = stableStringify(snapshot);
     let h = 0;
     for (let i=0; i<s.length; i++){
@@ -541,7 +716,7 @@
 
   function setCharacterSrc(src) {
     const img = $("characterSprite"); if (!img) return;
-    img.src = `${src}?t=${Date.now()}`;
+    img.src = `${src}`;
   }
   function setIdleCharacterByStatus(label){
     const idleSrc = STATUS_IDLE_GIF[label] || STATUS_IDLE_GIF["Neutral / Calm"];
@@ -776,7 +951,8 @@
     return {
       startedAt: meta?.startedAt || 0,
       nextRevealAt: meta?.nextRevealAt || fallback || 0,
-      lastCompletedAt: meta?.lastCompletedAt || 0
+      lastCompletedAt: meta?.lastCompletedAt || 0,
+      initialFillDone: !!meta?.initialFillDone
     };
   }
 
@@ -978,6 +1154,196 @@
     return { doneToday, totalToday, plannedBasicsToday, plannedCustomToday };
   }
 
+  /* ===================== NEW: Condition Report UI + API ===================== */
+  let reportBusy = false;
+  let reportAbort = null;
+  let reportCache = { key: "", at: 0, data: null };
+
+  function openReportModal(){
+    $("reportOverlay").classList.add("show");
+    $("reportOverlay").setAttribute("aria-hidden", "false");
+  }
+  function closeReportModal(){
+    $("reportOverlay").classList.remove("show");
+    $("reportOverlay").setAttribute("aria-hidden", "true");
+  }
+
+  function setReportLoadingUI({ title="Generating report...", sub="Analyzing last 7 days of check-ins and missions." } = {}){
+    const body = $("reportBody");
+    body.innerHTML = `
+      <div class="report-loading">
+        <div class="spinner-border" role="presentation" aria-hidden="true"></div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="font-weight:950; letter-spacing:-.2px;">${title}</div>
+          <div style="font-weight:800; color:var(--muted); font-size:12px;">${sub}</div>
+        </div>
+      </div>
+      <div class="report-block" style="margin-top:14px;">
+        <h6>What BioPal is checking</h6>
+        <p>Self check-ins (sleep, fatigue, mood), completed missions (hydration/med/dressing/custom), and routine consistency over the last 7 days.</p>
+      </div>
+    `;
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;").replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  // Accepts any payload shape and normalizes into UI sections safely
+  function renderConditionReportUI(result, meta){
+    const body = $("reportBody");
+
+    const summary = result?.summary ?? result?.overall_summary ?? result?.overall ?? "";
+    const score = result?.score ?? result?.condition_score ?? result?.overall_score ?? null;
+    const risk = result?.risk_level ?? result?.risk ?? result?.status ?? "";
+    const highlights = Array.isArray(result?.highlights) ? result.highlights : (Array.isArray(result?.positives) ? result.positives : []);
+    const concerns = Array.isArray(result?.concerns) ? result.concerns : (Array.isArray(result?.negatives) ? result.negatives : []);
+    const recommendations = Array.isArray(result?.recommendations) ? result.recommendations : (Array.isArray(result?.actions) ? result.actions : []);
+    const next7 = Array.isArray(result?.next_7_days_plan) ? result.next_7_days_plan : [];
+
+    const chips = [];
+    if (typeof score === "number") chips.push(`<span class="report-chip"><i class="bi bi-speedometer2"></i> Score: ${Math.round(score)}</span>`);
+    if (risk) chips.push(`<span class="report-chip"><i class="bi bi-shield-exclamation"></i> ${escapeHtml(risk)}</span>`);
+    chips.push(`<span class="report-chip"><i class="bi bi-calendar-week"></i> Days: ${meta.daysCount}</span>`);
+    chips.push(`<span class="report-chip"><i class="bi bi-check2-circle"></i> Missions: ${meta.missionsCount}</span>`);
+
+    const listToHtml = (arr) => {
+      if (!arr || !arr.length) return `<p style="margin:0; color:var(--muted); font-weight:800; font-size:12px;">No items.</p>`;
+      return `<ul style="margin:0; padding-left:18px;">
+        ${arr.slice(0, 8).map(x => `<li style="margin:6px 0; font-weight:750; font-size:13px; line-height:1.5;">${escapeHtml(x)}</li>`).join("")}
+      </ul>`;
+    };
+
+    body.innerHTML = `
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">${chips.join("")}</div>
+
+      <div class="report-block">
+        <h6>Overall</h6>
+        <p>${escapeHtml(summary || "Report generated. Review highlights and recommendations below.")}</p>
+      </div>
+
+      <div class="report-block">
+        <h6>Highlights</h6>
+        ${listToHtml(highlights)}
+      </div>
+
+      <div class="report-block">
+        <h6>Concerns</h6>
+        ${listToHtml(concerns)}
+      </div>
+
+      <div class="report-block">
+        <h6>Recommendations</h6>
+        ${listToHtml(recommendations)}
+      </div>
+
+      <div class="report-block">
+        <h6>Next 7 Days Focus</h6>
+        ${listToHtml(next7)}
+      </div>
+
+      <div class="hint" style="margin-top:12px;">
+        Generated from your last 7 days of check-ins and mission completion history. If anything feels off, consider contacting your care team.
+      </div>
+    `;
+  }
+
+  async function fetchConditionReport({ force=false } = {}){
+    if (!userSession) return;
+    if (reportBusy) return;
+
+    // modal must pop up first (your requirement)
+    openReportModal();
+    setReportLoadingUI();
+
+    reportBusy = true;
+    $("refreshReportBtn").disabled = true;
+
+    try{
+      if (reportAbort) reportAbort.abort();
+      reportAbort = new AbortController();
+
+      cachedHistory7d = await fetchHistoryDays(7);
+
+      const daysCount = Array.isArray(cachedHistory7d) ? cachedHistory7d.length : 0;
+      const missionsCount = cachedHistory7d.reduce((acc, d) => acc + (Array.isArray(d.completedMissions) ? d.completedMissions.length : 0), 0);
+
+      const cacheKey = hashSnapshot({
+        uid: userSession.uid,
+        profile: cachedUserProfile || {},
+        history: cachedHistory7d || [],
+      });
+
+      const fresh = (Date.now() - reportCache.at) < (15 * 60 * 1000); // 15 min cache
+      if (!force && reportCache.key === cacheKey && fresh && reportCache.data) {
+        console.log("[Report] using in-memory cache");
+        renderConditionReportUI(reportCache.data, { daysCount, missionsCount });
+        return;
+      }
+
+      const payload = {
+        profile: cachedUserProfile || {},
+        history: cachedHistory7d || [],
+        nowISO: new Date().toISOString()
+      };
+
+      console.groupCollapsed("[Report] request -> /api/condition_report");
+      console.log("payload:", payload);
+      console.groupEnd();
+
+      const t0 = performance.now();
+      const res = await fetch(API_CONDITION_REPORT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: reportAbort.signal
+      });
+      const t1 = performance.now();
+
+      console.log("[Report] HTTP", res.status, res.ok ? "OK" : "NOT OK", `${Math.round(t1 - t0)}ms`);
+
+      if (!res.ok){
+        const txt = await res.text().catch(()=> "");
+        console.warn("[Report] server error body:", txt);
+        throw new Error(`Report API ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("[Report] response JSON <-", data);
+
+      reportCache = { key: cacheKey, at: Date.now(), data };
+      renderConditionReportUI(data, { daysCount, missionsCount });
+
+      showToast({ title: "Report Ready", message: "Condition report generated." , key: "report_ok" });
+    } catch(e){
+      if (String(e?.name || "") === "AbortError"){
+        console.log("[Report] aborted");
+        return;
+      }
+      console.warn("[Report] failed:", e);
+      $("reportBody").innerHTML = `
+        <div class="report-block">
+          <h6>Could not generate report</h6>
+          <p style="color:var(--muted);">We couldn’t reach the report service right now. Please try again.</p>
+        </div>
+        <div class="report-block">
+          <h6>Quick fallback</h6>
+          <p style="color:var(--ink);">
+            Keep consistent hydration, keep check-ins daily, and follow your medication/dressing schedule. If symptoms worsen, contact your care team.
+          </p>
+        </div>
+      `;
+      showToast({ title: "Report Failed", message: "Please try again.", key: "report_fail" });
+    } finally {
+      reportBusy = false;
+      $("refreshReportBtn").disabled = false;
+    }
+  }
+  /* ======================================================================== */
+
   /* -------------------- Dashboard Logic (UPDATED RULES) -------------------- */
   async function updateDashboard() {
     if (!userSession) return;
@@ -996,6 +1362,9 @@
     const logData = lSnap.exists() ? lSnap.data() : {};
     const completed = logData.completedMissions || [];
     const hasTodayCheckin = !!(logData.survey_v2 || logData.survey);
+
+    // enable report button after auth + profile loaded
+    if ($("openReportBtn")) $("openReportBtn").disabled = false;
 
     const today = computeTodayTotals(logData, medicalDay);
 
@@ -1036,7 +1405,6 @@
       updateSensors();
       updateTopStars({ medicalDay, completed, intervalId: -1, hasTodayCheckin });
 
-      // no interval snapshot in sleep window
       return;
     }
 
@@ -1055,7 +1423,13 @@
         const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
         const im = logData.intervalMeta || {};
         const cur = im[intervalId] || {};
-        im[intervalId] = { ...cur, startedAt: nowMs, nextRevealAt: cur.nextRevealAt || 0, lastCompletedAt: cur.lastCompletedAt || 0 };
+        im[intervalId] = {
+          ...cur,
+          startedAt: nowMs,
+          nextRevealAt: cur.nextRevealAt || 0,
+          lastCompletedAt: cur.lastCompletedAt || 0,
+          initialFillDone: !!cur.initialFillDone
+        };
         await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge:true });
         console.log("[Interval] startedAt set for", intervalId, new Date(nowMs).toLocaleTimeString());
       } catch(e){
@@ -1091,38 +1465,61 @@
       shown++;
     }
 
-    // At interval start: if only one mission available, fill up to 2 with custom (max 2/interval)
-    if (isIntervalStart && shown < MAX_VISIBLE) {
-      const need = MAX_VISIBLE - shown;
+    /* ===================== IMPORTANT FIX (YOUR REQUEST) =====================
+       If at the beginning of the interval only Hydration is eligible (or basics < 2),
+       we MUST fill the remaining slot(s) with AI custom mission(s) immediately.
+       Also: do NOT generate multiple times in the same interval -> intervalMeta.initialFillDone guard.
+    ======================================================================= */
+    const metaNow = getIntervalMeta(logData, intervalId);
+    const slotsNow = getCustomSlots(logData, intervalId);
+    const existingCount = slotsNow.filter(Boolean).length;
 
-      const slots = getCustomSlots(logData, intervalId);
-      const existingCount = slots.filter(Boolean).length;
+    const needNow = Math.max(0, MAX_VISIBLE - shown);
+    const remainingCapacity = Math.max(0, MAX_CUSTOM_PER_INTERVAL - existingCount);
+    const allowedNew = Math.min(needNow, remainingCapacity);
 
-      const remainingCapacity = Math.max(0, MAX_CUSTOM_PER_INTERVAL - existingCount);
-      const allowedNew = Math.min(need, remainingCapacity);
+    const shouldInitialFill = (!metaNow.initialFillDone) && allowedNew > 0;
+
+    if (shouldInitialFill) {
+      console.log("[AI][InitialFill] basics shown:", shown, "need:", needNow, "existingCustomSlots:", existingCount, "allowedNew:", allowedNew);
 
       const fillPlan = [];
-      if (!slots[0]) fillPlan.push(0);
-      if (!slots[1]) fillPlan.push(1);
+      if (!slotsNow[0]) fillPlan.push(0);
+      if (!slotsNow[1]) fillPlan.push(1);
 
-      const tasks = [];
+      const placeholders = [];
+      for (let i=0; i<allowedNew; i++){
+        const ph = createLoadingCard("Generating custom mission...");
+        container.appendChild(ph);
+        placeholders.push(ph);
+        shown++;
+      }
+
       for (let i=0; i<allowedNew; i++){
         const slotIndex = fillPlan[i];
         if (slotIndex === undefined) break;
 
-        const ph = createLoadingCard("Generating custom mission...");
-        container.appendChild(ph);
-        shown++;
-
-        tasks.push((async () => {
-          const mission = await generateAndSaveCustom(medicalDay, intervalId, slotIndex, usedTitles);
-          replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
-        })());
+        const ph = placeholders[i];
+        const mission = await generateAndSaveCustom(medicalDay, intervalId, slotIndex, usedTitles);
+        usedTitles.add(lowerTitle(mission));
+        replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
       }
 
-      await Promise.allSettled(tasks);
+      try{
+        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+        const snapX = await getDoc(ref);
+        const dX = snapX.exists() ? (snapX.data() || {}) : {};
+        const imX = dX.intervalMeta || {};
+        const curX = imX[intervalId] || {};
+        imX[intervalId] = { ...curX, initialFillDone: true, startedAt: curX.startedAt || nowMs };
+        await setDoc(ref, { intervalMeta: imX, lastUpdate: serverTimestamp() }, { merge:true });
+        console.log("[AI][InitialFill] initialFillDone=true for", intervalId);
+      }catch(e){
+        console.warn("[AI][InitialFill] failed to set initialFillDone:", e);
+      }
     }
 
+    // Re-check meta after potential initial fill
     const meta2 = getIntervalMeta(logData, intervalId);
     const revealPending = (meta2.nextRevealAt || 0) > 0 && nowMs < meta2.nextRevealAt && meta2.nextRevealAt < intervalEndMs;
 
@@ -1161,6 +1558,7 @@
           let pickSlot = (!s0) ? 0 : 1;
 
           const mission = await generateAndSaveCustom(medicalDay, intervalId, pickSlot, usedTitles);
+          usedTitles.add(lowerTitle(mission));
           replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
         }
       }
@@ -1198,7 +1596,6 @@
     updateSensors();
     updateTopStars({ medicalDay, completed, intervalId: intervalId, hasTodayCheckin });
 
-    // NEW: persist exactly what's shown + status so other devices can render the same view
     await persistIntervalSnapshot({ medicalDay, intervalId, statusObj });
   }
 
@@ -1251,7 +1648,8 @@
             ...cur,
             startedAt: cur.startedAt || 0,
             nextRevealAt,
-            lastCompletedAt: Date.now()
+            lastCompletedAt: Date.now(),
+            initialFillDone: !!cur.initialFillDone
           };
         }
 
@@ -1264,9 +1662,7 @@
 
         showToast({ title: "Mission Complete!", message: "Great progress." });
 
-        // Reset snapshot hash so the next dashboard pass will persist the new view
         lastSnapshotHash = "";
-
         await updateDashboard();
       }
     } catch (e) {
@@ -1324,7 +1720,7 @@
 
   function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
 
-  /* -------------------- Profile Form Logic -------------------- */
+  /* -------------------- Profile Form Logic (UPDATED) -------------------- */
   function renderMedInputs(containerId, n, defaults = []) {
     const c = $(containerId); c.innerHTML = "";
     const standard = ["09:00", "14:00", "21:00"];
@@ -1334,44 +1730,97 @@
     }
   }
 
+  function toNumberOrEmpty(v){
+    const s = String(v ?? "").trim();
+    if (!s) return "";
+    const n = Number(s);
+    return Number.isFinite(n) ? n : "";
+  }
+
   $("edit_medFreq").onchange = (e) => renderMedInputs("edit_medTimesContainer", Number(e.target.value));
 
   $("openProfileBtn").onclick = () => {
     const d = cachedUserProfile || {};
     $("edit_gender").value = d.gender || "male";
-    $("edit_weight").value = d.weight || "";
-    $("edit_height").value = d.height || "";
+
+    // Read weight/height from Firebase correctly
+    $("edit_weight").value = (d.weight ?? "") === "" ? "" : String(d.weight ?? "");
+    $("edit_height").value = (d.height ?? "") === "" ? "" : String(d.height ?? "");
+
+    // NEW fields
+    $("edit_treatmentPhase").value = d.treatmentPhase || "";
+    $("edit_medicalConditions").value = d.medicalConditions || "";
+    $("edit_allergies").value = d.allergies || "";
+    $("edit_activityBaseline").value = d.activityBaseline || "";
+
+    const emg = d.emergencyContact || {};
+    $("edit_emgName").value = emg.name || "";
+    $("edit_emgRelation").value = emg.relationship || "";
+    $("edit_emgPhone").value = emg.phone || "";
+
     const med = d.schedule?.medication || { timesPerDay: 0 };
-    $("edit_medFreq").value = med.timesPerDay;
-    renderMedInputs("edit_medTimesContainer", med.timesPerDay, med.times || []);
+    $("edit_medFreq").value = med.timesPerDay ?? 0;
+    renderMedInputs("edit_medTimesContainer", Number(med.timesPerDay ?? 0), med.times || []);
+
     const dress = d.schedule?.dressing || { frequency: "none" };
-    $("edit_dressFreq").value = dress.frequency;
+    $("edit_dressFreq").value = dress.frequency || "none";
+    $("edit_dressDay").value = dress.dayOfWeek || "mon";
     $("edit_dressTime").value = dress.time || "09:00";
+
     $("profileDrawer").classList.add("show");
     $("drawerOverlay").classList.add("show");
   };
 
   $("profileEditForm").onsubmit = async (e) => {
     e.preventDefault();
-    const medTimes = Array.from(document.querySelectorAll(".med-time-input")).map(i => i.value);
+
+    const medTimes = Array.from(document.querySelectorAll(".med-time-input"))
+      .map(i => i.value)
+      .filter(Boolean);
+
+    const weightVal = toNumberOrEmpty($("edit_weight").value);
+    const heightVal = toNumberOrEmpty($("edit_height").value);
+
+    // Build update payload (includes NEW fields)
     const up = {
-      gender: $("edit_gender").value,
-      weight: Number($("edit_weight").value),
-      height: Number($("edit_height").value),
-      "schedule.medication": { timesPerDay: Number($("edit_medFreq").value), times: medTimes },
+      gender: $("edit_gender").value || "other",
+
+      // If empty, we store "" (keeps simple; avoids NaN). You can switch to deleteField later if you prefer.
+      weight: weightVal,
+      height: heightVal,
+
+      treatmentPhase: $("edit_treatmentPhase").value || "",
+      medicalConditions: $("edit_medicalConditions").value || "",
+      allergies: $("edit_allergies").value || "",
+      activityBaseline: $("edit_activityBaseline").value || "",
+
+      emergencyContact: {
+        name: $("edit_emgName").value || "",
+        relationship: $("edit_emgRelation").value || "",
+        phone: $("edit_emgPhone").value || ""
+      },
+
+      "schedule.medication": { timesPerDay: Number($("edit_medFreq").value || 0), times: medTimes.slice(0, Number($("edit_medFreq").value || 0)) },
       "schedule.dressing": {
-         frequency: $("edit_dressFreq").value,
-         time: $("edit_dressTime").value,
-         dayOfWeek: $("edit_dressDay").value
+         frequency: $("edit_dressFreq").value || "none",
+         time: $("edit_dressTime").value || "09:00",
+         dayOfWeek: $("edit_dressDay").value || "mon"
       }
     };
+
+    console.log("[Profile] updateDoc payload ->", up);
+
     await updateDoc(doc(db, "users", userSession.uid), up);
-    $("profileDrawer").classList.remove("show"); $("drawerOverlay").classList.remove("show");
+
+    $("profileDrawer").classList.remove("show");
+    $("drawerOverlay").classList.remove("show");
+
     showToast({ title: "Profile Saved", message: "Updating missions..." });
 
-    // Reset snapshot hash so we persist the new mission set after schedule changes
-    lastSnapshotHash = "";
+    // report cache should refresh because profile influences it
+    reportCache = { key:"", at:0, data:null };
 
+    lastSnapshotHash = "";
     updateDashboard();
   };
 
@@ -1500,9 +1949,10 @@
     $("overlay").classList.remove("show");
     showToast({ title: "Success", message: "Check-in recorded." });
 
-    // Reset snapshot hash so we persist refreshed view
-    lastSnapshotHash = "";
+    // report cache should refresh because history changed
+    reportCache = { key:"", at:0, data:null };
 
+    lastSnapshotHash = "";
     updateDashboard();
   };
 
@@ -1513,11 +1963,32 @@
 
   updateWizard();
 
+  /* -------------------- NEW: Report Button Handlers -------------------- */
+  $("openReportBtn").onclick = async () => {
+    // POPUP FIRST (already), then load dynamically
+    await fetchConditionReport({ force:false });
+  };
+  $("refreshReportBtn").onclick = async () => {
+    await fetchConditionReport({ force:true });
+  };
+  $("closeReportBtn").onclick = closeReportModal;
+  $("closeReportBtn2").onclick = closeReportModal;
+
+  // allow ESC to close report modal (no impact on existing design)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if ($("reportOverlay")?.classList.contains("show")) closeReportModal();
+      if ($("overlay")?.classList.contains("show")) $("overlay").classList.remove("show");
+    }
+  });
+  /* ----------------------------------------------------- */
+
   /* -------------------- Auth & Init -------------------- */
   onAuthStateChanged(auth, u => {
     if (u) {
       userSession = u;
       $("logoutBtn").disabled = false;
+      $("openReportBtn").disabled = false;  // enable report button after login
       updateDashboard();
     } else {
       window.location.href = "/login";
@@ -1527,8 +1998,6 @@
   $("logoutBtn").onclick = () => signOut(auth);
   $("test-warp-hour").onclick = () => { timeOffset += 1; lastSnapshotHash=""; updateDashboard(); };
 
-  // UPDATED: Trash icon resets today's data, shows success toast, and refreshes the UI.
-  // This deletes the entire daily_logs/{medicalDay} doc so ALL devices start fresh.
   $("test-reset").onclick = async () => {
     try{
       const day = getMedicalDayID();
@@ -1537,9 +2006,9 @@
       console.log("[Reset] Deleting daily log doc for:", day);
       await deleteDoc(ref);
 
-      // Clear local caches + snapshot hash
       cachedHistory7d = [];
       lastSnapshotHash = "";
+      reportCache = { key:"", at:0, data:null };
 
       showToast({ title: "Reset Complete", message: "Today's data was cleared." , key: `reset_${day}` });
 
