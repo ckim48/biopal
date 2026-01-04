@@ -1,0 +1,1558 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Mission Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --sky:#0ea5e9; --sky2:#38bdf8; --ink:#0b1220; --bg:#f6fbff;
+      --panel:rgba(255,255,255,.86); --wire:rgba(2,6,23,.10);
+      --soft:rgba(14,165,233,.08); --muted:#64748b;
+      --shadow:0 12px 34px -18px rgba(2,6,23,.22);
+      --ok:#10b981; --warn:#f59e0b; --bad:#ef4444;
+      --border:rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box; outline:none;}
+    body{
+      margin:0; font-family:'Plus Jakarta Sans',sans-serif;
+      background: radial-gradient(900px 520px at 18% 10%, rgba(56,189,248,.20), transparent 55%),
+                  radial-gradient(900px 520px at 85% 75%, rgba(14,165,233,.16), transparent 60%),
+                  linear-gradient(180deg, var(--bg) 0%, #ffffff 55%, #ffffff 100%);
+      color:var(--ink); -webkit-font-smoothing:antialiased; padding-bottom:120px;
+    }
+    .nav{
+      position:sticky; top:16px; z-index:100; max-width:1200px; margin:16px auto;
+      background:rgba(255,255,255,.70); backdrop-filter:blur(18px); border:1px solid var(--border);
+      border-radius:24px; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow);
+    }
+    .brand{ font-weight:900; font-size:22px; text-decoration:none; color:var(--ink); letter-spacing:-1px; display:flex; align-items:center; gap:10px; }
+    .brand-badge{ width:34px; height:34px; border-radius:12px; background:linear-gradient(135deg, var(--sky), var(--sky2)); display:grid; place-items:center; color:#fff; }
+    .btn{ padding:12px 18px; border-radius:14px; border:none; font-weight:800; font-size:14px; cursor:pointer; transition:all .18s ease; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-primary{ background:linear-gradient(135deg, var(--ink), #101a33); color:#fff; box-shadow:0 14px 26px -18px rgba(2,6,23,.55); }
+    .btn-ghost{ background:transparent; color:var(--ink); border:1px solid rgba(2,6,23,.08); }
+    .btn-primary:disabled, .btn-ghost:disabled{ opacity:.55; cursor:not-allowed; }
+
+    .page{ min-height:calc(100vh - 120px); display:flex; align-items:center; justify-content:center; padding:12px; }
+    .board{ width:min(1200px, 100%); border:1px solid rgba(14,165,233,.16); border-radius:28px; background:var(--panel); backdrop-filter:blur(18px); box-shadow: 0 22px 54px -38px rgba(2,6,23,.45); padding:22px; position:relative; overflow:hidden; }
+    .pill{ background:rgba(255,255,255,.72); border-radius:18px; padding:12px 16px; display:flex; align-items:center; gap:12px; border:1px solid rgba(2,6,23,.06); }
+    .mission-card{ background:rgba(255,255,255,.72); border-radius:18px; padding:16px; display:flex; align-items:center; gap:14px; border:1px solid rgba(14,165,233,.14); transition: all .18s ease; cursor:pointer; user-select:none; }
+    .mission-card:hover{ transform: translateY(-1px); border-color: var(--sky); }
+    .mission-card.completed{ opacity:.62; background:rgba(2,6,23,.04); pointer-events:none; transform:none; }
+    .icon-badge{ width:54px; height:54px; border-radius:18px; background:linear-gradient(135deg, var(--sky), var(--sky2)); color:#fff; display:grid; place-items:center; flex:0 0 auto; border:1px solid rgba(255,255,255,0.55); }
+    .sensor-card{ background:rgba(255,255,255,.72); border-radius:20px; padding:14px; display:flex; align-items:center; gap:16px; border:1px solid rgba(14,165,233,.12); margin-bottom:12px; }
+    .gif-slot{ width:64px; height:64px; border-radius:22px; background:rgba(14,165,233,.10); overflow:hidden; flex: 0 0 auto; border:1.5px solid rgba(14,165,233,.18); display:grid; place-items:center; }
+    .gif-slot img{ width:100%; height:100%; object-fit:cover; }
+    .character-box{ background:rgba(255,255,255,.72); border-radius:22px; width:100%; aspect-ratio:1/1; overflow:hidden; border:1px solid rgba(14,165,233,.14); }
+    .character-box img{ width:100%; height:100%; object-fit:cover; }
+    .sensor-value{ margin-top:6px; display:flex; align-items:center; gap:8px; font-weight:900; font-size:.92rem; }
+    .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+    .dot.ok{ background:var(--ok); } .dot.warn{ background:var(--warn); } .dot.bad{ background:var(--bad); }
+
+    .mock-clock{ position: fixed; bottom: 24px; left: 24px; background:rgba(2,6,23,.92); color: white; padding: 12px 18px; border-radius: 18px; font-weight: 900; font-size: 13px; z-index: 1000; display: flex; align-items: center; gap: 8px; }
+    .profile-fab{ position: fixed; right: 24px; bottom: 24px; z-index: 1100; width: 62px; height: 62px; border-radius: 22px; background: var(--sky); color: #fff; display: grid; place-items: center; box-shadow: 0 22px 44px -30px rgba(14,165,233,.75); border:none; }
+    .debug-panel{ position: fixed; bottom: 98px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+    .btn-debug{ width: 56px; height: 56px; border-radius: 18px; background: #0b1220; color: #fff; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.1); cursor:pointer; }
+
+    .rating-wrap{ display:flex; align-items:center; gap:12px; }
+    .stars{ display:flex; align-items:center; gap:3px; min-width:92px; }
+    .stars i{ font-size:16px; line-height:1; }
+    .stars .on{ color:#f59e0b; }
+    .stars .off{ color:rgba(2,6,23,.20); }
+    .rating-meta{ display:flex; flex-direction:column; line-height:1.15; }
+    .rating-top{ font-weight:950; letter-spacing:-.2px; display:flex; align-items:center; gap:8px; }
+    .rating-sub{ font-size:12px; font-weight:850; color:var(--muted); }
+
+    .overlay{ position:fixed; inset:0; background:rgba(2,6,23,.45); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; z-index:1200; padding:20px; }
+    .overlay.show{display:flex;}
+    .modalX{ background:#fff; width:100%; max-width:680px; border-radius:30px; overflow:hidden; box-shadow: 0 30px 60px rgba(0,0,0,.12); }
+    .modal-headerX{ padding:20px 24px; border-bottom:1px solid rgba(2,6,23,.08); display:flex; justify-content:space-between; align-items:center; }
+    .modal-bodyX{ padding:24px; max-height: 72vh; overflow-y: auto; }
+    .modal-footerX{ padding:16px 24px; border-top:1px solid rgba(2,6,23,.08); display:flex; justify-content:flex-end; gap:10px; background: #fafafa; }
+
+    .survey-step{display:none;}
+    .survey-step.active{display:block;}
+    .step-title{margin:0 0 10px; font-size:18px; font-weight:900; letter-spacing:-.3px;}
+    .step-sub{margin:0 0 18px; color:var(--muted); font-weight:600; font-size:13px;}
+
+    .field-group{margin-bottom:16px;}
+    .field-group label{ display:block; font-weight:900; font-size:12px; margin-bottom:8px; }
+    input,select,textarea{
+      width:100%; padding:12px; border-radius:14px;
+      border:1px solid rgba(14,165,233,.16);
+      background:rgba(14,165,233,.06);
+      font-weight:700; font-family:inherit;
+    }
+    .inline-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+    .subpanel{border:1px solid var(--border); background:#fff; border-radius:16px; padding:14px; margin-top:10px;}
+    .hint{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.35;}
+    .hidden{display:none !important;}
+
+    .profile-drawer {
+      position: fixed; top: 0; right: -420px; width: 100%; max-width: 400px; height: 100vh;
+      background: #fff; z-index: 1300; box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;
+    }
+    .profile-drawer.show { right: 0; }
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.3); backdrop-filter: blur(4px); z-index: 1250; display: none; }
+    .drawer-overlay.show { display: block; }
+    .drawer-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .drawer-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
+
+    .toast-wrap{
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      z-index: 2000; display:flex; flex-direction:column; gap:10px; pointer-events:none;
+    }
+    .toastX{
+      pointer-events:auto;
+      width: min(520px, calc(100vw - 28px));
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(2,6,23,.08);
+      border-radius: 18px;
+      box-shadow: 0 22px 44px -28px rgba(2,6,23,.45);
+      padding: 14px 14px;
+      display:flex; gap:12px; align-items:flex-start;
+      backdrop-filter: blur(12px);
+      animation: toastIn .22s cubic-bezier(.16,1,.3,1);
+    }
+    .toastX .t-ic{
+      width:42px; height:42px; border-radius:14px;
+      background: rgba(16,185,129,.12);
+      border: 1px solid rgba(16,185,129,.22);
+      display:grid; place-items:center;
+      color: #10b981;
+      flex:0 0 auto;
+    }
+    .toastX .t-title{ margin:0; font-weight:950; font-size:14px; line-height:1.2; }
+    .toastX .t-sub{ margin:3px 0 0; font-weight:700; font-size:12px; color: var(--muted); }
+    .toastX .t-close{
+      margin-left:auto;
+      width:36px; height:36px; border-radius:14px;
+      border:1px solid rgba(2,6,23,.08);
+      background: rgba(255,255,255,.75);
+      display:grid; place-items:center;
+      cursor:pointer;
+    }
+    @keyframes toastIn{
+      from{ transform: translateY(-8px); opacity:.0; }
+      to{ transform: translateY(0); opacity:1; }
+    }
+
+    /* --- Card-only loading state --- */
+    .mission-card.loading{
+      cursor:default; pointer-events:none;
+      background:rgba(255,255,255,.58);
+      border:1px dashed rgba(14,165,233,.35);
+      transform:none !important;
+    }
+    .mission-card.loading .icon-badge{
+      background:rgba(14,165,233,.12);
+      color:var(--ink);
+      border:1px solid rgba(14,165,233,.22);
+    }
+    .mission-card.loading .spinner-border{
+      width:1.05rem; height:1.05rem;
+    }
+
+    @media (max-width:768px){ .inline-2{grid-template-columns:1fr;} }
+  </style>
+</head>
+
+<body>
+  <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+  <nav class="nav">
+    <a href="#" class="brand"><span class="brand-badge"><i class="bi bi-shield-check"></i></span> BioPal</a>
+    <div style="display:flex; gap:8px;">
+      <button id="openSurveyBtn" class="btn btn-primary" disabled><i class="bi bi-clipboard2-pulse"></i> Check-in</button>
+      <button id="logoutBtn" class="btn btn-ghost" disabled><i class="bi bi-box-arrow-right"></i> Exit</button>
+    </div>
+  </nav>
+
+  <div class="page">
+    <div class="board">
+      <div class="d-flex justify-content-center mb-4">
+        <div class="pill">
+          <div class="rating-wrap">
+            <div class="stars" id="stars"></div>
+            <div class="rating-meta">
+              <div class="rating-top">
+                <i class="bi bi-clock-history"></i>
+                <span id="interval-label">--:--</span>
+              </div>
+              <div class="rating-sub" id="rating-msg">Synchronizing vitals...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mid-row g-4">
+        <div class="col-lg-4 d-flex flex-column gap-4" id="mission-container"></div>
+
+        <div class="col-lg-4 text-center">
+          <div class="character-box">
+            <img id="characterSprite" src="/static/gifs/character2.gif" alt="Guardian">
+          </div>
+          <div class="mt-3">
+            <h5 id="statusTitle" class="fw-bold m-0">Synchronizing...</h5>
+            <p id="statusDesc" class="small text-muted d-none">Awaiting diagnostic feed</p>
+          </div>
+        </div>
+
+        <div class="col-lg-4 d-flex flex-column gap-3">
+          <div class="sensor-card">
+            <div class="gif-slot"><img id="gif-temp" src="" alt="Temp"></div>
+            <div class="card-text"><p class="m-0 fw-bold">Temperature</p><div class="sensor-value" id="val-temp"><span class="dot"></span> --</div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="gif-slot"><img id="gif-heart" src="" alt="Heart"></div>
+            <div class="card-text"><p class="m-0 fw-bold">Heart Rate</p><div class="sensor-value" id="val-heart"><span class="dot"></span> --</div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="gif-slot"><img id="gif-stress" src="" alt="Stress"></div>
+            <div class="card-text"><p class="m-0 fw-bold">Stress Level</p><div class="sensor-value" id="val-stress"><span class="dot"></span> --</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="profile-drawer" id="profileDrawer">
+    <div class="drawer-header">
+      <h2 style="margin:0; font-size:18px; font-weight:950;">User Profile</h2>
+      <button id="closeDrawerBtn" class="btn btn-ghost" style="border-radius:50%; width:40px; height:40px; padding:0;">✕</button>
+    </div>
+    <div class="drawer-body">
+      <form id="profileEditForm">
+        <div class="field-group"><label>Gender</label><select id="edit_gender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
+        <div class="inline-2">
+          <div class="field-group"><label>Weight (kg)</label><input type="number" id="edit_weight" step="0.1"></div>
+          <div class="field-group"><label>Height (cm)</label><input type="number" id="edit_height" step="0.1"></div>
+        </div>
+        <hr>
+        <h6 style="font-weight:900;">Medication Routine</h6>
+        <div class="field-group"><label>Times per Day</label><select id="edit_medFreq"><option value="0">No medication</option><option value="1">1 time</option><option value="2">2 times</option><option value="3">3 times</option></select></div>
+        <div id="edit_medTimesContainer" class="inline-2"></div>
+        <hr>
+        <h6 style="font-weight:900;">Dressing Schedule</h6>
+        <div class="field-group"><label>Frequency</label><select id="edit_dressFreq"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div>
+        <div class="inline-2">
+          <div class="field-group"><label>Day of week (weekly)</label>
+            <select id="edit_dressDay">
+              <option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option>
+              <option value="thu">Thu</option><option value="fri">Fri</option>
+              <option value="sat">Sat</option><option value="sun">Sun</option>
+            </select>
+            <div class="hint">Used only when Frequency = Weekly.</div>
+          </div>
+          <div class="field-group"><label>Time</label><input type="time" id="edit_dressTime"></div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3">Save Profile</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="modalX">
+      <div class="modal-headerX">
+        <div>
+          <h2 style="margin:0; font-size:20px; font-weight:900;">Daily Check-in</h2>
+          <span id="stepIndicator" style="font-size:12px; color:var(--muted); font-weight:800;">STEP 1 OF 5</span>
+        </div>
+        <button id="closeModalBtn" class="btn btn-ghost" type="button">✕</button>
+      </div>
+
+      <form id="wizardForm" novalidate>
+        <div class="modal-bodyX">
+          <!-- steps unchanged -->
+          <div class="survey-step active" data-step="1">
+            <h3 class="step-title">A. Overall Condition</h3>
+            <p class="step-sub">A quick snapshot of your physical condition today.</p>
+            <div class="field-group">
+              <label for="a_condition">Overall physical condition</label>
+              <select id="a_condition" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="good">Good</option>
+                <option value="average">Average</option>
+                <option value="bad">Bad</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="a_painLevel">Pain level</label>
+              <select id="a_painLevel" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="none">None</option>
+                <option value="mild">Mild</option>
+                <option value="moderate">Moderate</option>
+                <option value="severe">Severe</option>
+              </select>
+            </div>
+            <div class="inline-2">
+              <div class="field-group">
+                <label for="a_painTiming">Pain timing (optional)</label>
+                <select id="a_painTiming"><option value="" selected>Not selected</option><option value="morning">Morning</option><option value="midday">Midday</option><option value="evening">Evening</option><option value="persistent">Persistent</option></select>
+              </div>
+              <div class="field-group">
+                <label for="a_nausea">Nausea/Vomiting (optional)</label>
+                <select id="a_nausea"><option value="" selected>Not selected</option><option value="yes">Yes</option><option value="no">No</option></select>
+              </div>
+            </div>
+            <div class="field-group">
+              <label for="a_skin">Skin / mucosa status (optional)</label>
+              <select id="a_skin"><option value="" selected>Not selected</option><option value="normal">Normal</option><option value="dry">Dry</option><option value="sensitive">Sensitive</option><option value="inflammation">Inflammation</option></select>
+            </div>
+          </div>
+
+          <div class="survey-step" data-step="2">
+            <h3 class="step-title">B. Sleep Status</h3>
+            <p class="step-sub">Your sleep routine helps BioPal provide feedback.</p>
+            <div class="inline-2">
+              <div class="field-group"><label for="b_sleepHours">Hours slept last night</label><input id="b_sleepHours" type="number" min="0" max="24" required></div>
+              <div class="field-group"><label for="b_sleepQuality">Sleep quality</label><select id="b_sleepQuality" required><option value="" selected disabled>Select...</option><option value="good">Slept well</option><option value="woke_often">Woke up often</option><option value="hardly">Hardly slept</option></select></div>
+            </div>
+            <div class="inline-2">
+              <div class="field-group"><label for="b_awakenings">Night awakenings</label><select id="b_awakenings" required><option value="" selected disabled>Select...</option><option value="0">0</option><option value="1-2">1-2</option><option value="3plus">3+</option></select></div>
+              <div class="field-group"><label for="b_morningFatigue">Morning fatigue</label><select id="b_morningFatigue" required><option value="" selected disabled>Select...</option><option value="refreshed">Refreshed</option><option value="slightly">Slightly tired</option><option value="very">Very tired</option></select></div>
+            </div>
+          </div>
+
+          <div class="survey-step" data-step="3">
+            <h3 class="step-title">C. Activity and Fatigue</h3>
+            <p class="step-sub">Track how active you were and how tired you feel.</p>
+            <div class="field-group"><label for="c_activityLevel">Daily activity level</label><select id="c_activityLevel" required><option value="" selected disabled>Select...</option><option value="low">Almost none</option><option value="normal">Normal</option><option value="active">Active</option></select></div>
+            <div class="field-group">
+              <label for="c_fatigue">Perceived fatigue (0–10)</label>
+              <input id="c_fatigue" type="range" min="0" max="10" value="5" required>
+              <div class="hint"><span id="c_fatigueLabel">5</span> / 10</div>
+            </div>
+          </div>
+
+          <div class="survey-step" data-step="4">
+            <h3 class="step-title">D. Emotion and Stress</h3>
+            <p class="step-sub">Emotional check-in.</p>
+            <div class="field-group"><label for="d_mood">Mood today</label><select id="d_mood" required><option value="" selected disabled>Select...</option><option value="good">Good</option><option value="neutral">Neutral</option><option value="sad">Sad</option><option value="scared">Scared</option><option value="angry">Angry</option><option value="tired">Tired</option></select></div>
+            <div class="field-group">
+              <label for="d_anxiety">Worry/Anxiety (0-10)</label>
+              <input id="d_anxiety" type="range" min="0" max="10" value="5" required>
+              <div class="hint"><span id="d_anxietyLabel">5</span> / 10</div>
+            </div>
+            <div class="field-group"><label for="d_hardMoment">Difficult moment today?</label><select id="d_hardMoment" required><option value="" selected disabled>Select...</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div class="field-group"><label for="d_note">Emotion note (optional)</label><textarea id="d_note"></textarea></div>
+            <div class="field-group"><label for="d_gsr">Stress sensor (optional)</label><input id="d_gsr" type="number" step="0.01"></div>
+          </div>
+
+          <div class="survey-step" data-step="5">
+            <h3 class="step-title">E. Care Routine Updates</h3>
+            <p class="step-sub">Record any changes in medication or dressing plans.</p>
+            <div class="field-group">
+              <label for="e_medChanged">Medication changed today?</label>
+              <select id="e_medChanged" required><option value="" selected disabled>Select...</option><option value="no">No</option><option value="yes">Yes</option></select>
+            </div>
+            <div id="e_medPanel" class="subpanel hidden">
+              <div class="field-group"><label for="e_medFreq">Times per day</label><select id="e_medFreq"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+              <div id="e_medTimesContainer" class="inline-2"></div>
+            </div>
+            <div class="field-group mt-3">
+              <label for="e_dressChanged">Dressing changed today?</label>
+              <select id="e_dressChanged" required><option value="" selected disabled>Select...</option><option value="no">No</option><option value="yes">Yes</option></select>
+            </div>
+            <div id="e_dressPanel" class="subpanel hidden">
+              <div class="field-group"><label for="e_dressFreq">Frequency</label><select id="e_dressFreq"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div>
+              <div id="e_dressDayWrap" class="hidden"><label for="e_dressDay">Day of week</label><select id="e_dressDay"><option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option><option value="thu">Thu</option><option value="fri">Fri</option><option value="sat">Sat</option><option value="sun">Sun</option></select></div>
+              <div class="field-group mt-2"><label for="e_dressTime">Time</label><input id="e_dressTime" type="time" value="09:00"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footerX">
+          <button type="button" id="prevBtn" class="btn btn-ghost" style="visibility:hidden;">Back</button>
+          <button type="button" id="nextBtn" class="btn btn-primary">Next Step</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="mock-clock"><i class="bi bi-cpu"></i> <span id="ui-now">00:00</span></div>
+  <button id="openProfileBtn" class="profile-fab"><i class="bi bi-person-badge" style="font-size:24px;"></i></button>
+
+  <div class="debug-panel">
+    <button class="btn-debug" style="background:#ef4444" id="test-reset" title="Reset day"><i class="bi bi-trash3-fill"></i></button>
+    <button class="btn-debug" id="test-warp-hour" title="+1 hour"><i class="bi bi-hourglass-split"></i></button>
+  </div>
+
+<script type="module">
+  import { db, auth } from "/static/js/firebase/config.js";
+  import {
+    doc, setDoc, getDoc, updateDoc, deleteField, serverTimestamp, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const $ = (id) => document.getElementById(id);
+
+  /* -------------------- State -------------------- */
+  let userSession = null, timeOffset = 0, currentStep = 1, cachedUserProfile = null;
+  let cachedHistory7d = [];
+
+  // call your Flask route
+  const API_GENERATE_MISSION_URL = "/api/generate_mission";
+
+  // DEBUG: mission request tracing
+  const AI_DEBUG = {
+    lastOkAt: 0,
+    lastErrAt: 0,
+    lastReqId: "",
+    okCount: 0,
+    errCount: 0
+  };
+
+  // Intervals: ONLY 09-12, 12-15, 15-18, 18-21
+  const INTERVALS = [
+    { id: "09-12", startHr: 9,  endHr: 12, label: "09:00 - 12:00" },
+    { id: "12-15", startHr: 12, endHr: 15, label: "12:00 - 15:00" },
+    { id: "15-18", startHr: 15, endHr: 18, label: "15:00 - 18:00" },
+    { id: "18-21", startHr: 18, endHr: 21, label: "18:00 - 21:00" }
+  ];
+
+  const ratingState = {
+    sensorStatus: { heart: "stable", stress: "stable", hydration: "stable" },
+    hydrationStatus: "caution",
+    checkinStatus: "caution",
+    history7dRatio: null,
+    lastMedicalDayFetched: null
+  };
+
+  const MAX_VISIBLE = 2;
+  const MAX_CUSTOM_PER_INTERVAL = 2;
+  const REVEAL_DELAY_MS = 60 * 60 * 1000;
+
+  /* -------------------- Cross-device persistence (NEW) -------------------- */
+  // We persist:
+  // - intervalSnapshot[intervalId].visibleMissions: the 2 cards currently shown (so other devices render exactly the same)
+  // - intervalSnapshot[intervalId].status: current status label/pct/done/total
+  // This only writes when the snapshot actually changes (hash guard), so it won't spam writes every minute.
+  let lastSnapshotHash = "";
+  function stableStringify(obj){
+    try{
+      return JSON.stringify(obj, Object.keys(obj).sort());
+    }catch(e){
+      return JSON.stringify(obj);
+    }
+  }
+  function hashSnapshot(snapshot){
+    // quick deterministic hash (string based)
+    const s = stableStringify(snapshot);
+    let h = 0;
+    for (let i=0; i<s.length; i++){
+      h = ((h<<5) - h) + s.charCodeAt(i);
+      h |= 0;
+    }
+    return String(h);
+  }
+  function buildVisibleSnapshotFromDOM(intervalId){
+    const container = $("mission-container");
+    const els = Array.from(container.querySelectorAll(".mission-card"));
+    const visible = [];
+    for (const el of els.slice(0, MAX_VISIBLE)){
+      const title = el.querySelector(".fw-bold")?.textContent?.trim() || "";
+      const sub = el.querySelector(".small")?.textContent?.trim() || "";
+      const iconClass = el.querySelector(".icon-badge i")?.className || "";
+      const icon = (iconClass.split(" ").find(x => x.startsWith("bi-")) || "bi-stars");
+      const isCompleted = el.classList.contains("completed");
+      const isLoading = el.classList.contains("loading");
+
+      visible.push({
+        title, sub, icon,
+        state: isLoading ? "loading" : (isCompleted ? "completed" : "active")
+      });
+    }
+    return { intervalId, visibleMissions: visible };
+  }
+
+  async function persistIntervalSnapshot({ medicalDay, intervalId, statusObj }){
+    if (!userSession || !medicalDay || !intervalId) return;
+    const base = buildVisibleSnapshotFromDOM(intervalId);
+
+    const snapshot = {
+      intervalId,
+      visibleMissions: base.visibleMissions,
+      status: {
+        label: statusObj?.label || currentStatusLabel || "",
+        pct: Number(statusObj?.pct ?? 0),
+        done: Number(statusObj?.done ?? 0),
+        total: Number(statusObj?.total ?? 0),
+      },
+      updatedAtMs: Date.now()
+    };
+
+    const h = hashSnapshot(snapshot);
+    if (h === lastSnapshotHash) return;
+    lastSnapshotHash = h;
+
+    try{
+      const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+      const keyPath = `intervalSnapshot.${intervalId}`;
+      console.log("[Persist] writing snapshot", { medicalDay, intervalId, snapshot });
+      await setDoc(ref, {
+        [keyPath]: snapshot,
+        lastUpdate: serverTimestamp()
+      }, { merge: true });
+    }catch(e){
+      console.warn("[Persist] snapshot write failed:", e);
+    }
+  }
+
+  /* -------------------- Toasts -------------------- */
+  const toastState = { lastKey: "", lastAt: 0 };
+  function showToast({ title, message, ms = 3200, key = "" }){
+    const wrap = $("toastWrap");
+    if (!wrap) return;
+    const now = Date.now();
+    const guardKey = String(key || `${title}|${message}`);
+    if (toastState.lastKey === guardKey && (now - toastState.lastAt) < 1500) return;
+    toastState.lastKey = guardKey; toastState.lastAt = now;
+    const el = document.createElement("div");
+    el.className = "toastX";
+    el.innerHTML = `<div class="t-ic"><i class="bi bi-check2-circle" style="font-size:18px;"></i></div><div><p class="t-title">${title}</p><p class="t-sub">${message}</p></div><button class="t-close" type="button"><i class="bi bi-x-lg"></i></button>`;
+    el.querySelector(".t-close").onclick = () => el.remove();
+    wrap.appendChild(el);
+    window.setTimeout(() => el.remove(), ms);
+  }
+
+  /* -------------------- Character & Gifs -------------------- */
+  const STATUS_IDLE_GIF = {
+    "Happy / Energized": "/static/gifs/character1.gif",
+    "Neutral / Calm": "/static/gifs/character2.gif",
+    "Tired / Low Energy": "/static/gifs/character3.gif",
+    "Concern / Warning": "/static/gifs/character4.gif",
+  };
+  const COMPLETE_GIF = {
+    WATER: "/static/gifs/hydration_complete.gif",
+    MED: "/static/gifs/medicaiton_complete.gif",
+    DRESS: "/static/gifs/dressing_complete.gif",
+    CUSTOM:"/static/gifs/custom_complete.gif"
+  };
+  let currentStatusLabel = "Neutral / Calm", isPlayingCompletion = false, characterTimer = null;
+
+  function setCharacterSrc(src) {
+    const img = $("characterSprite"); if (!img) return;
+    img.src = `${src}?t=${Date.now()}`;
+  }
+  function setIdleCharacterByStatus(label){
+    const idleSrc = STATUS_IDLE_GIF[label] || STATUS_IDLE_GIF["Neutral / Calm"];
+    setCharacterSrc(idleSrc);
+  }
+  function playCharacterOnce(type) {
+    if (characterTimer) clearTimeout(characterTimer);
+    isPlayingCompletion = true;
+    const src = COMPLETE_GIF[type] || COMPLETE_GIF.CUSTOM;
+    setCharacterSrc(src);
+    characterTimer = setTimeout(() => {
+      isPlayingCompletion = false;
+      setIdleCharacterByStatus(currentStatusLabel);
+    }, 2000);
+  }
+
+  /* -------------------- Time Utils -------------------- */
+  function getNow() {
+    const d = new Date(Date.now() + timeOffset * 3600000);
+    $("ui-now").textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    return d;
+  }
+  function getMedicalDayID() {
+    const now = getNow();
+    const medDate = new Date(now);
+    if (now.getHours() < 9) medDate.setDate(medDate.getDate() - 1);
+    return medDate.toISOString().slice(0, 10);
+  }
+  function shiftDay(yyyy_mm_dd, deltaDays){
+    const d = new Date(yyyy_mm_dd + "T00:00:00");
+    d.setDate(d.getDate() + deltaDays);
+    return d.toISOString().slice(0,10);
+  }
+  function lastNDaysFrom(baseDay, n){
+    const days = [];
+    for(let i=0;i<n;i++) days.push(shiftDay(baseDay, -i));
+    return days;
+  }
+  function getIntervalByHour(hr){
+    return INTERVALS.find(i => hr >= i.startHr && hr < i.endHr) || null;
+  }
+  function getIntervalEndDate(now, interval){
+    const end = new Date(now);
+    end.setHours(interval.endHr, 0, 0, 0);
+    return end;
+  }
+
+  /* -------------------- Schedule helpers -------------------- */
+  function timeStrToMinutes(t){
+    if (!t || typeof t !== "string") return null;
+    const m = t.match(/^(\d{1,2}):(\d{2})$/);
+    if (!m) return null;
+    const hh = Number(m[1]), mm = Number(m[2]);
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return null;
+    return hh * 60 + mm;
+  }
+  function intervalToMinuteRange(interval){
+    const start = interval.startHr * 60;
+    const end = interval.endHr * 60;
+    return { start, end };
+  }
+  function isTimeInInterval(timeStr, interval){
+    const mins = timeStrToMinutes(timeStr);
+    if (mins === null) return false;
+    const r = intervalToMinuteRange(interval);
+    return mins >= r.start && mins < r.end;
+  }
+  function getWeekdayKeyFromYYYYMMDD(yyyy_mm_dd){
+    const d = new Date(yyyy_mm_dd + "T00:00:00");
+    const map = ["sun","mon","tue","wed","thu","fri","sat"];
+    return map[d.getDay()];
+  }
+  function pickTimesWithinInterval(timesArr, interval){
+    const out = [];
+    const arr = Array.isArray(timesArr) ? timesArr : [];
+    for (const t of arr){
+      if (isTimeInInterval(t, interval)) out.push(t);
+    }
+    out.sort((a,b) => (timeStrToMinutes(a) ?? 0) - (timeStrToMinutes(b) ?? 0));
+    return out;
+  }
+  function isDressingDueForInterval(scheduleDressing, interval, medicalDay){
+    const d = scheduleDressing || {};
+    const freq = d.frequency || "none";
+    const time = d.time || null;
+
+    if (freq === "none" || !time) return { due:false, dueTime:null };
+    if (!isTimeInInterval(time, interval)) return { due:false, dueTime:null };
+
+    if (freq === "daily") return { due:true, dueTime: time };
+
+    if (freq === "weekly") {
+      const dayKey = d.dayOfWeek || null;
+      const todayKey = getWeekdayKeyFromYYYYMMDD(medicalDay);
+      if (!dayKey) return { due:false, dueTime:null };
+      return { due: dayKey === todayKey, dueTime: (dayKey === todayKey ? time : null) };
+    }
+
+    return { due:false, dueTime:null };
+  }
+
+  /* -------------------- History -------------------- */
+  async function fetchHistoryDays(n=7){
+    try{
+      const base = getMedicalDayID();
+      const days = lastNDaysFrom(base, n);
+      const out = [];
+      for(const day of days){
+        const snap = await getDoc(doc(db, "users", userSession.uid, "daily_logs", day));
+        if (snap.exists()){
+          const d = snap.data() || {};
+          out.push({
+            day,
+            survey_v2: d.survey_v2 || null,
+            completedMissions: d.completedMissions || [],
+            customMissionTexts: d.customMissionTexts || []
+          });
+        } else {
+          out.push({ day, survey_v2: null, completedMissions: [], customMissionTexts: [] });
+        }
+      }
+      console.log("[History] 7d fetched:", out);
+      return out;
+    } catch(e){
+      console.warn("[History] fetch failed:", e);
+      return [];
+    }
+  }
+
+  /* -------------------- Mission & Custom GPT API Logic -------------------- */
+  function makeReqId(prefix="REQ"){
+    return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2,8)}`;
+  }
+  function looksLikeGptMissionPayload(data){
+    return !!(data && typeof data === "object" && typeof data.name === "string" && typeof data.desc === "string" && typeof data.icon === "string");
+  }
+
+  async function fetchCustomMission(index, avoidTitles = new Set()) {
+    const reqId = makeReqId(`AI${index}`);
+    AI_DEBUG.lastReqId = reqId;
+
+    const payload = {
+      index,
+      profile: cachedUserProfile || {},
+      history: cachedHistory7d || [],
+      nowISO: new Date().toISOString()
+    };
+
+    console.groupCollapsed(`[AI][${reqId}] request -> /api/generate_mission (index=${index})`);
+    console.log("payload.profile keys:", Object.keys(payload.profile || {}));
+    console.log("payload.history days:", Array.isArray(payload.history) ? payload.history.length : 0);
+    console.log("payload:", payload);
+    console.groupEnd();
+
+    try {
+      const t0 = performance.now();
+      const response = await fetch(API_GENERATE_MISSION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const t1 = performance.now();
+
+      console.log(`[AI][${reqId}] HTTP status:`, response.status, response.ok ? "(OK)" : "(NOT OK)", `(${Math.round(t1-t0)}ms)`);
+
+      if (!response.ok) {
+        const t = await response.text().catch(()=> "");
+        AI_DEBUG.errCount += 1;
+        AI_DEBUG.lastErrAt = Date.now();
+        console.warn(`[AI][${reqId}] server returned non-200. body=`, t);
+        showToast({ title: "AI Mission Failed", message: `Server error (${response.status}). Using fallback.`, key: `ai_fail_${reqId}` });
+        throw new Error(`API ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`[AI][${reqId}] response JSON <-`, data);
+
+      if (looksLikeGptMissionPayload(data)) {
+        AI_DEBUG.okCount += 1;
+        AI_DEBUG.lastOkAt = Date.now();
+        console.log(`[AI][${reqId}] ✅ Looks like GPT mission payload (name/desc/icon present).`);
+      } else {
+        AI_DEBUG.errCount += 1;
+        AI_DEBUG.lastErrAt = Date.now();
+        console.warn(`[AI][${reqId}] ⚠️ Payload missing fields. Will fallback normalization.`);
+      }
+
+      const safeIcon = (data && typeof data.icon === "string" && data.icon.startsWith("bi-")) ? data.icon : "bi-stars";
+      const safeName = (data && data.name) ? String(data.name) : "Custom Mission";
+      const safeDesc = (data && data.desc) ? String(data.desc) : "A small goal tailored for you.";
+
+      // Prevent duplicates in the SAME view
+      let finalName = safeName;
+      let finalDesc = safeDesc;
+      let guard = 0;
+      while (avoidTitles.has(finalName.trim().toLowerCase()) && guard < 3) {
+        guard += 1;
+        finalName = `${safeName} +`;
+        finalDesc = safeDesc;
+      }
+
+      const mission = { id: `CUSTOM_${index}`, title: finalName, sub: finalDesc, icon: safeIcon };
+      console.log(`[AI][${reqId}] ✅ final mission object for UI ->`, mission);
+
+      if (looksLikeGptMissionPayload(data)) {
+        showToast({ title: "AI Mission Ready", message: `Custom mission generated.`, key: `ai_ok_${reqId}` });
+      }
+
+      return mission;
+
+    } catch (e) {
+      console.warn(`[AI][${reqId}] ❌ fetchCustomMission error:`, e);
+
+      const fallbacks = [
+        { id: "CUSTOM_1", title: "Body Stretch", sub: "5-min gentle stretch", icon: "bi-wind" },
+        { id: "CUSTOM_2", title: "Nature Breath", sub: "2-min deep breathing", icon: "bi-tree" },
+        { id: "CUSTOM_3", title: "Calm Sip", sub: "Warm tea or water, slow pace", icon: "bi-cup-hot" },
+        { id: "CUSTOM_4", title: "Mini Walk", sub: "3-min light walk", icon: "bi-person-walking" }
+      ];
+
+      const lowered = new Set(Array.from(avoidTitles).map(s => String(s).trim().toLowerCase()));
+      const pick = fallbacks.find(f => !lowered.has(f.title.trim().toLowerCase())) || fallbacks[index-1] || fallbacks[0];
+      console.log(`[AI][${reqId}] using fallback mission ->`, pick);
+      return pick;
+    }
+  }
+
+  /* -------------------- Custom mission persistence per interval -------------------- */
+  function getIntervalMeta(logData, intervalId){
+    const meta = (logData && logData.intervalMeta && logData.intervalMeta[intervalId]) ? logData.intervalMeta[intervalId] : null;
+    const fallback = (logData && typeof logData.nextRevealAt === "number") ? logData.nextRevealAt : 0;
+    return {
+      startedAt: meta?.startedAt || 0,
+      nextRevealAt: meta?.nextRevealAt || fallback || 0,
+      lastCompletedAt: meta?.lastCompletedAt || 0
+    };
+  }
+
+  function getCustomSlots(logData, intervalId){
+    const cm = logData?.customMissions?.[intervalId];
+    const slots = Array.isArray(cm?.slots) ? cm.slots : [];
+    return [slots[0] || null, slots[1] || null];
+  }
+
+  function countCustomSlotsForInterval(logData, intervalId){
+    const [a,b] = getCustomSlots(logData, intervalId);
+    return [a,b].filter(Boolean).length;
+  }
+
+  async function saveCustomSlot(medicalDay, intervalId, slotIndex, missionObj){
+    const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+    const snap = await getDoc(ref);
+    const d = snap.exists() ? (snap.data() || {}) : {};
+    const prev = d.customMissions || {};
+    const prevInterval = prev[intervalId] || {};
+    const prevSlots = Array.isArray(prevInterval.slots) ? prevInterval.slots.slice(0,2) : [null, null];
+
+    prevSlots[slotIndex] = missionObj;
+
+    const next = {
+      ...prev,
+      [intervalId]: {
+        ...prevInterval,
+        slots: prevSlots.slice(0,2),
+        updatedAtMs: Date.now()
+      }
+    };
+
+    await setDoc(ref, { customMissions: next, lastUpdate: serverTimestamp() }, { merge: true });
+  }
+
+  async function generateAndSaveCustom(medicalDay, intervalId, slotIndex, avoidTitles){
+    cachedHistory7d = await fetchHistoryDays(7);
+
+    const baseIdx = (slotIndex === 0) ? 1 : 2;
+
+    let mission = await fetchCustomMission(baseIdx, avoidTitles);
+    let key = String(mission.title || "").trim().toLowerCase();
+    if (avoidTitles.has(key)) {
+      console.warn("[AI] duplicate on first attempt; retrying once", mission.title);
+      mission = await fetchCustomMission(baseIdx + 2, avoidTitles);
+      key = String(mission.title || "").trim().toLowerCase();
+    }
+
+    await saveCustomSlot(medicalDay, intervalId, slotIndex, mission);
+    return mission;
+  }
+
+  /* -------------------- Mission plan builder -------------------- */
+  function buildBasicPoolForInterval(interval, medicalDay){
+    const pool = [{ id: "WATER", title: "Hydration", sub: "Drink 250ml Water", icon: "bi-droplet-fill" }];
+
+    const med = cachedUserProfile?.schedule?.medication || {};
+    const medTimes = Array.isArray(med.times) ? med.times : [];
+    const dueMedTimes = pickTimesWithinInterval(medTimes, interval);
+    if (dueMedTimes.length > 0) {
+      const t = dueMedTimes[0];
+      pool.push({ id: "MED", title: "Medication", sub: `Take at ${t}`, icon: "bi-capsule" });
+    }
+
+    const dress = cachedUserProfile?.schedule?.dressing || { frequency: "none" };
+    const dressDue = isDressingDueForInterval(dress, interval, medicalDay);
+    if (dressDue.due) {
+      const icon = "bi-bandaid";
+      pool.push({ id: "DRESS", title: "Dressing", sub: `Check or change bandage (${dressDue.dueTime})`, icon });
+    }
+
+    console.log("[Schedule] basics for interval", interval.id, "medicalDay", medicalDay, "=>", pool.map(x=>x.id));
+    return pool;
+  }
+
+  function isCustomId(id){
+    return String(id || "").startsWith("CUSTOM_");
+  }
+  function toFullId(intervalId, missionId){
+    return `${intervalId}_${missionId}`;
+  }
+
+  /* -------------------- UI helpers for missions -------------------- */
+  function createMissionCard(m, intervalId, medicalDay, isDone=false){
+    const card = document.createElement("div");
+    card.className = "mission-card" + (isDone ? " completed" : "");
+    card.innerHTML = `<div class="icon-badge"><i class="bi ${m.icon || "bi-stars"}"></i></div><div><p class="m-0 fw-bold">${m.title}</p><p class="m-0 small text-muted">${m.sub}</p></div>`;
+    const fullId = toFullId(intervalId, m.id);
+    if (!isDone) card.onclick = () => finishMission(fullId, medicalDay, isCustomId(m.id) ? "CUSTOM" : m.id);
+    return card;
+  }
+
+  function createLoadingCard(label="Generating custom mission..."){
+    const card = document.createElement("div");
+    card.className = "mission-card loading";
+    card.innerHTML = `
+      <div class="icon-badge"><i class="bi bi-stars"></i></div>
+      <div style="flex:1 1 auto;">
+        <p class="m-0 fw-bold">${label}</p>
+        <p class="m-0 small text-muted">This will take a moment.</p>
+      </div>
+      <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+        <div class="spinner-border spinner-border-sm" role="presentation"></div>
+      </div>
+    `;
+    return card;
+  }
+
+  function createLockedCard(minutes){
+    const card = document.createElement("div");
+    card.className = "mission-card completed";
+    card.innerHTML = `
+      <div class="icon-badge"><i class="bi bi-clock"></i></div>
+      <div>
+        <p class="m-0 fw-bold">Next Goal Unlocking</p>
+        <p class="m-0 small text-muted">Available in about ${minutes} min</p>
+      </div>`;
+    return card;
+  }
+
+  function createSuccessCard(){
+    const card = document.createElement("div");
+    card.className = "mission-card completed";
+    card.innerHTML = `
+      <div class="icon-badge"><i class="bi bi-check2-circle"></i></div>
+      <div>
+        <p class="m-0 fw-bold">All Missions Completed</p>
+        <p class="m-0 small text-muted">Excellent work for this time window.</p>
+      </div>`;
+    return card;
+  }
+
+  function createInfoCard(title, sub, icon="bi-info-circle"){
+    const card = document.createElement("div");
+    card.className = "mission-card completed";
+    card.innerHTML = `
+      <div class="icon-badge"><i class="bi ${icon}"></i></div>
+      <div>
+        <p class="m-0 fw-bold">${title}</p>
+        <p class="m-0 small text-muted">${sub}</p>
+      </div>`;
+    return card;
+  }
+
+  function replaceNode(oldNode, newNode){
+    if (!oldNode || !oldNode.parentNode) return;
+    oldNode.parentNode.replaceChild(newNode, oldNode);
+  }
+
+  function lowerTitle(m){ return String(m?.title || "").trim().toLowerCase(); }
+
+  function ensureTwoMissionCards(container, interval){
+    const cards = Array.from(container.querySelectorAll(".mission-card"));
+    if (cards.length > MAX_VISIBLE){
+      for (let i = MAX_VISIBLE; i < cards.length; i++) cards[i].remove();
+    }
+    while (container.querySelectorAll(".mission-card").length < MAX_VISIBLE){
+      if (!interval){
+        container.appendChild(createInfoCard(
+          "Sleep Time",
+          "It’s sleep time now. Rest your body and let it heal — you did enough for today. See you tomorrow.",
+          "bi-moon-stars"
+        ));
+      } else {
+        container.appendChild(createInfoCard("Awesome Work", "You cleared everything for this window. Keep the streak going.", "bi-shield-check"));
+      }
+    }
+  }
+
+  /* -------------------- TODAY PROGRESS -------------------- */
+  function countPlannedCustomToday(logData){
+    const cm = logData?.customMissions || {};
+    let count = 0;
+    for (const itv of INTERVALS){
+      const slots = cm?.[itv.id]?.slots;
+      if (Array.isArray(slots)){
+        count += slots.filter(Boolean).length;
+      }
+    }
+    return count;
+  }
+
+  function computePlannedBasicsToday(medicalDay){
+    let total = 0;
+    for (const itv of INTERVALS){
+      total += buildBasicPoolForInterval(itv, medicalDay).length;
+    }
+    return total;
+  }
+
+  function computeTodayTotals(logData, medicalDay){
+    const plannedBasicsToday = computePlannedBasicsToday(medicalDay);
+    const plannedCustomToday = countPlannedCustomToday(logData);
+
+    const doneToday = Array.isArray(logData?.completedMissions) ? logData.completedMissions.length : 0;
+    const totalToday = Math.max(1, plannedBasicsToday + plannedCustomToday);
+
+    return { doneToday, totalToday, plannedBasicsToday, plannedCustomToday };
+  }
+
+  /* -------------------- Dashboard Logic (UPDATED RULES) -------------------- */
+  async function updateDashboard() {
+    if (!userSession) return;
+
+    const now = getNow();
+    const medicalDay = getMedicalDayID();
+    const hr = now.getHours();
+    const interval = getIntervalByHour(hr);
+
+    const [pSnap, lSnap] = await Promise.all([
+      getDoc(doc(db, "users", userSession.uid)),
+      getDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay))
+    ]);
+
+    cachedUserProfile = pSnap.exists() ? pSnap.data() : {};
+    const logData = lSnap.exists() ? lSnap.data() : {};
+    const completed = logData.completedMissions || [];
+    const hasTodayCheckin = !!(logData.survey_v2 || logData.survey);
+
+    const today = computeTodayTotals(logData, medicalDay);
+
+    console.groupCollapsed("[Dash] updateDashboard()");
+    console.log("medicalDay:", medicalDay, "hour:", hr, "interval:", interval ? interval.id : "none");
+    console.log("completedMissions:", completed);
+    console.log("customMissions:", logData.customMissions || {});
+    console.log("intervalMeta:", logData.intervalMeta || {});
+    console.log("intervalSnapshot:", logData.intervalSnapshot || {});
+    console.groupEnd();
+
+    if (hasTodayCheckin) {
+      $("openSurveyBtn").disabled = true;
+      $("openSurveyBtn").innerHTML = `<i class="bi bi-check2-circle"></i> Check-in Finished`;
+    } else {
+      $("openSurveyBtn").disabled = false;
+      $("openSurveyBtn").innerHTML = `<i class="bi bi-clipboard2-pulse"></i> Check-in`;
+    }
+
+    const container = $("mission-container");
+    container.innerHTML = "";
+
+    if (!interval) {
+      $("interval-label").textContent = "Sleep Window";
+
+      container.appendChild(createInfoCard(
+        "Sleep Time",
+        "It’s sleep time now. Take a full rest — your body is working hard for you. We’ll continue tomorrow.",
+        "bi-moon-stars"
+      ));
+      container.appendChild(createInfoCard(
+        "Gentle Reminder",
+        "If you’re still awake, a small sip of water is enough. No pressure — rest comes first.",
+        "bi-cup-hot"
+      ));
+
+      const statusObj = updateStatus(today.doneToday, today.totalToday);
+      updateSensors();
+      updateTopStars({ medicalDay, completed, intervalId: -1, hasTodayCheckin });
+
+      // no interval snapshot in sleep window
+      return;
+    }
+
+    $("interval-label").textContent = interval.label;
+
+    const intervalId = interval.id;
+    const intervalEndMs = getIntervalEndDate(now, interval).getTime();
+    const nowMs = Date.now();
+
+    const meta = getIntervalMeta(logData, intervalId);
+    const isIntervalStart = !meta.startedAt;
+
+    // mark startedAt once per interval/day
+    if (isIntervalStart) {
+      try{
+        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+        const im = logData.intervalMeta || {};
+        const cur = im[intervalId] || {};
+        im[intervalId] = { ...cur, startedAt: nowMs, nextRevealAt: cur.nextRevealAt || 0, lastCompletedAt: cur.lastCompletedAt || 0 };
+        await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge:true });
+        console.log("[Interval] startedAt set for", intervalId, new Date(nowMs).toLocaleTimeString());
+      } catch(e){
+        console.warn("[Interval] failed to set startedAt:", e);
+      }
+    }
+
+    const basicPool = buildBasicPoolForInterval(interval, medicalDay);
+
+    const [slot0, slot1] = getCustomSlots(logData, intervalId);
+    const savedCustoms = [slot0, slot1].filter(Boolean);
+
+    const usedTitles = new Set();
+    const activeBasics = basicPool.filter(m => !completed.includes(toFullId(intervalId, m.id)));
+    const activeCustoms = savedCustoms.filter(m => !completed.includes(toFullId(intervalId, m.id)));
+
+    for (const m of activeBasics) usedTitles.add(lowerTitle(m));
+    for (const m of activeCustoms) usedTitles.add(lowerTitle(m));
+
+    // Render active missions (basics priority)
+    let shown = 0;
+    for (const m of activeBasics) {
+      if (shown >= MAX_VISIBLE) break;
+      container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
+      shown++;
+    }
+    for (const m of activeCustoms) {
+      if (shown >= MAX_VISIBLE) break;
+      const t = lowerTitle(m);
+      if (usedTitles.has(t)) continue;
+      usedTitles.add(t);
+      container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
+      shown++;
+    }
+
+    // At interval start: if only one mission available, fill up to 2 with custom (max 2/interval)
+    if (isIntervalStart && shown < MAX_VISIBLE) {
+      const need = MAX_VISIBLE - shown;
+
+      const slots = getCustomSlots(logData, intervalId);
+      const existingCount = slots.filter(Boolean).length;
+
+      const remainingCapacity = Math.max(0, MAX_CUSTOM_PER_INTERVAL - existingCount);
+      const allowedNew = Math.min(need, remainingCapacity);
+
+      const fillPlan = [];
+      if (!slots[0]) fillPlan.push(0);
+      if (!slots[1]) fillPlan.push(1);
+
+      const tasks = [];
+      for (let i=0; i<allowedNew; i++){
+        const slotIndex = fillPlan[i];
+        if (slotIndex === undefined) break;
+
+        const ph = createLoadingCard("Generating custom mission...");
+        container.appendChild(ph);
+        shown++;
+
+        tasks.push((async () => {
+          const mission = await generateAndSaveCustom(medicalDay, intervalId, slotIndex, usedTitles);
+          replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
+        })());
+      }
+
+      await Promise.allSettled(tasks);
+    }
+
+    const meta2 = getIntervalMeta(logData, intervalId);
+    const revealPending = (meta2.nextRevealAt || 0) > 0 && nowMs < meta2.nextRevealAt && meta2.nextRevealAt < intervalEndMs;
+
+    const activeShown = Array.from(container.querySelectorAll(".mission-card"))
+      .filter(el => !el.classList.contains("completed") && !el.classList.contains("loading"))
+      .length;
+
+    if (activeShown < MAX_VISIBLE && revealPending) {
+      const mins = Math.max(1, Math.round((meta2.nextRevealAt - nowMs) / 60000));
+      if (container.querySelectorAll(".mission-card").length < MAX_VISIBLE) {
+        container.appendChild(createLockedCard(mins));
+      }
+    }
+
+    const revealDue = (meta2.nextRevealAt || 0) > 0 && nowMs >= meta2.nextRevealAt && meta2.nextRevealAt < intervalEndMs;
+
+    if (revealDue) {
+      const curCustomCount = countCustomSlotsForInterval(logData, intervalId);
+      const hasCapacity = curCustomCount < MAX_CUSTOM_PER_INTERVAL;
+
+      if (hasCapacity) {
+        const activeShown2 = Array.from(container.querySelectorAll(".mission-card"))
+          .filter(el => !el.classList.contains("completed") && !el.classList.contains("loading"))
+          .length;
+
+        if (activeShown2 < MAX_VISIBLE) {
+          const ph = createLoadingCard("Unlocking next custom mission...");
+          if (container.querySelectorAll(".mission-card").length < MAX_VISIBLE) {
+            container.appendChild(ph);
+          } else {
+            const last = Array.from(container.querySelectorAll(".mission-card")).pop();
+            if (last) replaceNode(last, ph);
+          }
+
+          const [s0, s1] = getCustomSlots(logData, intervalId);
+          let pickSlot = (!s0) ? 0 : 1;
+
+          const mission = await generateAndSaveCustom(medicalDay, intervalId, pickSlot, usedTitles);
+          replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
+        }
+      }
+
+      try{
+        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+        const snap3 = await getDoc(ref);
+        const d3 = snap3.exists() ? (snap3.data() || {}) : {};
+        const im = d3.intervalMeta || {};
+        const cur = im[intervalId] || {};
+        im[intervalId] = { ...cur, nextRevealAt: 0 };
+        await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge: true });
+      } catch(e){
+        console.warn("[AI] Failed to clear nextRevealAt:", e);
+      }
+    }
+
+    const activeBasicsNow = basicPool.filter(m => !completed.includes(toFullId(intervalId, m.id))).length;
+    const [cs0, cs1] = getCustomSlots(logData, intervalId);
+    const customInSlots = [cs0, cs1].filter(Boolean);
+    const activeCustomsNow = customInSlots.filter(m => !completed.includes(toFullId(intervalId, m.id))).length;
+
+    const basicsDoneCount = basicPool.filter(m => completed.includes(toFullId(intervalId, m.id))).length;
+    const allBasicsDone = basicsDoneCount === basicPool.length;
+
+    if (activeBasicsNow === 0 && activeCustomsNow === 0 && allBasicsDone) {
+      container.innerHTML = "";
+      container.appendChild(createSuccessCard());
+      container.appendChild(createInfoCard("Next Interval", "New missions will appear in the next time window.", "bi-arrow-right-circle"));
+    }
+
+    ensureTwoMissionCards(container, interval);
+
+    const statusObj = updateStatus(today.doneToday, today.totalToday);
+    updateSensors();
+    updateTopStars({ medicalDay, completed, intervalId: intervalId, hasTodayCheckin });
+
+    // NEW: persist exactly what's shown + status so other devices can render the same view
+    await persistIntervalSnapshot({ medicalDay, intervalId, statusObj });
+  }
+
+  async function finishMission(fullId, medicalDay, type) {
+    try {
+      console.log("[Mission] finishMission ->", { fullId, medicalDay, type });
+
+      const now = getNow();
+      const hr = now.getHours();
+      const interval = getIntervalByHour(hr);
+      const intervalId = interval ? interval.id : null;
+
+      playCharacterOnce(type);
+
+      const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+      const snap = await getDoc(ref);
+      const d = snap.exists() ? (snap.data() || {}) : {};
+      let list = Array.isArray(d.completedMissions) ? d.completedMissions.slice() : [];
+
+      if (!list.includes(fullId)) {
+        list.push(fullId);
+
+        const isBasic = (type === "WATER" || type === "MED" || type === "DRESS");
+
+        let nextRevealAt = 0;
+        if (interval && intervalId && isBasic) {
+          const existingCustomCount = countCustomSlotsForInterval(d, intervalId);
+          const hasCapacity = existingCustomCount < MAX_CUSTOM_PER_INTERVAL;
+
+          const end = getIntervalEndDate(now, interval).getTime();
+          const completeAt = Date.now();
+          const candidate = completeAt + REVEAL_DELAY_MS;
+
+          if (hasCapacity && candidate < end) nextRevealAt = candidate;
+
+          console.log("[Mission] BASIC completion scheduling check",
+            { intervalId, existingCustomCount, hasCapacity,
+              completeAt: new Date(completeAt).toLocaleTimeString(),
+              candidate: new Date(candidate).toLocaleTimeString(),
+              intervalEnd: new Date(end).toLocaleTimeString(),
+              nextRevealAt: nextRevealAt ? new Date(nextRevealAt).toLocaleTimeString() : "none"
+            }
+          );
+        }
+
+        const intervalMeta = d.intervalMeta || {};
+        if (intervalId) {
+          const cur = intervalMeta[intervalId] || {};
+          intervalMeta[intervalId] = {
+            ...cur,
+            startedAt: cur.startedAt || 0,
+            nextRevealAt,
+            lastCompletedAt: Date.now()
+          };
+        }
+
+        await setDoc(ref, {
+          completedMissions: list,
+          intervalMeta,
+          nextRevealAt: deleteField(),
+          lastUpdate: serverTimestamp()
+        }, { merge: true });
+
+        showToast({ title: "Mission Complete!", message: "Great progress." });
+
+        // Reset snapshot hash so the next dashboard pass will persist the new view
+        lastSnapshotHash = "";
+
+        await updateDashboard();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function updateStatus(done, total) {
+    let pct = total > 0 ? Math.round((done/total)*100) : 0;
+    if (pct >= 80) currentStatusLabel = "Happy / Energized";
+    else if (pct >= 50) currentStatusLabel = "Neutral / Calm";
+    else if (pct >= 20) currentStatusLabel = "Tired / Low Energy";
+    else currentStatusLabel = "Concern / Warning";
+
+    $("statusTitle").textContent = currentStatusLabel;
+    $("statusDesc").textContent = `Today's mission progress: ${pct}% (${done}/${total})`;
+    if (!isPlayingCompletion) setIdleCharacterByStatus(currentStatusLabel);
+
+    return { label: currentStatusLabel, pct, done, total };
+  }
+
+  /* -------------------- Sensors -------------------- */
+  function updateSensors() {
+    const temp = 36.6, heart = 72, stress = "Stable";
+    $("val-temp").innerHTML = `<span class="dot ok"></span> ${temp}°C`;
+    $("val-heart").innerHTML = `<span class="dot ok"></span> ${heart} bpm`;
+    $("val-stress").innerHTML = `<span class="dot ok"></span> ${stress}`;
+
+    const gifT = $("gif-temp"), gifH = $("gif-heart"), gifS = $("gif-stress");
+    gifT.src = "/static/gifs/temperature_stable.gif";
+    gifH.src = "/static/gifs/heart_stable.gif";
+    gifS.src = "/static/gifs/stress_stable.gif";
+  }
+
+  /* -------------------- Rating/Stars -------------------- */
+  async function updateTopStars({ medicalDay, completed, intervalId, hasTodayCheckin }){
+    const ratio7d = await computeCheckinHistoryRatio7d(medicalDay);
+    ratingState.checkinStatus = hasTodayCheckin ? "stable" : (ratio7d > 0.5 ? "stable" : "caution");
+
+    const combinedScore = (hasTodayCheckin ? 1 : 0.5) + (completed.length > 0 ? 1 : 0);
+    const stars = clamp(Math.ceil(combinedScore * 2.5), 1, 5);
+
+    const el = $("stars"); el.innerHTML = "";
+    for(let i=0; i<5; i++) el.innerHTML += `<i class="bi bi-star${i<stars?'-fill on':''}"></i>`;
+    $("rating-msg").textContent = stars >= 4 ? "Excellent routine today." : "Keep up the consistency.";
+  }
+
+  async function computeCheckinHistoryRatio7d(medicalDay){
+    try {
+      const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+      const s = await getDoc(ref);
+      return s.exists() ? 1 : 0.5;
+    } catch(e) { return 0.5; }
+  }
+
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  /* -------------------- Profile Form Logic -------------------- */
+  function renderMedInputs(containerId, n, defaults = []) {
+    const c = $(containerId); c.innerHTML = "";
+    const standard = ["09:00", "14:00", "21:00"];
+    for (let i = 1; i <= n; i++) {
+      const val = defaults[i-1] || standard[i-1] || "09:00";
+      c.innerHTML += `<div class="field-group"><label>Time ${i}</label><input type="time" class="med-time-input" value="${val}"></div>`;
+    }
+  }
+
+  $("edit_medFreq").onchange = (e) => renderMedInputs("edit_medTimesContainer", Number(e.target.value));
+
+  $("openProfileBtn").onclick = () => {
+    const d = cachedUserProfile || {};
+    $("edit_gender").value = d.gender || "male";
+    $("edit_weight").value = d.weight || "";
+    $("edit_height").value = d.height || "";
+    const med = d.schedule?.medication || { timesPerDay: 0 };
+    $("edit_medFreq").value = med.timesPerDay;
+    renderMedInputs("edit_medTimesContainer", med.timesPerDay, med.times || []);
+    const dress = d.schedule?.dressing || { frequency: "none" };
+    $("edit_dressFreq").value = dress.frequency;
+    $("edit_dressTime").value = dress.time || "09:00";
+    $("profileDrawer").classList.add("show");
+    $("drawerOverlay").classList.add("show");
+  };
+
+  $("profileEditForm").onsubmit = async (e) => {
+    e.preventDefault();
+    const medTimes = Array.from(document.querySelectorAll(".med-time-input")).map(i => i.value);
+    const up = {
+      gender: $("edit_gender").value,
+      weight: Number($("edit_weight").value),
+      height: Number($("edit_height").value),
+      "schedule.medication": { timesPerDay: Number($("edit_medFreq").value), times: medTimes },
+      "schedule.dressing": {
+         frequency: $("edit_dressFreq").value,
+         time: $("edit_dressTime").value,
+         dayOfWeek: $("edit_dressDay").value
+      }
+    };
+    await updateDoc(doc(db, "users", userSession.uid), up);
+    $("profileDrawer").classList.remove("show"); $("drawerOverlay").classList.remove("show");
+    showToast({ title: "Profile Saved", message: "Updating missions..." });
+
+    // Reset snapshot hash so we persist the new mission set after schedule changes
+    lastSnapshotHash = "";
+
+    updateDashboard();
+  };
+
+  /* -------------------- Survey Wizard Logic -------------------- */
+  const updateWizard = () => {
+    document.querySelectorAll('.survey-step').forEach(s => s.classList.toggle('active', Number(s.dataset.step) === currentStep));
+    $("stepIndicator").textContent = `STEP ${currentStep} OF 5`;
+    $("prevBtn").style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+    $("nextBtn").textContent = currentStep === 5 ? 'Save Check-in' : 'Next Step';
+  };
+
+  const fatigue = $("c_fatigue"), fatigueLabel = $("c_fatigueLabel");
+  if (fatigue && fatigueLabel) fatigue.oninput = () => (fatigueLabel.textContent = fatigue.value);
+
+  const anxiety = $("d_anxiety"), anxietyLabel = $("d_anxietyLabel");
+  if (anxiety && anxietyLabel) anxiety.oninput = () => (anxietyLabel.textContent = anxiety.value);
+
+  function renderWizardMedInputs(n){
+    const c = $("e_medTimesContainer"); if (!c) return;
+    c.innerHTML = "";
+    const standard = ["09:00","14:00","21:00"];
+    for(let i=1;i<=n;i++){
+      const val = standard[i-1] || "09:00";
+      c.innerHTML += `<div class="field-group"><label>Time ${i}</label><input type="time" class="e-med-time" value="${val}"></div>`;
+    }
+  }
+
+  const eMedChanged = $("e_medChanged");
+  const eMedPanel = $("e_medPanel");
+  const eMedFreq = $("e_medFreq");
+  if (eMedChanged && eMedPanel) {
+    eMedChanged.onchange = () => {
+      const show = eMedChanged.value === "yes";
+      eMedPanel.classList.toggle("hidden", !show);
+      if (show) renderWizardMedInputs(Number(eMedFreq?.value || 0));
+    };
+  }
+  if (eMedFreq) eMedFreq.onchange = () => renderWizardMedInputs(Number(eMedFreq.value || 0));
+
+  const eDressChanged = $("e_dressChanged");
+  const eDressPanel = $("e_dressPanel");
+  const eDressFreq = $("e_dressFreq");
+  const eDressDayWrap = $("e_dressDayWrap");
+  if (eDressChanged && eDressPanel) {
+    eDressChanged.onchange = () => {
+      const show = eDressChanged.value === "yes";
+      eDressPanel.classList.toggle("hidden", !show);
+      if (show) eDressDayWrap?.classList.toggle("hidden", (eDressFreq?.value || "none") !== "weekly");
+    };
+  }
+  if (eDressFreq && eDressDayWrap) {
+    eDressFreq.onchange = () => {
+      eDressDayWrap.classList.toggle("hidden", eDressFreq.value !== "weekly");
+    };
+  }
+
+  $("nextBtn").onclick = async () => {
+    if (currentStep < 5) { currentStep++; updateWizard(); return; }
+
+    const medicalDay = getMedicalDayID();
+
+    const eMedChangedVal = $("e_medChanged")?.value || "no";
+    const eDressChangedVal = $("e_dressChanged")?.value || "no";
+
+    let medUpdate = null;
+    if (eMedChangedVal === "yes") {
+      const n = Number($("e_medFreq")?.value || 0);
+      const times = Array.from(document.querySelectorAll(".e-med-time")).map(i => i.value);
+      medUpdate = { timesPerDay: n, times: times.slice(0, n) };
+    }
+
+    let dressUpdate = null;
+    if (eDressChangedVal === "yes") {
+      dressUpdate = {
+        frequency: $("e_dressFreq")?.value || "none",
+        dayOfWeek: $("e_dressDay")?.value || "mon",
+        time: $("e_dressTime")?.value || "09:00"
+      };
+    }
+
+    const payload = {
+      survey_v2: {
+        A: {
+          cond: $("a_condition").value,
+          pain: $("a_painLevel").value,
+          painTiming: $("a_painTiming")?.value || "",
+          nausea: $("a_nausea")?.value || "",
+          skin: $("a_skin")?.value || ""
+        },
+        B: {
+          hours: $("b_sleepHours").value,
+          qual: $("b_sleepQuality").value,
+          awakenings: $("b_awakenings")?.value || "",
+          morningFatigue: $("b_morningFatigue")?.value || ""
+        },
+        C: {
+          activityLevel: $("c_activityLevel")?.value || "",
+          fatigue: $("c_fatigue").value
+        },
+        D: {
+          mood: $("d_mood").value,
+          anxiety: $("d_anxiety").value,
+          hardMoment: $("d_hardMoment")?.value || "",
+          note: $("d_note")?.value || "",
+          gsr: $("d_gsr")?.value || ""
+        },
+        E: {
+          medChanged: eMedChangedVal,
+          dressChanged: eDressChangedVal,
+          medication: medUpdate,
+          dressing: dressUpdate
+        }
+      },
+      updatedAt: serverTimestamp()
+    };
+
+    await setDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay), payload, { merge: true });
+
+    if (medUpdate || dressUpdate) {
+      const up = {};
+      if (medUpdate) up["schedule.medication"] = medUpdate;
+      if (dressUpdate) up["schedule.dressing"] = dressUpdate;
+      if (Object.keys(up).length) await updateDoc(doc(db, "users", userSession.uid), up);
+    }
+
+    $("overlay").classList.remove("show");
+    showToast({ title: "Success", message: "Check-in recorded." });
+
+    // Reset snapshot hash so we persist refreshed view
+    lastSnapshotHash = "";
+
+    updateDashboard();
+  };
+
+  $("prevBtn").onclick = () => { currentStep--; updateWizard(); };
+  $("openSurveyBtn").onclick = () => { currentStep = 1; updateWizard(); $("overlay").classList.add("show"); };
+  $("closeModalBtn").onclick = () => $("overlay").classList.remove("show");
+  $("closeDrawerBtn").onclick = () => { $("profileDrawer").classList.remove("show"); $("drawerOverlay").classList.remove("show"); };
+
+  updateWizard();
+
+  /* -------------------- Auth & Init -------------------- */
+  onAuthStateChanged(auth, u => {
+    if (u) {
+      userSession = u;
+      $("logoutBtn").disabled = false;
+      updateDashboard();
+    } else {
+      window.location.href = "/login";
+    }
+  });
+
+  $("logoutBtn").onclick = () => signOut(auth);
+  $("test-warp-hour").onclick = () => { timeOffset += 1; lastSnapshotHash=""; updateDashboard(); };
+
+  // UPDATED: Trash icon resets today's data, shows success toast, and refreshes the UI.
+  // This deletes the entire daily_logs/{medicalDay} doc so ALL devices start fresh.
+  $("test-reset").onclick = async () => {
+    try{
+      const day = getMedicalDayID();
+      const ref = doc(db, "users", userSession.uid, "daily_logs", day);
+
+      console.log("[Reset] Deleting daily log doc for:", day);
+      await deleteDoc(ref);
+
+      // Clear local caches + snapshot hash
+      cachedHistory7d = [];
+      lastSnapshotHash = "";
+
+      showToast({ title: "Reset Complete", message: "Today's data was cleared." , key: `reset_${day}` });
+
+      await updateDashboard();
+    } catch(e){
+      console.warn("[Reset] failed:", e);
+      showToast({ title: "Reset Failed", message: "Could not clear today. Please try again.", key: "reset_fail" });
+    }
+  };
+
+  setInterval(updateDashboard, 60000);
+  getNow();
+</script>
+
+</body>
+</html>

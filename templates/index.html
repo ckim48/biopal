@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Intelligent Health Ecosystem</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0ea5e9;
+      --primary-glow: rgba(14, 165, 233, 0.1);
+      --accent: #6366f1;
+      --bg: #ffffff;
+      --card-bg: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #f1f5f9;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* --- Subtle Background Elements --- */
+    .bg-decorator {
+      position: absolute; width: 100%; height: 100%;
+      background: radial-gradient(circle at top right, #f0f9ff 0%, transparent 40%),
+                  radial-gradient(circle at bottom left, #eef2ff 0%, transparent 40%);
+      z-index: -1; top: 0; left: 0;
+    }
+
+    /* --- Navigation --- */
+    .navbar {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+    }
+    .brand { font-weight: 800; font-size: 22px; color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .brand-logo { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 9px; }
+
+    /* --- High-Impact Hero --- */
+    .hero { padding: 160px 0 100px; }
+    .hero-h1 {
+      font-weight: 800; font-size: clamp(3rem, 7vw, 5.5rem);
+      line-height: 1.05; letter-spacing: -3px; margin-bottom: 25px;
+      color: var(--text-main);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px;
+      background: var(--primary-glow); border-radius: 100px; color: var(--primary);
+      font-weight: 700; font-size: 13px; margin-bottom: 24px;
+    }
+    .btn-action {
+      background: var(--text-main); color: #fff; padding: 16px 36px; border-radius: 14px;
+      font-weight: 700; text-decoration: none; transition: 0.3s;
+    }
+    .btn-action:hover { background: #334155; transform: translateY(-2px); color: #fff; }
+
+    /* --- About Section --- */
+    .about-box { padding: 100px 0; background: #fff; }
+    .section-tag { color: var(--primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; font-size: 13px; }
+
+    /* --- Modern Feature Grid --- */
+    .feature-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 28px; padding: 40px; transition: all 0.4s ease;
+      height: 100%; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.02);
+    }
+    .feature-card:hover {
+      border-color: var(--primary); transform: translateY(-8px);
+      box-shadow: 0 20px 40px -15px rgba(14, 165, 233, 0.15);
+    }
+    .feat-icon {
+        width: 56px; height: 56px; background: var(--primary-glow);
+        color: var(--primary); border-radius: 14px; display: grid;
+        place-items: center; font-size: 26px; margin-bottom: 24px;
+    }
+
+    /* --- Alternating Process Timeline --- */
+    .step-container { margin: 120px 0; }
+    .step-visual {
+      background: #fff; padding: 12px; border-radius: 32px;
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,0.1); border: 1px solid var(--border);
+    }
+    .step-number {
+      font-size: 14px; font-weight: 800; color: var(--primary);
+      background: var(--primary-glow); width: 32px; height: 32px;
+      display: grid; place-items: center; border-radius: 8px; margin-bottom: 20px;
+    }
+
+    @media (max-width: 991px) {
+      .hero-h1 { font-size: 3rem; }
+      .step-container { text-align: center; }
+      .step-number { margin-inline: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-decorator"></div>
+
+  <nav class="navbar fixed-top">
+    <div class="container">
+      <a href="{{ url_for('home') }}" class="brand"> BioPal</a>
+      <div class="ms-auto d-none d-md-block">
+        <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-bold border">Sign In</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h1 class="hero-h1">Vitality, <br><span class="text-gradient">Redefined.</span></h1>
+          <p class="lead text-muted mb-5 pe-lg-5" style="font-size: 1.2rem;">
+            BioPal synchronizes your biological data with your digital lifestyle, creating a seamless loop of health optimization.
+          </p>
+          <div class="d-flex gap-3">
+            <a href="#process" class="btn-action">Get Started</a>
+            <button class="btn btn-outline-secondary border-0 fw-bold"><i class="bi bi-play-circle me-2"></i> How it works</button>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-5 mt-lg-0">
+            <div class="step-visual">
+                <img src="{{ url_for('static', filename='gifs/character1.gif') }}" class="img-fluid rounded-4 w-100" alt="BioPal Dashboard">
+            </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="about-box">
+    <div class="container">
+      <div class="row g-5 align-items-center">
+        <div class="col-lg-6">
+          <span class="section-tag">About BioPal</span>
+          <h2 class="display-5 fw-800 mt-3 mb-0" style="font-weight: 800;">Integrated Intelligence for your <span class="text-primary">Immune Health.</span></h2>
+        </div>
+        <div class="col-lg-6">
+          <p class="text-muted fs-5 mb-0">
+            We believe health should be intuitive, not intrusive. BioPal connects medical-grade hardware to our immersive <strong>ImmuneSphere VR</strong> environment, allowing you to visualize stress and master your recovery in real-time.
+          </p>
+        </div>
+      </div>
+
+      <div class="row g-4 mt-5">
+        <div class="col-lg-4">
+          <div class="feature-card">
+            <div class="feat-icon"><i class="bi bi-patch-check"></i></div>
+            <h4 class="fw-bold">Bio-Sensors</h4>
+            <p class="text-muted mb-0">Ultra-thin hardware that monitors heart rate variability, hydration, and sleep cycles with clinical precision.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="feature-card">
+            <div class="feat-icon" style="color:var(--accent); background: #eef2ff;"><i class="bi bi-vr"></i></div>
+            <h4 class="fw-bold">ImmuneSphere VR</h4>
+            <p class="text-muted mb-0">A spatial health app that transforms your data into calming, restorative 3D landscapes for mental recovery.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="feature-card">
+            <div class="feat-icon" style="color:#10b981; background: #ecfdf5;"><i class="bi bi-command"></i></div>
+            <h4 class="fw-bold">Web Control</h4>
+            <p class="text-muted mb-0">Sync everything to your desktop. Analyze long-term trends and export reports for your physician.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" class="container py-5">
+    <div class="text-center mb-5">
+        <span class="section-tag">The Workflow</span>
+        <h2 class="display-6 fw-800 mt-2" style="font-weight: 800;">How to use BioPal</h2>
+    </div>
+
+    <div class="row step-container align-items-center">
+        <div class="col-lg-5">
+            <div class="step-number">1</div>
+            <h3 class="fw-bold">Wear the Precision</h3>
+            <p class="text-muted fs-5">Apply our lightweight sensors. They connect via low-energy Bluetooth to begin your 24/7 baseline health monitoring.</p>
+        </div>
+        <div class="col-lg-6 offset-lg-1 mt-4 mt-lg-0">
+            <div class="step-visual">
+                <img src="{{ url_for('static', filename='gifs/character1.gif') }}" class="img-fluid rounded-4 w-100" alt="Hardware Sensors">
+            </div>
+        </div>
+    </div>
+
+    <div class="row step-container align-items-center flex-lg-row-reverse">
+        <div class="col-lg-5 offset-lg-1">
+            <div class="step-number">2</div>
+            <h3 class="fw-bold">Step into ImmuneSphere</h3>
+            <p class="text-muted fs-5">Sync with our VR app to see your biology come to life. Use bio-feedback to lower your heart rate and unlock mental clarity.</p>
+        </div>
+        <div class="col-lg-6 mt-4 mt-lg-0">
+            <div class="step-visual">
+                <img src="{{ url_for('static', filename='gifs/character1.gif') }}" class="img-fluid rounded-4 w-100" alt="VR Session">
+            </div>
+        </div>
+    </div>
+
+    <div class="row step-container align-items-center">
+        <div class="col-lg-5">
+            <div class="step-number">3</div>
+            <h3 class="fw-bold">Review on the Web</h3>
+            <p class="text-muted fs-5">Log into the web app to view your health score evolution. Receive personalized recommendations based on your bio-trends.</p>
+        </div>
+        <div class="col-lg-6 offset-lg-1 mt-4 mt-lg-0">
+            <div class="step-visual">
+                <img src="{{ url_for('static', filename='gifs/character1.gif') }}" class="img-fluid rounded-4 w-100" alt="Web Portal">
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <footer class="py-5 border-top bg-light">
+    <div class="container text-center">
+        <p class="text-muted small">© 2026 BioPal Health Tech. <br>Designed for better living through ImmuneSphere VR.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Create Account</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --primary:#0070f3;
+      --ink:#020617;
+      --muted:#64748b;
+      --bg:#f8faff;
+      --glass:rgba(255,255,255,.95);
+      --border:rgba(15,23,42,.08);
+      --error:#ef4444;
+      --ok:#10b981;
+      --panel:#ffffff;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:linear-gradient(-45deg,#f0f9ff,#e0f2fe,#f0fdf4);
+      padding:20px;
+    }
+
+    .card{
+      width:100%;max-width:620px;background:var(--glass);backdrop-filter:blur(20px);
+      border-radius:32px;border:1px solid var(--border);
+      box-shadow:0 25px 50px -12px rgba(0,0,0,.05);
+      padding:40px;
+    }
+
+    .steps-container{display:flex;justify-content:space-between;margin-bottom:32px;position:relative}
+    .step-dot{
+      width:36px;height:36px;border-radius:12px;background:#f1f5f9;
+      display:grid;place-items:center;font-size:14px;font-weight:800;
+      color:var(--muted);transition:all .3s ease;z-index:2;
+    }
+    .step-dot.active{background:var(--primary);color:#fff;transform:scale(1.08)}
+    .step-dot.completed{background:var(--ok);color:#fff}
+    .steps-container::after{
+      content:"";position:absolute;top:18px;left:0;width:100%;height:2px;background:#f1f5f9;z-index:1
+    }
+
+    h1{font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-1px}
+    .subtitle{color:var(--muted);font-size:15px;margin-bottom:32px;font-weight:500}
+
+    .step-content{display:none;animation:slideUp .4s ease}
+    .step-content.active{display:block}
+    @keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+    .field{margin-bottom:18px}
+    label{
+      display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:var(--ink);
+      text-transform:uppercase;letter-spacing:.5px
+    }
+    input,select,textarea{
+      width:100%;padding:12px 14px;border-radius:14px;border:1px solid var(--border);
+      background:#fbfcfe;font-size:15px;transition:all .2s;
+    }
+    textarea{min-height:84px;resize:vertical}
+    input:focus,select:focus,textarea:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(0,112,243,.1);
+      outline:none;
+    }
+
+    .btn-group{display:flex;gap:12px;margin-top:32px}
+    .btn{
+      flex:1;padding:16px;border:none;border-radius:16px;font-weight:800;font-size:16px;
+      cursor:pointer;transition:all .2s;
+    }
+    .btn-next{background:var(--ink);color:#fff}
+    .btn-prev{background:#f1f5f9;color:var(--muted)}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+
+    .info-box{
+      font-size:12px;color:var(--muted);background:#f8fafc;padding:14px;border-radius:14px;
+      border:1px solid var(--border);margin-top:10px;line-height:1.5;
+    }
+
+    .section{
+      border:1px solid var(--border);
+      background:var(--panel);
+      border-radius:18px;
+      padding:14px;
+      margin-top:12px;
+    }
+    .section h3{
+      margin:0 0 10px;
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+
+    .hidden{display:none !important}
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <div class="steps-container">
+      <div class="step-dot active" id="dot-1">1</div>
+      <div class="step-dot" id="dot-2">2</div>
+      <div class="step-dot" id="dot-3">3</div>
+      <div class="step-dot" id="dot-4">4</div>
+    </div>
+
+    <h1 id="step-title">Create Account</h1>
+    <p class="subtitle" id="step-subtitle">Step 1 of 4: Secure your BioPal portal.</p>
+
+    <form id="registerForm" novalidate>
+      <!-- STEP 1 -->
+      <div class="step-content active" id="step-1">
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="name@example.com" required>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Min. 6 chars" required minlength="6">
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Repeat" required minlength="6">
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-content" id="step-2">
+        <div class="grid-3">
+          <div class="field">
+            <label>Birth Year</label>
+            <input type="number" id="birthYear" placeholder="YYYY" min="1920" max="2024" required>
+          </div>
+          <div class="field">
+            <label>Gender</label>
+            <select id="sex" required>
+              <option value="" disabled selected>Select</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Height (cm)</label>
+            <input type="number" id="height" placeholder="cm" step="0.1" required>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Current Weight (kg)</label>
+            <input type="number" id="weight" placeholder="kg" step="0.1" required>
+          </div>
+          <div class="field">
+            <label>Treatment Phase</label>
+            <select id="treatmentPhase" required>
+              <option value="" disabled selected>Select</option>
+              <option value="active">Active</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="recovery">Recovery</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Cancer Type</label>
+          <input type="text" id="cancerType" placeholder="e.g. Stage II Breast Cancer" required>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-content" id="step-3">
+        <div class="field">
+          <label>Activity Baseline</label>
+          <select id="energyBaseline" required>
+            <option value="high">Mobile (Regular movement)</option>
+            <option value="mid">Partial (Frequent rest)</option>
+            <option value="low">Resting (Bed-based)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Medical Conditions / Allergies</label>
+          <textarea id="conditions" placeholder="e.g. Diabetes, Penicillin allergy..."></textarea>
+        </div>
+
+        <div class="section">
+          <h3>Medication</h3>
+
+          <div class="field" style="margin-bottom:12px;">
+            <label>How many times per day?</label>
+            <select id="medFreq" required>
+              <option value="0" selected>No medication</option>
+              <option value="1">1 time/day</option>
+              <option value="2">2 times/day</option>
+              <option value="3">3 times/day</option>
+            </select>
+          </div>
+
+          <div id="medTimesWrap" class="hidden">
+            <div class="field">
+              <label>Medication Times</label>
+              <div id="medTimesContainer" class="grid"></div>
+            </div>
+            <div class="info-box">
+              Choose the exact time(s) you usually take medication.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Dressing</h3>
+
+          <div class="field" style="margin-bottom:12px;">
+            <label>How often?</label>
+            <select id="dressingFreq" required>
+              <option value="none" selected>No dressing schedule</option>
+              <option value="daily">Every day</option>
+              <option value="weekly">Every week</option>
+            </select>
+          </div>
+
+          <div id="dressingWrap" class="hidden">
+            <div class="grid">
+              <div class="field" id="dressingDayWrap" style="display:none;">
+                <label>Day of Week</label>
+                <select id="dressingDay">
+                  <option value="mon">Mon</option>
+                  <option value="tue">Tue</option>
+                  <option value="wed">Wed</option>
+                  <option value="thu">Thu</option>
+                  <option value="fri">Fri</option>
+                  <option value="sat">Sat</option>
+                  <option value="sun">Sun</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Time</label>
+                <input type="time" id="dressingTime" value="09:00">
+              </div>
+            </div>
+
+            <div class="info-box">
+              If weekly, select the day and time. If daily, select the time.
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          Physical metrics help AI detect weight fluctuations, which are important during treatment.
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-content" id="step-4">
+        <div class="field">
+          <label>Emergency Contact</label>
+          <input type="text" id="emergencyContact" placeholder="Name and Relationship" required>
+        </div>
+        <div class="field">
+          <label>Emergency Phone</label>
+          <input type="tel" id="emergencyPhone" placeholder="010-0000-0000" required>
+        </div>
+
+        <div class="field" style="margin-top:24px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;">
+            <input type="checkbox" id="consent" required style="width:auto;margin-top:3px;">
+            <span style="font-size:13px;font-weight:500;color:var(--ink);">
+              I consent to BioPal securely storing my data for AI-driven health analysis.
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn btn-prev" id="prevBtn" style="display:none;">Back</button>
+        <button type="button" class="btn btn-next" id="nextBtn">Continue</button>
+      </div>
+    </form>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "{{ url_for('static', filename='js/firebase/config.js') }}";
+    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // ----------------------------
+    // Wizard state
+    // ----------------------------
+    let currentStep = 1;
+    const totalSteps = 4;
+    const titles = ["Create Account", "Body & Clinical", "Baseline & Schedule", "Care Team"];
+
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+
+    // ----------------------------
+    // Medication UI (0/1/2/3 times per day)
+    // ----------------------------
+    const medFreq = document.getElementById("medFreq");
+    const medTimesWrap = document.getElementById("medTimesWrap");
+    const medTimesContainer = document.getElementById("medTimesContainer");
+
+    function renderMedTimeInputs(n){
+      medTimesContainer.innerHTML = "";
+      const defaults = n === 1 ? ["09:00"]
+        : n === 2 ? ["09:00","21:00"]
+        : ["09:00","14:00","21:00"];
+
+      for (let i = 1; i <= n; i++){
+        const wrap = document.createElement("div");
+        wrap.className = "field";
+        wrap.innerHTML = `
+          <label>Time ${i}</label>
+          <input type="time" class="med-time" value="${defaults[i-1] || "09:00"}">
+        `;
+        medTimesContainer.appendChild(wrap);
+      }
+    }
+
+    function syncMedUI(){
+      const n = Number(medFreq.value);
+      if (n <= 0){
+        medTimesWrap.classList.add("hidden");
+        medTimesContainer.innerHTML = "";
+        return;
+      }
+      medTimesWrap.classList.remove("hidden");
+      renderMedTimeInputs(n);
+    }
+
+    medFreq.addEventListener("change", syncMedUI);
+    syncMedUI();
+
+    // ----------------------------
+    // Dressing UI (none/daily/weekly + time + day if weekly)
+    // ----------------------------
+    const dressingFreq = document.getElementById("dressingFreq");
+    const dressingWrap = document.getElementById("dressingWrap");
+    const dressingDayWrap = document.getElementById("dressingDayWrap");
+
+    function syncDressingUI(){
+      const f = dressingFreq.value;
+      if (f === "none"){
+        dressingWrap.classList.add("hidden");
+        dressingDayWrap.style.display = "none";
+        return;
+      }
+      dressingWrap.classList.remove("hidden");
+      dressingDayWrap.style.display = (f === "weekly") ? "block" : "none";
+    }
+
+    dressingFreq.addEventListener("change", syncDressingUI);
+    syncDressingUI();
+
+    // ----------------------------
+    // Validation
+    // ----------------------------
+    function markInvalid(el, invalid){
+      if (!el) return;
+      el.style.borderColor = invalid ? "#ef4444" : "rgba(15, 23, 42, 0.08)";
+    }
+
+    function validateStep(step){
+      const stepEl = document.getElementById(`step-${step}`);
+      let ok = true;
+
+      const requiredEls = stepEl.querySelectorAll("[required]");
+      requiredEls.forEach(el => {
+        const hidden = el.offsetParent === null;
+        if (hidden) return;
+
+        if (el.type === "checkbox"){
+          if (!el.checked) ok = false;
+        } else {
+          if (!el.value) ok = false;
+        }
+        if (el.type !== "checkbox") markInvalid(el, !el.value);
+      });
+
+      if (step === 1){
+        const p = document.getElementById("password").value;
+        const c = document.getElementById("confirmPassword").value;
+        if (p && c && p !== c){
+          markInvalid(document.getElementById("password"), true);
+          markInvalid(document.getElementById("confirmPassword"), true);
+          alert("Passwords do not match.");
+          return false;
+        }
+      }
+
+      if (step === 3){
+        const n = Number(medFreq.value);
+        if (n > 0){
+          const times = [...document.querySelectorAll(".med-time")].map(x => x.value).filter(Boolean);
+          if (times.length !== n) ok = false;
+        }
+        if (dressingFreq.value !== "none"){
+          const t = document.getElementById("dressingTime").value;
+          if (!t) ok = false;
+        }
+      }
+
+      if (!ok) alert("Please complete all required fields.");
+      return ok;
+    }
+
+    // ----------------------------
+    // Wizard UI updates
+    // ----------------------------
+    function updateWizard(){
+      document.getElementById("step-title").innerText = titles[currentStep - 1];
+      document.getElementById("step-subtitle").innerText = `Step ${currentStep} of ${totalSteps}`;
+      prevBtn.style.display = currentStep === 1 ? "none" : "block";
+      nextBtn.innerText = currentStep === totalSteps ? "Finalize Account" : "Continue";
+    }
+
+    // ----------------------------
+    // Navigation
+    // ----------------------------
+    nextBtn.onclick = async () => {
+      if (!validateStep(currentStep)) return;
+
+      if (currentStep < totalSteps){
+        document.getElementById(`step-${currentStep}`).classList.remove("active");
+        document.getElementById(`dot-${currentStep}`).classList.add("completed");
+
+        currentStep++;
+        document.getElementById(`step-${currentStep}`).classList.add("active");
+        document.getElementById(`dot-${currentStep}`).classList.add("active");
+
+        updateWizard();
+      } else {
+        await finalizeAccount();
+      }
+    };
+
+    prevBtn.onclick = () => {
+      if (currentStep <= 1) return;
+
+      document.getElementById(`step-${currentStep}`).classList.remove("active");
+      document.getElementById(`dot-${currentStep}`).classList.remove("active");
+
+      currentStep--;
+      document.getElementById(`step-${currentStep}`).classList.add("active");
+      document.getElementById(`dot-${currentStep}`).classList.remove("completed");
+
+      updateWizard();
+    };
+
+    // ----------------------------
+    // Finalize + Firestore save
+    // ----------------------------
+    async function finalizeAccount(){
+      const pass = document.getElementById("password").value;
+      const confirm = document.getElementById("confirmPassword").value;
+      if (pass !== confirm) return alert("Passwords do not match.");
+
+      nextBtn.disabled = true;
+      nextBtn.innerText = "Syncing...";
+
+      try{
+        const email = document.getElementById("email").value.trim();
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        const medN = Number(document.getElementById("medFreq").value);
+        const medTimes = (medN > 0)
+          ? [...document.querySelectorAll(".med-time")].map(x => x.value).filter(Boolean)
+          : [];
+
+        const dressFreq = document.getElementById("dressingFreq").value;
+
+        const schedule = {
+          medication: {
+            timesPerDay: medN,
+            times: medTimes
+          },
+          dressing: {
+            frequency: dressFreq,
+            dayOfWeek: (dressFreq === "weekly") ? document.getElementById("dressingDay").value : null,
+            time: (dressFreq === "none") ? null : document.getElementById("dressingTime").value
+          }
+        };
+
+        const profile = {
+          uid: user.uid,
+          email,
+          body: {
+            birthYear: Number(document.getElementById("birthYear").value),
+            sex: document.getElementById("sex").value,
+            heightCm: Number(document.getElementById("height").value),
+            weightKg: Number(document.getElementById("weight").value)
+          },
+          clinical: {
+            cancerType: document.getElementById("cancerType").value.trim(),
+            treatmentPhase: document.getElementById("treatmentPhase").value
+          },
+          baseline: {
+            energyLevel: document.getElementById("energyBaseline").value,
+            conditions: document.getElementById("conditions").value.trim()
+          },
+          schedule,
+          emergency: {
+            contact: document.getElementById("emergencyContact").value.trim(),
+            phone: document.getElementById("emergencyPhone").value.trim()
+          },
+          createdAt: serverTimestamp(),
+          setupComplete: true
+        };
+
+        await setDoc(doc(db, "users", user.uid), profile);
+
+        alert("Account setup complete!");
+        window.location.href = "{{ url_for('login') }}";
+      } catch (error){
+        alert(error.message);
+        nextBtn.disabled = false;
+        nextBtn.innerText = "Finalize Account";
+      }
+    }
+
+    updateWizard();
+  </script>
+</body>
+</html>

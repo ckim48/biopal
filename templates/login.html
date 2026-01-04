@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Login</title>
+  <style>
+    :root {
+      --primary: #1e88ff;
+      --ink: #0f172a;
+      --glass: rgba(255, 255, 255, 0.8);
+      --border: rgba(255, 255, 255, 0.3);
+    }
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, "Inter", sans-serif;
+      background: linear-gradient(-45deg, #e6f6ff, #cfeeff, #f4fbff, #ffffff);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      padding: 20px;
+    }
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 48px 40px;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 32px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 50px -12px rgba(30, 136, 255, 0.15);
+      text-align: center;
+    }
+
+    h1 { font-size: 24px; font-weight: 800; margin: 0 0 18px; color: var(--ink); }
+    .sub { color: rgba(15, 23, 42, .65); font-size: 14px; margin-bottom: 20px; }
+
+    .field { text-align: left; margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--ink);
+      opacity: 0.75;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(30, 136, 255, 0.1);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .link {
+      font-size: 13px;
+      color: rgba(15, 23, 42, .65);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .link:hover { color: var(--primary); }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      margin-top: 14px;
+      border: none;
+      border-radius: 16px;
+      background: var(--ink);
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn:hover { background: #1e293b; transform: translateY(-2px); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .msg {
+      display: none;
+      margin: 12px 0 6px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(30,136,255,.22);
+      background: rgba(99,185,255,.10);
+      color: rgba(15,23,42,.9);
+      font-size: 13px;
+      text-align: left;
+    }
+    .msg.show { display: block; }
+
+    .register-link {
+      margin-top: 22px;
+      font-size: 14px;
+      color: #64748b;
+    }
+    .register-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Sign in to BioPal</h1>
+    <div class="sub">Welcome back. Please sign in to continue.</div>
+
+    <!-- Flask/Jinja message area (server-side) -->
+    {% if error %}
+      <div class="msg show">{{ error }}</div>
+    {% else %}
+      <div id="msg" class="msg"></div>
+    {% endif %}
+
+    <!-- IMPORTANT: Use method/action so it can work with Flask POST -->
+    <form id="loginForm" method="POST" action="{{ url_for('login') }}">
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="Enter your email" autocomplete="email" required>
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+        <div class="row">
+          <!-- You can wire this later to a Flask route like /forgot -->
+          <a id="forgotLink" class="link" href="#">Forgot password?</a>
+        </div>
+      </div>
+
+      <button id="submitBtn" type="submit" class="btn">Continue</button>
+    </form>
+
+    <div class="register-link">
+      New here?
+      <!-- Update to Flask route when you add it -->
+<a href="{{ url_for('register') }}">Create an account</a>
+    </div>
+  </div>
+
+  <!-- Update script path to Flask static -->
+  <script type="module" src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
+
+</body>
+</html>
