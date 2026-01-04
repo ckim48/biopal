@@ -9,7 +9,11 @@ from openai import OpenAI
 app = Flask(__name__)
 app.secret_key = "change-this-to-a-random-secret-key"
 
-# Uses OPENAI_API_KEY from environment
+# IMPORTANT:
+# Never hardcode API keys in code. Use environment variable OPENAI_API_KEY.
+# Example:
+#   export OPENAI_API_KEY="sk-..."
+#   export OPENAI_MODEL="gpt-4o-mini"
 
 
 @app.get("/")
@@ -55,14 +59,14 @@ def api_logout():
 def register():
     return render_template("register.html")
 
+
 @app.get("/main")
 def main():
     return render_template("main.html")
 
 
-
 # -----------------------------
-# NEW: OpenAI Custom Mission API
+# OpenAI Custom Mission API
 # -----------------------------
 @app.post("/api/generate_mission")
 def generate_mission():
@@ -81,22 +85,17 @@ def generate_mission():
     history = data.get("history") or []
     now_iso = (data.get("nowISO") or "").strip()
 
-    # Light safety/size guards
     if not isinstance(profile, dict):
         profile = {}
     if not isinstance(history, list):
         history = []
 
-    # Keep history short to reduce tokens/cost
     history_trim = history[:7]
 
-    # Pull a few helpful fields (optional)
     sched = profile.get("schedule") or {}
     med = (sched.get("medication") or {}) if isinstance(sched, dict) else {}
     dressing = (sched.get("dressing") or {}) if isinstance(sched, dict) else {}
 
-    # We want short, actionable, non-medical “missions”
-    # Do NOT give medical instructions. Keep it lifestyle-level only.
     system = (
         "You generate ONE short wellness mission for a patient self-care dashboard. "
         "Do not provide medical advice, diagnosis, medication instructions, or clinical claims. "
@@ -114,6 +113,10 @@ def generate_mission():
             "gender": profile.get("gender"),
             "weight": profile.get("weight"),
             "height": profile.get("height"),
+            "treatmentPhase": profile.get("treatmentPhase"),
+            "activityBaseline": profile.get("activityBaseline"),
+            "medicalConditions": profile.get("medicalConditions"),
+            "allergies": profile.get("allergies"),
             "medication_timesPerDay": med.get("timesPerDay"),
             "medication_times": med.get("times"),
             "dressing_frequency": dressing.get("frequency"),
@@ -136,26 +139,19 @@ def generate_mission():
     fallback = {"name": "2-Min Breathing", "desc": "Inhale 4, exhale 6 for 2 minutes.", "icon": "bi-wind"}
 
     try:
-        # Use Responses API style (OpenAI SDK v1+).
-        # If your installed SDK only supports chat.completions, see note below.
         resp = client.responses.create(
             model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             input=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": json.dumps(user, ensure_ascii=False)},
             ],
-            # Try to force JSON output:
             response_format={"type": "json_object"},
             temperature=0.7,
         )
 
-        # Extract text
-        text = ""
-        # Responses API commonly provides output_text convenience
-        if hasattr(resp, "output_text") and resp.output_text:
-            text = resp.output_text
-        else:
-            # Fallback extraction (best effort)
+        text = getattr(resp, "output_text", "") or ""
+        if not text:
+            # best-effort extraction
             try:
                 parts = []
                 for item in (resp.output or []):
@@ -172,28 +168,174 @@ def generate_mission():
 
         obj = json.loads(text)
 
-        name = str(obj.get("name") or "").strip()
-        desc = str(obj.get("desc") or "").strip()
+        name = str(obj.get("name") or "").strip() or fallback["name"]
+        desc = str(obj.get("desc") or "").strip() or fallback["desc"]
         icon = str(obj.get("icon") or "").strip()
-
-        if not name:
-            name = fallback["name"]
-        if not desc:
-            desc = fallback["desc"]
-        if not (icon.startswith("bi-")):
+        if not icon.startswith("bi-"):
             icon = fallback["icon"]
 
-        # Hard length clamps
         name = name[:30]
         desc = desc[:80]
 
         return jsonify({"name": name, "desc": desc, "icon": icon})
 
     except Exception as e:
-        # Server-side debug
         print("[/api/generate_mission] error:", repr(e))
         return jsonify(fallback)
 
+
+# -----------------------------
+# NEW: GPT Condition Report API
+# -----------------------------
+@app.post("/api/condition_report")
+def condition_report():
+    """
+    Called by your dashboard JS:
+      POST /api/condition_report
+      { profile, history, nowISO }
+
+    Returns JSON (used by modal UI):
+      {
+        "summary": "...",
+        "score": 0..100,
+        "risk_level": "Low Risk" | "Moderate" | "Needs Attention",
+        "highlights": [...],
+        "concerns": [...],
+        "recommendations": [...],
+        "next_7_days_plan": [...]
+      }
+    """
+    data = request.get_json(silent=True) or {}
+
+    profile = data.get("profile") or {}
+    history = data.get("history") or []
+    now_iso = (data.get("nowISO") or "").strip()
+
+    if not isinstance(profile, dict):
+        profile = {}
+    if not isinstance(history, list):
+        history = []
+
+    history_trim = history[:7]
+
+    # Output schema your front-end can render
+    schema = {
+        "summary": "string",
+        "score": "integer (0-100)",
+        "risk_level": "string",
+        "highlights": ["string"],
+        "concerns": ["string"],
+        "recommendations": ["string"],
+        "next_7_days_plan": ["string"]
+    }
+
+    system = (
+        "You are BioPal's health routine assistant. "
+        "Generate a supportive, non-medical condition report based ONLY on the provided 7-day check-in history "
+        "and mission completion logs. "
+        "Do NOT provide diagnosis, medication instructions, or urgent medical directives. "
+        "If something seems concerning, suggest contacting a clinician in general terms without alarms. "
+        "Be concise and practical. Output must be valid JSON ONLY, matching the provided schema. "
+        "score must be an integer 0-100."
+    )
+
+    user = {
+        "task": "Create a 7-day condition report.",
+        "nowISO": now_iso,
+        "profile_hint": {
+            "gender": profile.get("gender"),
+            "weight": profile.get("weight"),
+            "height": profile.get("height"),
+            "treatmentPhase": profile.get("treatmentPhase"),
+            "activityBaseline": profile.get("activityBaseline"),
+            "medicalConditions": profile.get("medicalConditions"),
+            "allergies": profile.get("allergies"),
+            "medication_schedule": (profile.get("schedule") or {}).get("medication"),
+            "dressing_schedule": (profile.get("schedule") or {}).get("dressing"),
+        },
+        "history_7d": history_trim,
+        "output_schema": schema,
+        "style_rules": {
+            "tone": "warm, clear, encouraging",
+            "no_emojis": True,
+            "length": "short (about 8-12 lines total when rendered)",
+            "risk_level_options": ["Low Risk", "Moderate", "Needs Attention"]
+        }
+    }
+
+    fallback = {
+        "summary": "Not enough recent data to generate a detailed report. Complete the daily check-in and missions for a few days.",
+        "score": 50,
+        "risk_level": "Moderate",
+        "highlights": [],
+        "concerns": ["Insufficient 7-day history."],
+        "recommendations": ["Complete today's check-in to begin tracking trends."],
+        "next_7_days_plan": ["Do one check-in per day.", "Complete hydration mission consistently."]
+    }
+
+    try:
+        resp = client.responses.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            input=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": json.dumps(user, ensure_ascii=False)},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.5,
+        )
+
+        text = getattr(resp, "output_text", "") or ""
+        if not text:
+            # best-effort extraction
+            try:
+                parts = []
+                for item in (resp.output or []):
+                    for c in (getattr(item, "content", None) or []):
+                        t = getattr(c, "text", None)
+                        if t:
+                            parts.append(t)
+                text = "\n".join(parts).strip()
+            except Exception:
+                text = ""
+
+        if not text:
+            return jsonify(fallback)
+
+        obj = json.loads(text)
+
+        # Normalize/validate minimal fields
+        summary = str(obj.get("summary") or "").strip() or fallback["summary"]
+
+        try:
+            score = int(obj.get("score"))
+        except Exception:
+            score = fallback["score"]
+        score = max(0, min(100, score))
+
+        risk = str(obj.get("risk_level") or "").strip()
+        if risk not in ("Low Risk", "Moderate", "Needs Attention"):
+            risk = fallback["risk_level"]
+
+        def list_str(v):
+            if isinstance(v, list):
+                return [str(x).strip() for x in v if str(x).strip()][:8]
+            return []
+
+        out = {
+            "summary": summary[:900],
+            "score": score,
+            "risk_level": risk,
+            "highlights": list_str(obj.get("highlights")) or fallback["highlights"],
+            "concerns": list_str(obj.get("concerns")) or fallback["concerns"],
+            "recommendations": list_str(obj.get("recommendations")) or fallback["recommendations"],
+            "next_7_days_plan": list_str(obj.get("next_7_days_plan")) or fallback["next_7_days_plan"]
+        }
+
+        return jsonify(out)
+
+    except Exception as e:
+        print("[/api/condition_report] error:", repr(e))
+        return jsonify(fallback)
 
 
 if __name__ == "__main__":
