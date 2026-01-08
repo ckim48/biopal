@@ -115,8 +115,17 @@
   <nav class="navbar fixed-top">
     <div class="container">
       <a href="{{ url_for('home') }}" class="brand"> BioPal</a>
+
+      <!-- AUTH BUTTONS (toggle by Firebase Auth state) -->
       <div class="ms-auto d-none d-md-block">
-        <a href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-bold border">Sign In</a>
+        <!-- Signed-out -->
+        <a id="navSignedOut" href="{{ url_for('login') }}" class="btn btn-light rounded-pill px-4 fw-bold border">Sign In</a>
+
+        <!-- Signed-in -->
+        <div id="navSignedIn" class="d-none">
+          <a href="{{ url_for('main') }}" class="btn btn-dark rounded-pill px-4 fw-bold me-2">BioPal App</a>
+          <button id="logoutBtn" class="btn btn-light rounded-pill px-4 fw-bold border">Logout</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -235,5 +244,38 @@
     </div>
   </footer>
 
+  <!-- Firebase Auth state sync (THIS fixes "login status not applying") -->
+  <script type="module">
+    import { auth } from "{{ url_for('static', filename='js/firebase/config.js') }}";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const navSignedOut = document.getElementById("navSignedOut");
+    const navSignedIn = document.getElementById("navSignedIn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function setSignedInUI(isSignedIn){
+      if (isSignedIn){
+        navSignedOut.classList.add("d-none");
+        navSignedIn.classList.remove("d-none");
+      } else {
+        navSignedIn.classList.add("d-none");
+        navSignedOut.classList.remove("d-none");
+      }
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      setSignedInUI(!!user);
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try{
+        await signOut(auth);
+        // Optional: redirect after logout
+        window.location.href = "{{ url_for('home') }}";
+      } catch (e){
+        alert(e.message);
+      }
+    });
+  </script>
 </body>
 </html>

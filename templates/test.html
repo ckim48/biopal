@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Seed Mock Data</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{ --ink:#0b1220; --muted:#64748b; --line:rgba(2,6,23,.08); --bg:#f6fbff; }
+    body{
+      font-family:"Plus Jakarta Sans", system-ui, sans-serif;
+      background: radial-gradient(900px 520px at 18% 10%, rgba(56,189,248,.20), transparent 55%),
+                  radial-gradient(900px 520px at 85% 75%, rgba(14,165,233,.16), transparent 60%),
+                  linear-gradient(180deg, var(--bg) 0%, #ffffff 55%, #ffffff 100%);
+      color:var(--ink);
+      padding:24px;
+    }
+    .wrap{ max-width: 980px; margin: 0 auto; }
+    .cardx{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 22px 54px -40px rgba(2,6,23,.35);
+      padding: 18px;
+      backdrop-filter: blur(14px);
+    }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .smallmuted{ color:var(--muted); font-weight:700; font-size: 13px; }
+    .btnx{ border-radius: 14px; font-weight: 900; padding: 10px 14px; }
+    pre{
+      background: rgba(2,6,23,.04);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 0;
+      max-height: 360px;
+      overflow:auto;
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+      <div>
+        <h1 class="fw-black" style="font-weight:900; letter-spacing:-.4px;">Seed Mock Data</h1>
+        <p class="smallmuted mb-0">
+          Creates <span class="mono">daily_logs</span> for the last 7 medical days for the currently signed-in user.
+        </p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/dashboard" class="btn btn-outline-dark btnx">Back to Dashboard</a>
+      </div>
+    </div>
+
+    <div class="cardx mb-3">
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+        <div>
+          <div class="smallmuted">Signed in as</div>
+          <div class="mono" id="who">Checking…</div>
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-dark btnx" id="btnSeed" disabled>Seed last 7 days</button>
+          <button class="btn btn-outline-danger btnx" id="btnDelete" disabled>Delete seeded data</button>
+          <button class="btn btn-outline-secondary btnx" id="btnDry" disabled>Dry-run preview</button>
+        </div>
+      </div>
+      <hr style="border-color:var(--line); opacity:1;">
+
+      <div class="smallmuted mb-2">What it writes</div>
+      <ul class="smallmuted mb-0">
+        <li><span class="mono">users/{uid}/daily_logs/{YYYY-MM-DD}</span></li>
+        <li>Fields: <span class="mono">survey_v2</span>, <span class="mono">completedMissions</span>, <span class="mono">intervalMeta</span>, <span class="mono">mockSeed</span>, <span class="mono">lastUpdate</span></li>
+      </ul>
+    </div>
+
+    <div class="cardx">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="smallmuted">Log</div>
+          <div class="smallmuted">Tip: after seeding, refresh dashboard and open Condition Report.</div>
+        </div>
+        <div class="smallmuted" id="status">Idle</div>
+      </div>
+      <div class="mt-2">
+        <pre id="log"></pre>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import { db, auth } from "/static/js/firebase/config.js";
+  import {
+    doc, setDoc, getDoc, deleteDoc, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const $ = (id) => document.getElementById(id);
+  const logEl = $("log");
+  const statusEl = $("status");
+
+  const INTERVALS = [
+    { id: "09-12", startHr: 9,  endHr: 12 },
+    { id: "12-15", startHr: 12, endHr: 15 },
+    { id: "15-18", startHr: 15, endHr: 18 },
+    { id: "18-21", startHr: 18, endHr: 21 }
+  ];
+
+  function log(msg){
+    logEl.textContent += msg + "\\n";
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  function setStatus(s){ statusEl.textContent = s; }
+
+  // "Medical day" = if time < 09:00, treat as yesterday
+  function getMedicalDayID(dateObj = new Date()){
+    const now = dateObj;
+    const medDate = new Date(now);
+    if (now.getHours() < 9) medDate.setDate(medDate.getDate() - 1);
+    return medDate.toISOString().slice(0, 10);
+  }
+  function shiftDay(yyyy_mm_dd, deltaDays){
+    const d = new Date(yyyy_mm_dd + "T00:00:00");
+    d.setDate(d.getDate() + deltaDays);
+    return d.toISOString().slice(0,10);
+  }
+  function lastNDaysFrom(baseDay, n){
+    const days = [];
+    for(let i=0;i<n;i++) days.push(shiftDay(baseDay, -i));
+    return days;
+  }
+
+  function randPick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+  function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+  function randInt(lo, hi){ return Math.floor(lo + Math.random() * (hi - lo + 1)); }
+
+  function buildSurveyV2(dayIndex){
+    // dayIndex: 0=today, 6=6 days ago (we’ll vary values smoothly)
+    const cond = randPick(["good","average","average","bad"]);
+    const pain = randPick(["none","mild","mild","moderate"]);
+    const sleepHours = clamp(7.5 - dayIndex*0.2 + (Math.random()*0.8 - 0.4), 4.5, 9.5);
+    const qual = sleepHours >= 7 ? randPick(["good","good","woke_often"]) : randPick(["woke_often","hardly"]);
+    const awakenings = randPick(["0","1-2","1-2","3plus"]);
+    const morningFatigue = randPick(["refreshed","slightly","slightly","very"]);
+    const activityLevel = randPick(["low","normal","normal","active"]);
+    const fatigue = clamp(Math.round(4 + dayIndex*0.4 + (Math.random()*2 - 1)), 0, 10);
+    const mood = randPick(["good","neutral","neutral","tired","sad"]);
+    const anxiety = clamp(Math.round(4 + dayIndex*0.3 + (Math.random()*2 - 1)), 0, 10);
+
+    return {
+      A: { cond, pain, painTiming:"", nausea:"", skin:"" },
+      B: { hours: Number(sleepHours.toFixed(1)), qual, awakenings, morningFatigue },
+      C: { activityLevel, fatigue },
+      D: { mood, anxiety, hardMoment: randPick(["yes","no","no"]), note:"", gsr:"" },
+      E: { medChanged:"no", dressChanged:"no", medication:null, dressing:null }
+    };
+  }
+
+  function buildCompletedMissions(){
+    // your code checks completedMissions = ["09-12_WATER", ...]
+    // We'll create a believable set: some water done, sometimes med, sometimes dress.
+    const out = [];
+
+    for (const iv of INTERVALS){
+      // WATER is often done
+      if (Math.random() < 0.75) out.push(`${iv.id}_WATER`);
+
+      // MED + DRESS occasionally done
+      if (Math.random() < 0.45) out.push(`${iv.id}_MED`);
+      if (Math.random() < 0.25) out.push(`${iv.id}_DRESS`);
+
+      // Sometimes a custom mission exists & completed
+      if (Math.random() < 0.20) out.push(`${iv.id}_CUSTOM_1`);
+    }
+
+    // Deduplicate
+    return Array.from(new Set(out));
+  }
+
+  function buildIntervalMeta(){
+    // Not strictly required (your dashboard can create startedAt),
+    // but having it makes things look “filled”.
+    const meta = {};
+    const base = Date.now() - 1000*60*60*2; // 2 hours ago-ish
+    for (const iv of INTERVALS){
+      meta[iv.id] = {
+        startedAt: base - randInt(0, 1000*60*20),
+        nextRevealAt: 0,
+        lastCompletedAt: base - randInt(0, 1000*60*10)
+      };
+    }
+    return meta;
+  }
+
+  function makeDailyLogDoc(dayStr, dayIndex){
+    return {
+      survey_v2: buildSurveyV2(dayIndex),
+      completedMissions: buildCompletedMissions(),
+      intervalMeta: buildIntervalMeta(),
+      mockSeed: {
+        tag: "seed7d_v1",
+        day: dayStr,
+        createdAtMs: Date.now()
+      },
+      lastUpdate: serverTimestamp()
+    };
+  }
+
+  async function dryRun(uid){
+    const base = getMedicalDayID(new Date());
+    const days = lastNDaysFrom(base, 7);
+
+    log("=== DRY RUN PREVIEW ===");
+    for (let i=0; i<days.length; i++){
+      const day = days[i];
+      const sample = makeDailyLogDoc(day, i);
+      log(`users/${uid}/daily_logs/${day}`);
+      log(JSON.stringify({
+        ...sample,
+        lastUpdate: "[serverTimestamp()]"
+      }, null, 2));
+      log("------------------------------------------------------------");
+    }
+    log("Dry-run complete.");
+  }
+
+  async function seed7days(uid){
+    setStatus("Seeding…");
+    const base = getMedicalDayID(new Date());
+    const days = lastNDaysFrom(base, 7);
+
+    log(`Seeding for UID: ${uid}`);
+    log(`Medical base day: ${base}`);
+    log(`Days: ${days.join(", ")}`);
+
+    for (let i=0; i<days.length; i++){
+      const day = days[i];
+      const ref = doc(db, "users", uid, "daily_logs", day);
+
+      const payload = makeDailyLogDoc(day, i);
+
+      // merge so you don’t destroy real fields if they exist
+      await setDoc(ref, payload, { merge:true });
+
+      log(`✅ wrote daily_logs/${day} (merge)`);
+    }
+
+    setStatus("Done");
+    log("All 7 days seeded. Refresh dashboard now.");
+  }
+
+  async function deleteSeeded(uid){
+    setStatus("Deleting…");
+    const base = getMedicalDayID(new Date());
+    const days = lastNDaysFrom(base, 7);
+
+    log(`Deleting seeded docs for UID: ${uid}`);
+    for (const day of days){
+      const ref = doc(db, "users", uid, "daily_logs", day);
+      const snap = await getDoc(ref);
+      if (!snap.exists()){
+        log(`- daily_logs/${day} does not exist`);
+        continue;
+      }
+      const d = snap.data() || {};
+      const tag = d?.mockSeed?.tag || "";
+      if (tag !== "seed7d_v1"){
+        log(`⚠️ skipped daily_logs/${day} (not tagged seed7d_v1)`);
+        continue;
+      }
+      await deleteDoc(ref);
+      log(`🗑️ deleted daily_logs/${day}`);
+    }
+    setStatus("Done");
+    log("Delete complete.");
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    logEl.textContent = "";
+    if (!user){
+      $("who").textContent = "Not signed in";
+      setStatus("Sign in required");
+      log("Please sign in first, then reload this page.");
+      return;
+    }
+
+    $("who").textContent = `${user.uid}`;
+    $("btnSeed").disabled = false;
+    $("btnDelete").disabled = false;
+    $("btnDry").disabled = false;
+
+    $("btnDry").onclick = () => dryRun(user.uid);
+    $("btnSeed").onclick = () => seed7days(user.uid);
+    $("btnDelete").onclick = () => deleteSeeded(user.uid);
+
+    log("Ready. Click 'Dry-run preview' to inspect payload, then 'Seed last 7 days'.");
+  });
+</script>
+</body>
+</html>

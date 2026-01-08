@@ -4,13 +4,13 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAt906fBZy_HEphH847kG8WmszeOvX56fI",
-  authDomain: "cancertest-1e83a.firebaseapp.com",
-  projectId: "cancertest-1e83a",
-  storageBucket: "cancertest-1e83a.firebasestorage.app",
-  messagingSenderId: "408747690644",
-  appId: "1:408747690644:web:0dae3cdb595cc5ff054281",
-  measurementId: "G-5NXEDFTWS2"
+  apiKey: "AIzaSyBX4q-sOcYbPAkzQCaKuQkrMPUuxmMPi4E",
+  authDomain: "cancer-4dce7.firebaseapp.com",
+  projectId: "cancer-4dce7",
+  storageBucket: "cancer-4dce7.firebasestorage.app",
+  messagingSenderId: "886892546006",
+  appId: "1:886892546006:web:a24b1d1e09dbdf219d8677",
+  measurementId: "G-2CB8SDWRLL"
 };
 
 export const app = initializeApp(firebaseConfig);

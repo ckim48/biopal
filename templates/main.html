@@ -18,6 +18,16 @@
       --shadow:0 12px 34px -18px rgba(2,6,23,.22);
       --ok:#10b981; --warn:#f59e0b; --bad:#ef4444;
       --border:rgba(2,6,23,.08);
+
+      --orange:#f59e0b;
+      --orange2:#fb923c;
+      --orangeSoft: rgba(245,158,11,.12);
+      --orangeBorder: rgba(245,158,11,.25);
+      --orangeInk: #7c2d12;
+
+      --fz-title: 16.5px;
+      --fz-sub: 13.5px;
+      --fz-body: 15.5px;
     }
     *{box-sizing:border-box; outline:none;}
     body{
@@ -26,48 +36,241 @@
                   radial-gradient(900px 520px at 85% 75%, rgba(14,165,233,.16), transparent 60%),
                   linear-gradient(180deg, var(--bg) 0%, #ffffff 55%, #ffffff 100%);
       color:var(--ink); -webkit-font-smoothing:antialiased; padding-bottom:120px;
+      font-size: var(--fz-body);
     }
+
     .nav{
       position:sticky; top:16px; z-index:100; max-width:1200px; margin:16px auto;
       background:rgba(255,255,255,.70); backdrop-filter:blur(18px); border:1px solid var(--border);
-      border-radius:24px; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow);
+      border-radius:24px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; box-shadow:var(--shadow);
+      gap:12px;
     }
-    .brand{ font-weight:900; font-size:22px; text-decoration:none; color:var(--ink); letter-spacing:-1px; display:flex; align-items:center; gap:10px; }
-    .brand-badge{ width:34px; height:34px; border-radius:12px; background:linear-gradient(135deg, var(--sky), var(--sky2)); display:grid; place-items:center; color:#fff; }
+    .nav-left{ display:flex; align-items:center; gap:12px; min-width: 260px; }
+    .nav-right{ display:flex; gap:8px; align-items:center; }
+
     .btn{ padding:12px 18px; border-radius:14px; border:none; font-weight:800; font-size:14px; cursor:pointer; transition:all .18s ease; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
     .btn-primary{ background:linear-gradient(135deg, var(--ink), #101a33); color:#fff; box-shadow:0 14px 26px -18px rgba(2,6,23,.55); }
     .btn-ghost{ background:transparent; color:var(--ink); border:1px solid rgba(2,6,23,.08); }
     .btn-primary:disabled, .btn-ghost:disabled{ opacity:.55; cursor:not-allowed; }
 
+    .nav-greet{
+      display:flex; flex-direction:column; line-height:1.08;
+      padding:6px 2px;
+      min-width: 200px;
+    }
+    .nav-greet .hello{
+      font-weight:950; letter-spacing:-.35px; font-size:15px;
+    }
+    .nav-greet .sub{
+      font-weight:850; font-size:13px;
+      color:rgba(100,116,139,.95);
+      margin-top:3px;
+    }
+
+    .selfcheck-wrap{ max-width:1200px; margin: 0 auto 10px; padding: 0 12px; }
+    .selfcheck-banner{
+      display:none;
+      border-radius:20px;
+      padding:14px 14px;
+      border:1px solid var(--orangeBorder);
+      background:
+        radial-gradient(260px 120px at 10% 20%, rgba(251,146,60,.18), transparent 60%),
+        radial-gradient(260px 140px at 90% 80%, rgba(245,158,11,.16), transparent 60%),
+        rgba(255,255,255,.78);
+      box-shadow: 0 22px 54px -40px rgba(2,6,23,.35);
+      backdrop-filter: blur(14px);
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .selfcheck-banner.show{ display:flex; }
+    .selfcheck-left{ display:flex; align-items:center; gap:10px; }
+    .selfcheck-ic{
+      width:46px; height:46px; border-radius:18px;
+      background: linear-gradient(135deg, var(--orange), var(--orange2));
+      display:grid; place-items:center; color:#fff;
+      box-shadow: 0 18px 36px -26px rgba(245,158,11,.75);
+      border: 1px solid rgba(255,255,255,.40);
+      flex:0 0 auto;
+    }
+    .selfcheck-ic i{ font-size:18px; }
+    .selfcheck-txt{ display:flex; flex-direction:column; line-height:1.15; }
+    .selfcheck-title{
+      margin:0; font-weight:950; letter-spacing:-.3px; font-size: var(--fz-title); color: var(--orangeInk);
+      display:flex; align-items:center; gap:8px;
+    }
+    .selfcheck-sub{
+      margin:6px 0 0; font-weight:850; font-size: var(--fz-sub); color: rgba(124,45,18,.80);
+    }
+    .btn-orange{
+      padding:11px 14px;
+      border-radius:16px;
+      border:1px solid rgba(245,158,11,.30);
+      background: linear-gradient(135deg, rgba(245,158,11,.20), rgba(251,146,60,.14));
+      color: #7c2d12;
+      font-weight:950;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
+      transition: all .16s ease;
+      box-shadow: 0 16px 36px -28px rgba(245,158,11,.55);
+      white-space:nowrap;
+      font-size: 14px;
+    }
+    .btn-orange:hover{ transform: translateY(-1px); border-color: rgba(245,158,11,.45); }
+
+    .selfcheck-banner.done{
+      border-color: rgba(16,185,129,.25);
+      background:
+        radial-gradient(260px 120px at 10% 20%, rgba(16,185,129,.16), transparent 60%),
+        radial-gradient(260px 140px at 90% 80%, rgba(56,189,248,.16), transparent 60%),
+        rgba(255,255,255,.82);
+    }
+    .selfcheck-banner.done .selfcheck-ic{
+      background: linear-gradient(135deg, rgba(16,185,129,1), rgba(56,189,248,1));
+      box-shadow: 0 18px 36px -26px rgba(16,185,129,.55);
+    }
+    .selfcheck-banner.done .selfcheck-title{ color: rgba(6,95,70,1); }
+    .selfcheck-banner.done .selfcheck-sub{ color: rgba(6,95,70,.82); }
+    .btn-green{
+      padding:11px 14px;
+      border-radius:16px;
+      border:1px solid rgba(16,185,129,.25);
+      background: linear-gradient(135deg, rgba(16,185,129,.14), rgba(56,189,248,.10));
+      color: rgba(6,95,70,1);
+      font-weight:950;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer;
+      transition: all .16s ease;
+      box-shadow: 0 16px 36px -28px rgba(16,185,129,.45);
+      white-space:nowrap;
+      font-size: 14px;
+    }
+    .btn-green:hover{ transform: translateY(-1px); border-color: rgba(16,185,129,.40); }
+
     .page{ min-height:calc(100vh - 120px); display:flex; align-items:center; justify-content:center; padding:12px; }
     .board{ width:min(1200px, 100%); border:1px solid rgba(14,165,233,.16); border-radius:28px; background:var(--panel); backdrop-filter:blur(18px); box-shadow: 0 22px 54px -38px rgba(2,6,23,.45); padding:22px; position:relative; overflow:hidden; }
     .pill{ background:rgba(255,255,255,.72); border-radius:18px; padding:12px 16px; display:flex; align-items:center; gap:12px; border:1px solid rgba(2,6,23,.06); }
-    .mission-card{ background:rgba(255,255,255,.72); border-radius:18px; padding:16px; display:flex; align-items:center; gap:14px; border:1px solid rgba(14,165,233,.14); transition: all .18s ease; cursor:pointer; user-select:none; }
-    .mission-card:hover{ transform: translateY(-1px); border-color: var(--sky); }
-    .mission-card.completed{ opacity:.62; background:rgba(2,6,23,.04); pointer-events:none; transform:none; }
-    .icon-badge{ width:54px; height:54px; border-radius:18px; background:linear-gradient(135deg, var(--sky), var(--sky2)); color:#fff; display:grid; place-items:center; flex:0 0 auto; border:1px solid rgba(255,255,255,0.55); }
+
+    .topbar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:16px;
+      min-height: 62px;
+    }
+    .topbar .sleep-wrap{ flex: 0 0 auto; width: min(420px, 100%); }
+    .topbar .time-wrap{
+      position:absolute;
+      left:50%;
+      transform: translateX(-50%);
+      display:flex;
+      justify-content:center;
+      width: min(360px, 100%);
+      pointer-events:none;
+    }
+    .topbar .time-wrap .pill{ pointer-events:auto; }
+
+    .sleep-pill{
+      padding:12px 14px;
+      border-radius:20px;
+      background: rgba(255,255,255,.74);
+      border:1px solid rgba(2,6,23,.08);
+      box-shadow: 0 14px 28px -24px rgba(2,6,23,.32);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .sleep-left{ display:flex; align-items:center; gap:10px; min-width: 0; }
+    .sleep-meta{ display:flex; flex-direction:column; line-height:1.15; min-width:0; }
+    .sleep-title{
+      margin:0; font-weight:950; letter-spacing:-.25px; font-size: 15.5px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .sleep-sub{ margin:5px 0 0; font-weight:850; color: var(--muted); font-size: 13px; }
+    .sleep-stars{
+      display:flex; align-items:center; gap:4px;
+      padding:8px 10px; border-radius:999px;
+      background: rgba(245,158,11,.10);
+      border:1px solid rgba(245,158,11,.18);
+      flex:0 0 auto;
+    }
+    .sleep-stars i{ font-size:18px; line-height:1; }
+    .sleep-stars .on{ color:#f59e0b; }
+    .sleep-stars .off{ color:rgba(2,6,23,.22); }
+
+    .mission-card{
+      background:rgba(255,255,255,.78);
+      border-radius:22px;
+      padding:24px 18px;
+      min-height:160px;
+      display:flex; align-items:center; gap:14px;
+      border:1.5px solid rgba(14,165,233,.18);
+      box-shadow: 0 12px 26px -20px rgba(2,6,23,.28);
+      transition: all .18s ease;
+      cursor:pointer; user-select:none;
+      position:relative; overflow:hidden;
+    }
+    .mission-card::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, rgba(56,189,248,.18), transparent 55%, rgba(14,165,233,.12));
+      opacity:.55;
+      pointer-events:none;
+    }
+    .mission-card > *{ position:relative; z-index:1; }
+    .mission-card:hover{
+      transform: translateY(-1px);
+      border-color: rgba(14,165,233,.45);
+      box-shadow: 0 18px 34px -24px rgba(2,6,23,.34);
+    }
+    .mission-card.completed{ opacity:.62; background:rgba(2,6,23,.04); pointer-events:none; transform:none; box-shadow:none; }
+    .icon-badge{
+      width:64px; height:64px;
+      border-radius:24px;
+      background:linear-gradient(135deg, var(--sky), var(--sky2));
+      color:#fff; display:grid; place-items:center; flex:0 0 auto;
+      border:1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 16px 30px -24px rgba(14,165,233,.60);
+    }
+    .icon-badge i{ font-size:24px; }
+    .icon-badge img{
+      width:45px; height:45px; object-fit:contain; display:block;
+      filter: drop-shadow(0 10px 18px rgba(2,6,23,.18));
+    }
+
     .sensor-card{ background:rgba(255,255,255,.72); border-radius:20px; padding:14px; display:flex; align-items:center; gap:16px; border:1px solid rgba(14,165,233,.12); margin-bottom:12px; }
     .gif-slot{ width:64px; height:64px; border-radius:22px; background:rgba(14,165,233,.10); overflow:hidden; flex: 0 0 auto; border:1.5px solid rgba(14,165,233,.18); display:grid; place-items:center; }
     .gif-slot img{ width:100%; height:100%; object-fit:cover; }
     .character-box{ background:rgba(255,255,255,.72); border-radius:22px; width:100%; aspect-ratio:1/1; overflow:hidden; border:1px solid rgba(14,165,233,.14); }
     .character-box img{ width:100%; height:100%; object-fit:cover; }
-    .sensor-value{ margin-top:6px; display:flex; align-items:center; gap:8px; font-weight:900; font-size:.92rem; }
+    .sensor-value{ margin-top:6px; display:flex; align-items:center; gap:8px; font-weight:900; font-size:1.05rem; }
     .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
     .dot.ok{ background:var(--ok); } .dot.warn{ background:var(--warn); } .dot.bad{ background:var(--bad); }
 
-    .mock-clock{ position: fixed; bottom: 24px; left: 24px; background:rgba(2,6,23,.92); color: white; padding: 12px 18px; border-radius: 18px; font-weight: 900; font-size: 13px; z-index: 1000; display: flex; align-items: center; gap: 8px; }
-    .profile-fab{ position: fixed; right: 24px; bottom: 24px; z-index: 1100; width: 62px; height: 62px; border-radius: 22px; background: var(--sky); color: #fff; display: grid; place-items: center; box-shadow: 0 22px 44px -30px rgba(14,165,233,.75); border:none; }
-    .debug-panel{ position: fixed; bottom: 98px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-    .btn-debug{ width: 56px; height: 56px; border-radius: 18px; background: #0b1220; color: #fff; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.1); cursor:pointer; }
-
-    .rating-wrap{ display:flex; align-items:center; gap:12px; }
-    .stars{ display:flex; align-items:center; gap:3px; min-width:92px; }
-    .stars i{ font-size:16px; line-height:1; }
-    .stars .on{ color:#f59e0b; }
-    .stars .off{ color:rgba(2,6,23,.20); }
-    .rating-meta{ display:flex; flex-direction:column; line-height:1.15; }
-    .rating-top{ font-weight:950; letter-spacing:-.2px; display:flex; align-items:center; gap:8px; }
-    .rating-sub{ font-size:12px; font-weight:850; color:var(--muted); }
+    .center-feedback{ margin-top:14px; display:flex; justify-content:center; }
+    .feedback-card{
+      width:min(440px, 100%);
+      border-radius:22px;
+      padding:16px 16px;
+      border:1px solid rgba(14,165,233,.18);
+      background:
+        radial-gradient(240px 120px at 18% 10%, rgba(56,189,248,.22), transparent 60%),
+        radial-gradient(260px 140px at 88% 86%, rgba(14,165,233,.18), transparent 60%),
+        rgba(255,255,255,.72);
+      box-shadow: 0 22px 54px -40px rgba(2,6,23,.42);
+      backdrop-filter: blur(14px);
+      position:relative; overflow:hidden; text-align:center;
+    }
+    .feedback-card::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: linear-gradient(120deg, rgba(56,189,248,.22), transparent 58%, rgba(14,165,233,.16));
+      opacity:.75; pointer-events:none;
+    }
+    .feedback-inner{ position:relative; z-index:1; }
+    #statusTitle{ margin:0; font-weight:950; letter-spacing:-.35px; font-size:19px; line-height:1.25; }
 
     .overlay{ position:fixed; inset:0; background:rgba(2,6,23,.45); backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center; z-index:1200; padding:20px; }
     .overlay.show{display:flex;}
@@ -75,6 +278,38 @@
     .modal-headerX{ padding:20px 24px; border-bottom:1px solid rgba(2,6,23,.08); display:flex; justify-content:space-between; align-items:center; }
     .modal-bodyX{ padding:24px; max-height: 72vh; overflow-y: auto; }
     .modal-footerX{ padding:16px 24px; border-top:1px solid rgba(2,6,23,.08); display:flex; justify-content:flex-end; gap:10px; background: #fafafa; }
+
+    .confirm-header{
+      border-bottom:1px solid rgba(14,165,233,.18);
+      background:
+        radial-gradient(260px 120px at 12% 20%, rgba(56,189,248,.28), transparent 60%),
+        radial-gradient(260px 140px at 90% 80%, rgba(14,165,233,.20), transparent 60%),
+        rgba(255,255,255,.92);
+    }
+    .confirm-title{
+      margin:0; font-size:18px; font-weight:950; letter-spacing:-.25px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .confirm-badge{
+      width:36px; height:36px; border-radius:14px;
+      display:grid; place-items:center; color:#fff;
+      background: linear-gradient(135deg, var(--sky), var(--sky2));
+      border: 1px solid rgba(255,255,255,.38);
+      box-shadow: 0 18px 34px -28px rgba(14,165,233,.55);
+      flex:0 0 auto;
+    }
+    .confirm-sub{ margin:8px 0 0; color: var(--muted); font-weight:800; font-size: 13px; line-height:1.45; }
+    .btn-sky{
+      padding:11px 14px; border-radius:16px;
+      border:1px solid rgba(14,165,233,.22);
+      background: linear-gradient(135deg, rgba(14,165,233,.14), rgba(56,189,248,.10));
+      color: var(--ink); font-weight:950;
+      display:inline-flex; align-items:center; gap:8px;
+      cursor:pointer; transition: all .16s ease;
+      box-shadow: 0 16px 36px -28px rgba(14,165,233,.35);
+      white-space:nowrap; font-size: 14px;
+    }
+    .btn-sky:hover{ transform: translateY(-1px); border-color: rgba(14,165,233,.40); }
 
     .survey-step{display:none;}
     .survey-step.active{display:block;}
@@ -88,22 +323,12 @@
       border:1px solid rgba(14,165,233,.16);
       background:rgba(14,165,233,.06);
       font-weight:700; font-family:inherit;
+      font-size: 14.5px;
     }
     .inline-2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
     .subpanel{border:1px solid var(--border); background:#fff; border-radius:16px; padding:14px; margin-top:10px;}
     .hint{font-size:11px; color:var(--muted); margin-top:6px; line-height:1.35;}
     .hidden{display:none !important;}
-
-    .profile-drawer {
-      position: fixed; top: 0; right: -420px; width: 100%; max-width: 400px; height: 100vh;
-      background: #fff; z-index: 1300; box-shadow: -10px 0 40px rgba(0,0,0,0.1);
-      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column;
-    }
-    .profile-drawer.show { right: 0; }
-    .drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.3); backdrop-filter: blur(4px); z-index: 1250; display: none; }
-    .drawer-overlay.show { display: block; }
-    .drawer-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .drawer-body { padding: 24px; overflow-y: auto; flex-grow: 1; }
 
     .toast-wrap{
       position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
@@ -144,77 +369,76 @@
       to{ transform: translateY(0); opacity:1; }
     }
 
-    /* --- Card-only loading state --- */
     .mission-card.loading{
       cursor:default; pointer-events:none;
       background:rgba(255,255,255,.58);
-      border:1px dashed rgba(14,165,233,.35);
+      border:1.5px dashed rgba(14,165,233,.35);
       transform:none !important;
+      box-shadow:none;
     }
+    .mission-card.loading::after{ opacity:.25; }
     .mission-card.loading .icon-badge{
       background:rgba(14,165,233,.12);
       color:var(--ink);
       border:1px solid rgba(14,165,233,.22);
+      box-shadow:none;
     }
-    .mission-card.loading .spinner-border{
-      width:1.05rem; height:1.05rem;
+    .mission-card.loading .spinner-border{ width:1.05rem; height:1.05rem; }
+
+    .mission-card.locked{
+      opacity:.95;
+      background:rgba(255,255,255,.70);
+      border:1.5px dashed rgba(14,165,233,.35);
+      box-shadow:none;
+    }
+    .mission-card.locked::after{ opacity:.25; }
+    .mission-card.locked:hover{ transform: translateY(-1px); border-color: var(--sky); }
+
+    .debug-panel{ position: fixed; bottom: 42px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+    .btn-debug{ width: 56px; height: 56px; border-radius: 18px; background: #0b1220; color: #fff; display: grid; place-items: center; border: 1px solid rgba(255,255,255,0.1); cursor:pointer; }
+
+    @media (max-width:900px){
+      .topbar{ flex-direction:column; align-items:stretch; gap:10px; min-height: unset; }
+      .topbar .time-wrap{ position:static; transform:none; width: 100%; }
+      .topbar .sleep-wrap{ width: 100%; }
+    }
+    @media (max-width:768px){
+      .inline-2{grid-template-columns:1fr;}
+      .nav{ padding:12px 14px; }
+      .nav-left{ min-width: unset; }
+      .nav-greet{ min-width: unset; }
+      .selfcheck-banner{ flex-direction:column; align-items:flex-start; }
     }
 
-    /* ===================== NEW: Condition Report FAB + Modal ===================== */
-    .report-fab{
-      position: fixed;
-      right: 24px;
-      bottom: 98px; /* sits above profile button */
-      z-index: 1101;
-      width: 62px; height: 62px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #0b1220, #101a33);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 22px 44px -30px rgba(2,6,23,.55);
-      border:none;
-    }
-    .report-fab:disabled{ opacity:.55; cursor:not-allowed; }
-    .report-loading{
-      display:flex; align-items:center; gap:12px;
-      padding: 12px 14px;
-      border: 1px solid rgba(14,165,233,.14);
-      background: rgba(14,165,233,.06);
-      border-radius: 16px;
-    }
-    .report-chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(14,165,233,.08);
-      border: 1px solid rgba(14,165,233,.16);
-      font-weight: 900;
-      font-size: 12px;
-      color: var(--ink);
-    }
-    .report-block{
-      border:1px solid rgba(2,6,23,.08);
-      border-radius: 18px;
-      padding: 14px;
-      background: #fff;
-      margin-top: 12px;
-    }
-    .report-block h6{
-      margin:0 0 8px;
-      font-weight: 950;
-      letter-spacing: -.2px;
-    }
-    .report-block p{
-      margin:0;
+    .nav-right .btn-ghost {
+      background: var(--soft);
+      color: var(--sky);
+      border: 1px solid rgba(14,165,233, 0.2);
       font-weight: 700;
-      color: var(--ink);
-      line-height: 1.55;
-      font-size: 13px;
     }
-    /* ========================================================================== */
+    .nav-right .btn-ghost:hover {
+      background: var(--sky);
+      color: white;
+      border-color: var(--sky);
+      transform: translateY(-1px);
+    }
+    #logoutBtn {
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--bad);
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+    #logoutBtn:hover { background: var(--bad); color: white; }
 
-    @media (max-width:768px){ .inline-2{grid-template-columns:1fr;} }
+    /* ✅ NEW: blinking highlight for the chosen mission card */
+    .mission-card.is-alarming{
+      border-color: rgba(245,158,11,.65) !important;
+      box-shadow: 0 22px 44px -28px rgba(245,158,11,.55) !important;
+      animation: alarmBlink 1s ease-in-out infinite;
+    }
+    @keyframes alarmBlink{
+      0%,100%{ transform: translateY(0); filter:saturate(1); }
+      50%{ transform: translateY(-2px); filter:saturate(1.25); }
+    }
   </style>
 </head>
 
@@ -222,40 +446,97 @@
   <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
 
   <nav class="nav">
-    <a href="#" class="brand"><span class="brand-badge"><i class="bi bi-shield-check"></i></span> BioPal</a>
-    <div style="display:flex; gap:8px;">
-      <button id="openSurveyBtn" class="btn btn-primary" disabled><i class="bi bi-clipboard2-pulse"></i> Check-in</button>
-      <button id="logoutBtn" class="btn btn-ghost" disabled><i class="bi bi-box-arrow-right"></i> Exit</button>
+    <div class="nav-left">
+      <div class="nav-greet" id="navGreeting" aria-label="Greeting">
+        <div class="hello" id="helloLine">Hi, there</div>
+        <div class="sub" id="greetSub">Welcome back</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a href="/dashboard" class="btn btn-ghost nav-btn-dash">
+        <i class="bi bi-grid-fill"></i> Dashboard
+      </a>
+
+      <a href="/chatbot" class="btn btn-ghost nav-btn-chat">
+        <i class="bi bi-chat-dots-fill"></i> Chatbot
+      </a>
+
+      <a href="/profile" class="btn btn-ghost nav-btn-user" id="profileNavBtn">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+
+      <button id="openSurveyBtn" class="btn btn-primary" disabled>
+        <i class="bi bi-clipboard2-pulse"></i> Daily Check-in
+      </button>
+
+      <button id="logoutBtn" class="btn btn-ghost nav-btn-exit" disabled>
+        <i class="bi bi-box-arrow-right"></i> Exit
+      </button>
     </div>
   </nav>
 
+  <div class="selfcheck-wrap">
+    <div class="selfcheck-banner" id="selfCheckBanner" role="status" aria-live="polite">
+      <div class="selfcheck-left">
+        <div class="selfcheck-ic" id="selfCheckIcon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <div class="selfcheck-txt">
+          <p class="selfcheck-title" id="selfCheckTitle">Self-check is not completed</p>
+          <p class="selfcheck-sub" id="selfCheckSub">Please complete today’s check-in so BioPal can help you better.</p>
+        </div>
+      </div>
+
+      <button class="btn-orange" id="selfCheckGoBtn" type="button">
+        <i class="bi bi-clipboard2-heart"></i> Start Check-in
+      </button>
+
+      <button class="btn-green hidden d-none" id="selfCheckDoneBtn" type="button">
+        <i class="bi bi-check2-circle"></i> View Check-in
+      </button>
+    </div>
+  </div>
+
   <div class="page">
     <div class="board">
-      <div class="d-flex justify-content-center mb-4">
-        <div class="pill">
-          <div class="rating-wrap">
-            <div class="stars" id="stars"></div>
-            <div class="rating-meta">
-              <div class="rating-top">
-                <i class="bi bi-clock-history"></i>
-                <span id="interval-label">--:--</span>
+
+      <div class="topbar">
+        <div class="sleep-wrap">
+          <div class="sleep-pill">
+            <div class="sleep-left">
+              <div class="sleep-meta">
+                <p class="sleep-title">Sleep Score</p>
+                <p class="sleep-sub" id="sleepStarsSub">Your next check-in will update this score.</p>
               </div>
-              <div class="rating-sub" id="rating-msg">Synchronizing vitals...</div>
+            </div>
+            <div class="sleep-stars" id="stars" title="Sleep Score"></div>
+          </div>
+        </div>
+
+        <div class="time-wrap">
+          <div class="pill">
+            <div class="rating-top" style="font-weight:950; letter-spacing:-.2px; display:flex; align-items:center; gap:10px;">
+              <i class="bi bi-clock-history"></i>
+              <span id="realtime-label">--:--</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="row mid-row g-4">
-        <div class="col-lg-4 d-flex flex-column gap-4" id="mission-container"></div>
+        <div class="col-lg-4 d-flex flex-column gap-3">
+          <div class="d-flex flex-column gap-4" id="mission-container"></div>
+        </div>
 
         <div class="col-lg-4 text-center">
           <div class="character-box">
             <img id="characterSprite" src="/static/gifs/character2.gif" alt="Guardian">
           </div>
-          <div class="mt-3">
-            <h5 id="statusTitle" class="fw-bold m-0">Synchronizing...</h5>
-            <p id="statusDesc" class="small text-muted d-none">Awaiting diagnostic feed</p>
+
+          <div class="center-feedback">
+            <div class="feedback-card" aria-live="polite">
+              <div class="feedback-inner">
+                <h5 id="statusTitle">Synchronizing…</h5>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -277,138 +558,44 @@
     </div>
   </div>
 
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-  <div class="profile-drawer" id="profileDrawer">
-    <div class="drawer-header">
-      <h2 style="margin:0; font-size:18px; font-weight:950;">User Profile</h2>
-      <button id="closeDrawerBtn" class="btn btn-ghost" style="border-radius:50%; width:40px; height:40px; padding:0;">✕</button>
-    </div>
-    <div class="drawer-body">
-      <form id="profileEditForm">
-        <!-- Basics -->
-        <div class="field-group">
-          <label>Gender</label>
-          <select id="edit_gender">
-            <option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
-          </select>
-        </div>
-        <div class="inline-2">
-          <div class="field-group"><label>Weight (kg)</label><input type="number" id="edit_weight" step="0.1"></div>
-          <div class="field-group"><label>Height (cm)</label><input type="number" id="edit_height" step="0.1"></div>
-        </div>
-
-        <hr>
-
-        <!-- NEW: Treatment Phase -->
-        <h6 style="font-weight:900;">Treatment Phase</h6>
-        <div class="field-group">
-          <label>Phase</label>
-          <select id="edit_treatmentPhase">
-            <option value="">Not set</option>
-            <option value="pre_treatment">Pre-treatment</option>
-            <option value="active_treatment">Active treatment</option>
-            <option value="recovery">Recovery</option>
-            <option value="maintenance">Maintenance</option>
-            <option value="survivorship">Survivorship</option>
-            <option value="other">Other</option>
-          </select>
-          <div class="hint">Used to tailor guidance and custom missions.</div>
-        </div>
-
-        <hr>
-
-        <!-- NEW: Medical Conditions / Allergies -->
-        <h6 style="font-weight:900;">Medical Conditions / Allergies</h6>
-        <div class="field-group">
-          <label>Medical conditions (optional)</label>
-          <textarea id="edit_medicalConditions" rows="3" placeholder="e.g., asthma, diabetes, hypertension"></textarea>
-          <div class="hint">Free text. Keep it short and practical.</div>
-        </div>
-        <div class="field-group">
-          <label>Allergies (optional)</label>
-          <textarea id="edit_allergies" rows="2" placeholder="e.g., penicillin, peanuts"></textarea>
-        </div>
-
-        <hr>
-
-        <!-- NEW: Activity Baseline -->
-        <h6 style="font-weight:900;">Activity Baseline</h6>
-        <div class="field-group">
-          <label>Baseline</label>
-          <select id="edit_activityBaseline">
-            <option value="">Not set</option>
-            <option value="low">Low (mostly resting)</option>
-            <option value="light">Light (short walks, light chores)</option>
-            <option value="moderate">Moderate (regular daily activity)</option>
-            <option value="active">Active (exercise most days)</option>
-          </select>
-          <div class="hint">Helps determine safe mission intensity.</div>
-        </div>
-
-        <hr>
-
-        <!-- NEW: Emergency Contact -->
-        <h6 style="font-weight:900;">Emergency Contact</h6>
-        <div class="field-group">
-          <label>Name (optional)</label>
-          <input id="edit_emgName" type="text" placeholder="Contact name">
-        </div>
-        <div class="inline-2">
-          <div class="field-group">
-            <label>Relationship (optional)</label>
-            <input id="edit_emgRelation" type="text" placeholder="e.g., Parent, Spouse, Friend">
-          </div>
-          <div class="field-group">
-            <label>Phone (optional)</label>
-            <input id="edit_emgPhone" type="tel" placeholder="e.g., 010-1234-5678">
+  <!-- ✅ Mission Confirmation Modal -->
+  <div class="overlay" id="confirmOverlay" aria-hidden="true">
+    <div class="modalX" style="max-width:520px;">
+      <div class="modal-headerX confirm-header">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="confirm-badge" id="confirmIcon"><i class="bi bi-check2-circle"></i></div>
+          <div>
+            <h3 class="confirm-title" id="confirmTitle">Complete mission?</h3>
+            <p class="confirm-sub" id="confirmSub">Are you ready to mark this mission as done?</p>
           </div>
         </div>
+        <button id="confirmCloseBtn" class="btn btn-ghost" type="button">✕</button>
+      </div>
 
-        <hr>
-
-        <!-- Medication (existing) -->
-        <h6 style="font-weight:900;">Medication Routine</h6>
-        <div class="field-group">
-          <label>Times per Day</label>
-          <select id="edit_medFreq">
-            <option value="0">No medication</option>
-            <option value="1">1 time</option>
-            <option value="2">2 times</option>
-            <option value="3">3 times</option>
-          </select>
-        </div>
-        <div id="edit_medTimesContainer" class="inline-2"></div>
-
-        <hr>
-
-        <!-- Dressing (existing) -->
-        <h6 style="font-weight:900;">Dressing Schedule</h6>
-        <div class="field-group">
-          <label>Frequency</label>
-          <select id="edit_dressFreq">
-            <option value="none">None</option>
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
-        </div>
-        <div class="inline-2">
-          <div class="field-group">
-            <label>Day of week (weekly)</label>
-            <select id="edit_dressDay">
-              <option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option>
-              <option value="thu">Thu</option><option value="fri">Fri</option><option value="sat">Sat</option>
-              <option value="sun">Sun</option>
-            </select>
-            <div class="hint">Used only when Frequency = Weekly.</div>
+      <div class="modal-bodyX" style="padding:16px 20px;">
+        <div style="border:1px solid rgba(14,165,233,.16); background:rgba(14,165,233,.06); border-radius:18px; padding:14px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="icon-badge" style="width:54px; height:54px; border-radius:20px;">
+              <img id="confirmPng" src="/static/img/missions/custom.png" alt="mission">
+            </div>
+            <div style="min-width:0;">
+              <div id="confirmMissionName" style="font-weight:950; font-size:16px; letter-spacing:-.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Mission</div>
+              <div id="confirmMissionDesc" style="margin-top:4px; color:var(--muted); font-weight:800; font-size:13px; line-height:1.35;">Description</div>
+            </div>
           </div>
-          <div class="field-group"><label>Time</label><input type="time" id="edit_dressTime"></div>
-        </div>
 
-        <button type="submit" class="btn btn-primary w-100 mt-3">Save Profile</button>
-      </form>
+          <div id="confirmExtra" style="margin-top:12px; font-weight:850; font-size:13px; color:rgba(2,6,23,.80);"></div>
+        </div>
+      </div>
+
+      <div class="modal-footerX" style="background:rgba(255,255,255,.92); border-top:1px solid rgba(14,165,233,.14);">
+        <button type="button" id="confirmCancelBtn" class="btn btn-ghost">Not yet</button>
+        <button type="button" id="confirmOkBtn" class="btn-sky"><i class="bi bi-check2"></i> Yes, complete</button>
+      </div>
     </div>
   </div>
 
+  <!-- Survey Modal -->
   <div class="overlay" id="overlay">
     <div class="modalX">
       <div class="modal-headerX">
@@ -421,7 +608,7 @@
 
       <form id="wizardForm" novalidate>
         <div class="modal-bodyX">
-          <!-- steps unchanged -->
+          <!-- steps ... (unchanged) -->
           <div class="survey-step active" data-step="1">
             <h3 class="step-title">A. Overall Condition</h3>
             <p class="step-sub">A quick snapshot of your physical condition today.</p>
@@ -447,16 +634,32 @@
             <div class="inline-2">
               <div class="field-group">
                 <label for="a_painTiming">Pain timing (optional)</label>
-                <select id="a_painTiming"><option value="" selected>Not selected</option><option value="morning">Morning</option><option value="midday">Midday</option><option value="evening">Evening</option><option value="persistent">Persistent</option></select>
+                <select id="a_painTiming">
+                  <option value="" selected>Not selected</option>
+                  <option value="morning">Morning</option>
+                  <option value="midday">Midday</option>
+                  <option value="evening">Evening</option>
+                  <option value="persistent">Persistent</option>
+                </select>
               </div>
               <div class="field-group">
                 <label for="a_nausea">Nausea/Vomiting (optional)</label>
-                <select id="a_nausea"><option value="" selected>Not selected</option><option value="yes">Yes</option><option value="no">No</option></select>
+                <select id="a_nausea">
+                  <option value="" selected>Not selected</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
               </div>
             </div>
             <div class="field-group">
               <label for="a_skin">Skin / mucosa status (optional)</label>
-              <select id="a_skin"><option value="" selected>Not selected</option><option value="normal">Normal</option><option value="dry">Dry</option><option value="sensitive">Sensitive</option><option value="inflammation">Inflammation</option></select>
+              <select id="a_skin">
+                <option value="" selected>Not selected</option>
+                <option value="normal">Normal</option>
+                <option value="dry">Dry</option>
+                <option value="sensitive">Sensitive</option>
+                <option value="inflammation">Inflammation</option>
+              </select>
             </div>
           </div>
 
@@ -465,18 +668,46 @@
             <p class="step-sub">Your sleep routine helps BioPal provide feedback.</p>
             <div class="inline-2">
               <div class="field-group"><label for="b_sleepHours">Hours slept last night</label><input id="b_sleepHours" type="number" min="0" max="24" required></div>
-              <div class="field-group"><label for="b_sleepQuality">Sleep quality</label><select id="b_sleepQuality" required><option value="" selected disabled>Select...</option><option value="good">Slept well</option><option value="woke_often">Woke up often</option><option value="hardly">Hardly slept</option></select></div>
+              <div class="field-group"><label for="b_sleepQuality">Sleep quality</label>
+                <select id="b_sleepQuality" required>
+                  <option value="" selected disabled>Select...</option>
+                  <option value="good">Slept well</option>
+                  <option value="woke_often">Woke up often</option>
+                  <option value="hardly">Hardly slept</option>
+                </select>
+              </div>
             </div>
             <div class="inline-2">
-              <div class="field-group"><label for="b_awakenings">Night awakenings</label><select id="b_awakenings" required><option value="" selected disabled>Select...</option><option value="0">0</option><option value="1-2">1-2</option><option value="3plus">3+</option></select></div>
-              <div class="field-group"><label for="b_morningFatigue">Morning fatigue</label><select id="b_morningFatigue" required><option value="" selected disabled>Select...</option><option value="refreshed">Refreshed</option><option value="slightly">Slightly tired</option><option value="very">Very tired</option></select></div>
+              <div class="field-group"><label for="b_awakenings">Night awakenings</label>
+                <select id="b_awakenings" required>
+                  <option value="" selected disabled>Select...</option>
+                  <option value="0">0</option>
+                  <option value="1-2">1-2</option>
+                  <option value="3plus">3+</option>
+                </select>
+              </div>
+              <div class="field-group"><label for="b_morningFatigue">Morning fatigue</label>
+                <select id="b_morningFatigue" required>
+                  <option value="" selected disabled>Select...</option>
+                  <option value="refreshed">Refreshed</option>
+                  <option value="slightly">Slightly tired</option>
+                  <option value="very">Very tired</option>
+                </select>
+              </div>
             </div>
           </div>
 
           <div class="survey-step" data-step="3">
             <h3 class="step-title">C. Activity and Fatigue</h3>
             <p class="step-sub">Track how active you were and how tired you feel.</p>
-            <div class="field-group"><label for="c_activityLevel">Daily activity level</label><select id="c_activityLevel" required><option value="" selected disabled>Select...</option><option value="low">Almost none</option><option value="normal">Normal</option><option value="active">Active</option></select></div>
+            <div class="field-group"><label for="c_activityLevel">Daily activity level</label>
+              <select id="c_activityLevel" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="low">Almost none</option>
+                <option value="normal">Normal</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
             <div class="field-group">
               <label for="c_fatigue">Perceived fatigue (0–10)</label>
               <input id="c_fatigue" type="range" min="0" max="10" value="5" required>
@@ -487,13 +718,29 @@
           <div class="survey-step" data-step="4">
             <h3 class="step-title">D. Emotion and Stress</h3>
             <p class="step-sub">Emotional check-in.</p>
-            <div class="field-group"><label for="d_mood">Mood today</label><select id="d_mood" required><option value="" selected disabled>Select...</option><option value="good">Good</option><option value="neutral">Neutral</option><option value="sad">Sad</option><option value="scared">Scared</option><option value="angry">Angry</option><option value="tired">Tired</option></select></div>
+            <div class="field-group"><label for="d_mood">Mood today</label>
+              <select id="d_mood" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="good">Good</option>
+                <option value="neutral">Neutral</option>
+                <option value="sad">Sad</option>
+                <option value="scared">Scared</option>
+                <option value="angry">Angry</option>
+                <option value="tired">Tired</option>
+              </select>
+            </div>
             <div class="field-group">
               <label for="d_anxiety">Worry/Anxiety (0-10)</label>
               <input id="d_anxiety" type="range" min="0" max="10" value="5" required>
               <div class="hint"><span id="d_anxietyLabel">5</span> / 10</div>
             </div>
-            <div class="field-group"><label for="d_hardMoment">Difficult moment today?</label><select id="d_hardMoment" required><option value="" selected disabled>Select...</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+            <div class="field-group"><label for="d_hardMoment">Difficult moment today?</label>
+              <select id="d_hardMoment" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
             <div class="field-group"><label for="d_note">Emotion note (optional)</label><textarea id="d_note"></textarea></div>
             <div class="field-group"><label for="d_gsr">Stress sensor (optional)</label><input id="d_gsr" type="number" step="0.01"></div>
           </div>
@@ -501,25 +748,56 @@
           <div class="survey-step" data-step="5">
             <h3 class="step-title">E. Care Routine Updates</h3>
             <p class="step-sub">Record any changes in medication or dressing plans.</p>
+
             <div class="field-group">
               <label for="e_medChanged">Medication changed today?</label>
-              <select id="e_medChanged" required><option value="" selected disabled>Select...</option><option value="no">No</option><option value="yes">Yes</option></select>
+              <select id="e_medChanged" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
             </div>
             <div id="e_medPanel" class="subpanel hidden">
-              <div class="field-group"><label for="e_medFreq">Times per day</label><select id="e_medFreq"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+              <div class="field-group"><label for="e_medFreq">Times per day</label>
+                <select id="e_medFreq">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
               <div id="e_medTimesContainer" class="inline-2"></div>
             </div>
+
             <div class="field-group mt-3">
               <label for="e_dressChanged">Dressing changed today?</label>
-              <select id="e_dressChanged" required><option value="" selected disabled>Select...</option><option value="no">No</option><option value="yes">Yes</option></select>
+              <select id="e_dressChanged" required>
+                <option value="" selected disabled>Select...</option>
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
             </div>
             <div id="e_dressPanel" class="subpanel hidden">
-              <div class="field-group"><label for="e_dressFreq">Frequency</label><select id="e_dressFreq"><option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></div>
-              <div id="e_dressDayWrap" class="hidden"><label for="e_dressDay">Day of week</label><select id="e_dressDay"><option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option><option value="thu">Thu</option><option value="fri">Fri</option><option value="sat">Sat</option><option value="sun">Sun</option></select></div>
+              <div class="field-group"><label for="e_dressFreq">Frequency</label>
+                <select id="e_dressFreq">
+                  <option value="none">None</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+              </div>
+              <div id="e_dressDayWrap" class="hidden">
+                <label for="e_dressDay">Day of week</label>
+                <select id="e_dressDay">
+                  <option value="mon">Mon</option><option value="tue">Tue</option><option value="wed">Wed</option>
+                  <option value="thu">Thu</option><option value="fri">Fri</option>
+                  <option value="sat">Sat</option><option value="sun">Sun</option>
+                </select>
+              </div>
               <div class="field-group mt-2"><label for="e_dressTime">Time</label><input id="e_dressTime" type="time" value="09:00"></div>
             </div>
           </div>
         </div>
+
         <div class="modal-footerX">
           <button type="button" id="prevBtn" class="btn btn-ghost" style="visibility:hidden;">Back</button>
           <button type="button" id="nextBtn" class="btn btn-primary">Next Step</button>
@@ -528,7 +806,7 @@
     </div>
   </div>
 
-  <!-- ===================== NEW: Condition Report Modal ===================== -->
+  <!-- Condition Report Modal -->
   <div class="overlay" id="reportOverlay" aria-hidden="true">
     <div class="modalX">
       <div class="modal-headerX">
@@ -538,60 +816,67 @@
         </div>
         <button id="closeReportBtn" class="btn btn-ghost" type="button">✕</button>
       </div>
-      <div class="modal-bodyX" id="reportBody">
-        <!-- content injected dynamically -->
-      </div>
+      <div class="modal-bodyX" id="reportBody"></div>
       <div class="modal-footerX">
         <button type="button" id="refreshReportBtn" class="btn btn-ghost"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
         <button type="button" id="closeReportBtn2" class="btn btn-primary">Close</button>
       </div>
     </div>
   </div>
-  <!-- ===================================================================== -->
 
-  <div class="mock-clock"><i class="bi bi-cpu"></i> <span id="ui-now">00:00</span></div>
-
-  <!-- NEW floating button -->
-  <button id="openReportBtn" class="report-fab" title="Condition Report" disabled>
-    <i class="bi bi-clipboard-data" style="font-size:24px;"></i>
-  </button>
-
-  <button id="openProfileBtn" class="profile-fab"><i class="bi bi-person-badge" style="font-size:24px;"></i></button>
+  <!-- Mission Reveal Modal -->
+  <div class="overlay" id="missionRevealOverlay" aria-hidden="true">
+    <div class="modalX">
+      <div class="modal-headerX">
+        <div>
+          <h2 style="margin:0; font-size:20px; font-weight:900;">New Mission Unlocked</h2>
+          <span id="missionRevealSub" style="font-size:12px; color:var(--muted); font-weight:800;">Tap the mission card to complete it.</span>
+        </div>
+        <button id="closeMissionRevealBtn" class="btn btn-ghost" type="button">✕</button>
+      </div>
+      <div class="modal-bodyX" id="missionRevealBody"></div>
+      <div class="modal-footerX">
+        <button type="button" id="closeMissionRevealBtn2" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
 
   <div class="debug-panel">
     <button class="btn-debug" style="background:#ef4444" id="test-reset" title="Reset day"><i class="bi bi-trash3-fill"></i></button>
-    <button class="btn-debug" id="test-warp-hour" title="+1 hour"><i class="bi bi-hourglass-split"></i></button>
+    <button class="btn-debug" id="test-skip-1h" title="Skip +1 hour"><i class="bi bi-hourglass-split"></i></button>
+    <button class="btn-debug" id="test-skip-3h" title="Skip +3 hours"><i class="bi bi-hourglass"></i></button>
   </div>
 
 <script type="module">
   import { db, auth } from "/static/js/firebase/config.js";
-  import {
-    doc, setDoc, getDoc, updateDoc, deleteField, serverTimestamp, deleteDoc
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { doc, setDoc, getDoc, updateDoc, deleteField, serverTimestamp, deleteDoc }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const $ = (id) => document.getElementById(id);
 
-  /* -------------------- State -------------------- */
   let userSession = null, timeOffset = 0, currentStep = 1, cachedUserProfile = null;
   let cachedHistory7d = [];
 
-  // call your Flask route
   const API_GENERATE_MISSION_URL = "/api/generate_mission";
-
-  // NEW: condition report endpoint
   const API_CONDITION_REPORT_URL = "/api/condition_report";
 
-  // DEBUG: mission request tracing
-  const AI_DEBUG = {
-    lastOkAt: 0,
-    lastErrAt: 0,
-    lastReqId: "",
-    okCount: 0,
-    errCount: 0
-  };
+  const MAX_VISIBLE = 2;
 
-  // Intervals: ONLY 09-12, 12-15, 15-18, 18-21
+  const REVEAL_DELAY_MS = 60 * 60 * 1000;
+  const REMINDER_EVERY_MS = 5 * 60 * 1000;
+
+  const REMINDER_GIF = {
+    WATER: "/static/gifs/hydration_time.gif",
+    DRESS: "/static/gifs/dressing_time.gif",
+    MED:   "/static/gifs/medication.gif"
+  };
+  const REMINDER_DURATION_MS = 2400;
+
+  /* ✅ FIXED: alarm should re-trigger every 10 seconds forever */
+  const MISSION_ALARM_MS = 10_000;
+
   const INTERVALS = [
     { id: "09-12", startHr: 9,  endHr: 12, label: "09:00 - 12:00" },
     { id: "12-15", startHr: 12, endHr: 15, label: "12:00 - 15:00" },
@@ -599,87 +884,58 @@
     { id: "18-21", startHr: 18, endHr: 21, label: "18:00 - 21:00" }
   ];
 
-  const ratingState = {
-    sensorStatus: { heart: "stable", stress: "stable", hydration: "stable" },
-    hydrationStatus: "caution",
-    checkinStatus: "caution",
-    history7dRatio: null,
-    lastMedicalDayFetched: null
+  const MISSION_ICON_PNG = {
+    WATER:  "/static/img/missions/hydration.png",
+    MED:    "/static/img/missions/medicine.png",
+    DRESS:  "/static/img/missions/dressing.png",
+    CUSTOM: "/static/img/missions/custom.png",
+    INFO:   "/static/img/missions/custom.png"
   };
 
-  const MAX_VISIBLE = 2;
-  const MAX_CUSTOM_PER_INTERVAL = 2;
-  const REVEAL_DELAY_MS = 60 * 60 * 1000;
-
-  /* -------------------- Cross-device persistence (NEW) -------------------- */
-  let lastSnapshotHash = "";
-  function stableStringify(obj){
-    try{
-      return JSON.stringify(obj, Object.keys(obj).sort());
-    }catch(e){
-      return JSON.stringify(obj);
-    }
-  }
-  function hashSnapshot(snapshot){
-    const s = stableStringify(snapshot);
-    let h = 0;
-    for (let i=0; i<s.length; i++){
-      h = ((h<<5) - h) + s.charCodeAt(i);
-      h |= 0;
-    }
-    return String(h);
-  }
-  function buildVisibleSnapshotFromDOM(intervalId){
-    const container = $("mission-container");
-    const els = Array.from(container.querySelectorAll(".mission-card"));
-    const visible = [];
-    for (const el of els.slice(0, MAX_VISIBLE)){
-      const title = el.querySelector(".fw-bold")?.textContent?.trim() || "";
-      const sub = el.querySelector(".small")?.textContent?.trim() || "";
-      const iconClass = el.querySelector(".icon-badge i")?.className || "";
-      const icon = (iconClass.split(" ").find(x => x.startsWith("bi-")) || "bi-stars");
-      const isCompleted = el.classList.contains("completed");
-      const isLoading = el.classList.contains("loading");
-
-      visible.push({
-        title, sub, icon,
-        state: isLoading ? "loading" : (isCompleted ? "completed" : "active")
-      });
-    }
-    return { intervalId, visibleMissions: visible };
+  function missionPngSrc(missionId){
+    const id = String(missionId || "");
+    if (id.startsWith("CUSTOM_")) return MISSION_ICON_PNG.CUSTOM;
+    return MISSION_ICON_PNG[id] || MISSION_ICON_PNG.INFO;
   }
 
-  async function persistIntervalSnapshot({ medicalDay, intervalId, statusObj }){
-    if (!userSession || !medicalDay || !intervalId) return;
-    const base = buildVisibleSnapshotFromDOM(intervalId);
+  /* -------------------- csCode -------------------- */
+  function isNewUserFromHistory(history){
+    const arr = Array.isArray(history) ? history : [];
+    if (!arr.length) return true;
+    const anyActivity = arr.some(d =>
+      !!d?.survey_v2 ||
+      (Array.isArray(d?.completedMissions) && d.completedMissions.length > 0) ||
+      (Array.isArray(d?.customMissionTexts) && d.customMissionTexts.length > 0) ||
+      (d?.customMissions && typeof d.customMissions === "object" && Object.keys(d.customMissions).length > 0)
+    );
+    return !anyActivity;
+  }
+  function computeCSCode(profile, history){
+    const isNew = isNewUserFromHistory(history);
+    const fromProfile = (profile && typeof profile.csCode === "string") ? profile.csCode : "";
+    if (isNew) return "cs01";
+    if (fromProfile) return fromProfile;
+    return "cs02";
+  }
 
-    const snapshot = {
-      intervalId,
-      visibleMissions: base.visibleMissions,
-      status: {
-        label: statusObj?.label || currentStatusLabel || "",
-        pct: Number(statusObj?.pct ?? 0),
-        done: Number(statusObj?.done ?? 0),
-        total: Number(statusObj?.total ?? 0),
-      },
-      updatedAtMs: Date.now()
-    };
-
-    const h = hashSnapshot(snapshot);
-    if (h === lastSnapshotHash) return;
-    lastSnapshotHash = h;
-
-    try{
-      const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
-      const keyPath = `intervalSnapshot.${intervalId}`;
-      console.log("[Persist] writing snapshot", { medicalDay, intervalId, snapshot });
-      await setDoc(ref, {
-        [keyPath]: snapshot,
-        lastUpdate: serverTimestamp()
-      }, { merge: true });
-    }catch(e){
-      console.warn("[Persist] snapshot write failed:", e);
-    }
+  /* -------------------- Navbar greeting -------------------- */
+  function resolveUserName(profile){
+    const p = profile || {};
+    return (p.username || p.displayName || p.name || p.fullName || p.nickname || p.email || "there");
+  }
+  function greetingSublineByTime(now){
+    const h = now.getHours();
+    if (h >= 5 && h < 12) return "Good morning • Stay steady today";
+    if (h >= 12 && h < 17) return "Good afternoon • Small steps count";
+    if (h >= 17 && h < 22) return "Good evening • Keep it gentle";
+    return "Late night • Prioritize rest";
+  }
+  function updateGreeting(){
+    const name = resolveUserName(cachedUserProfile);
+    const nice = String(name).split("@")[0] || "there";
+    const now = getNow();
+    $("helloLine").textContent = `Hi, ${nice}`;
+    $("greetSub").textContent = greetingSublineByTime(now);
   }
 
   /* -------------------- Toasts -------------------- */
@@ -691,9 +947,14 @@
     const guardKey = String(key || `${title}|${message}`);
     if (toastState.lastKey === guardKey && (now - toastState.lastAt) < 1500) return;
     toastState.lastKey = guardKey; toastState.lastAt = now;
+
     const el = document.createElement("div");
     el.className = "toastX";
-    el.innerHTML = `<div class="t-ic"><i class="bi bi-check2-circle" style="font-size:18px;"></i></div><div><p class="t-title">${title}</p><p class="t-sub">${message}</p></div><button class="t-close" type="button"><i class="bi bi-x-lg"></i></button>`;
+    el.innerHTML = `
+      <div class="t-ic"><i class="bi bi-check2-circle" style="font-size:18px;"></i></div>
+      <div><p class="t-title">${title}</p><p class="t-sub">${message}</p></div>
+      <button class="t-close" type="button"><i class="bi bi-x-lg"></i></button>
+    `;
     el.querySelector(".t-close").onclick = () => el.remove();
     wrap.appendChild(el);
     window.setTimeout(() => el.remove(), ms);
@@ -704,39 +965,335 @@
     "Happy / Energized": "/static/gifs/character1.gif",
     "Neutral / Calm": "/static/gifs/character2.gif",
     "Tired / Low Energy": "/static/gifs/character3.gif",
-    "Concern / Warning": "/static/gifs/character4.gif",
+    "Concern / Warning": "/static/gifs/character4.gif"
   };
+
   const COMPLETE_GIF = {
     WATER: "/static/gifs/hydration_complete.gif",
     MED: "/static/gifs/medicaiton_complete.gif",
     DRESS: "/static/gifs/dressing_complete.gif",
     CUSTOM:"/static/gifs/custom_complete.gif"
   };
-  let currentStatusLabel = "Neutral / Calm", isPlayingCompletion = false, characterTimer = null;
+
+  const ALARM_GIF = {
+    WATER: "/static/gifs/hydration_alarm.gif",
+    MED:   "/static/gifs/medicine_alarm.gif",
+    DRESS: "/static/gifs/dressing_alarm.gif",
+    CUSTOM:"/static/gifs/custom_alarm.gif"
+  };
+  const ALARM_LOOP_MS = 2400;
+
+  let currentStatusLabel = "Neutral / Calm";
+  let currentSelfScore = null;
+
+  let isPlayingCompletion = false;
+  let isPlayingReminder = false;
+  let isPlayingAlarm = false;
+
+  let characterTimer = null;
+  let reminderTimer = null;
+  let alarmTimer = null;
+
+  let activeBasicsSet = new Set();
 
   function setCharacterSrc(src) {
-    const img = $("characterSprite"); if (!img) return;
+    const img = $("characterSprite");
+    if (!img) return;
     img.src = `${src}`;
   }
+
   function setIdleCharacterByStatus(label){
     const idleSrc = STATUS_IDLE_GIF[label] || STATUS_IDLE_GIF["Neutral / Calm"];
     setCharacterSrc(idleSrc);
   }
+
+  function stopReminderAnim(){
+    if (reminderTimer) clearTimeout(reminderTimer);
+    reminderTimer = null;
+    isPlayingReminder = false;
+  }
+  function stopAlarmAnim(){
+    if (alarmTimer) clearTimeout(alarmTimer);
+    alarmTimer = null;
+    isPlayingAlarm = false;
+  }
+
   function playCharacterOnce(type) {
+    stopReminderAnim();
+    stopAlarmAnim();
     if (characterTimer) clearTimeout(characterTimer);
+
     isPlayingCompletion = true;
     const src = COMPLETE_GIF[type] || COMPLETE_GIF.CUSTOM;
     setCharacterSrc(src);
+
     characterTimer = setTimeout(() => {
       isPlayingCompletion = false;
       setIdleCharacterByStatus(currentStatusLabel);
     }, 2000);
   }
 
+  function playReminderOnce(type){
+    if (isPlayingCompletion || isPlayingAlarm) return;
+    if (!type) return;
+    const gif = REMINDER_GIF[type];
+    if (!gif) return;
+
+    stopReminderAnim();
+    isPlayingReminder = true;
+
+    setCharacterSrc(gif);
+
+    reminderTimer = setTimeout(() => {
+      isPlayingReminder = false;
+      setIdleCharacterByStatus(currentStatusLabel);
+    }, REMINDER_DURATION_MS);
+  }
+
+  /* ✅ alarm: one loop only */
+  function playAlarmOnce(type){
+    if (isPlayingCompletion || isPlayingReminder) return;
+    const t = (type === "WATER" || type === "MED" || type === "DRESS") ? type : "CUSTOM";
+    const gif = ALARM_GIF[t];
+    if (!gif) return;
+
+    stopAlarmAnim();
+    isPlayingAlarm = true;
+    setCharacterSrc(gif);
+
+    alarmTimer = setTimeout(() => {
+      isPlayingAlarm = false;
+      setIdleCharacterByStatus(currentStatusLabel);
+    }, ALARM_LOOP_MS);
+  }
+
+  function weightedPick(types){
+    const w = [];
+    for (const t of types){
+      const weight = (t === "MED" || t === "DRESS") ? 3 : 1;
+      for (let i=0; i<weight; i++) w.push(t);
+    }
+    if (!w.length) return null;
+    return w[Math.floor(Math.random() * w.length)];
+  }
+
+  async function maybePlayReminderGif(){
+    if (!userSession) return;
+    if (isPlayingCompletion || isPlayingReminder || isPlayingAlarm) return;
+
+    const options = Array.from(activeBasicsSet).filter(t => (t === "WATER" || t === "MED" || t === "DRESS"));
+    if (!options.length) return;
+
+    const pick = weightedPick(options);
+    playReminderOnce(pick);
+  }
+
+  /* -------------------- ✅ Self-check Scoring (Rubric) -------------------- */
+  function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+  function safeNum(v, fallback=0){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function scoreA1(cond){
+    const v = String(cond || "");
+    if (v === "good") return 30;
+    if (v === "average") return 15;
+    if (v === "bad") return 0;
+    return 0;
+  }
+  function scoreA2(pain){
+    const v = String(pain || "");
+    if (v === "none") return 20;
+    if (v === "mild") return 15;
+    if (v === "moderate") return 10;
+    if (v === "severe") return 0;
+    return 0;
+  }
+  function scoreC(fatigue){
+    const f = clamp(safeNum(fatigue, 10), 0, 10);
+    return (10 - f) * 2.5;
+  }
+  function scoreD(mood){
+    const v = String(mood || "");
+    if (v === "good") return 25;
+    if (v === "neutral") return 15;
+    return 5;
+  }
+  function computeDailyScoreFromSurvey(surveyV2){
+    if (!surveyV2) return null;
+    const A = surveyV2.A || {};
+    const C = surveyV2.C || {};
+    const D = surveyV2.D || {};
+
+    const a1 = scoreA1(A.cond);
+    const a2 = scoreA2(A.pain);
+    const c  = scoreC(C.fatigue);
+    const d  = scoreD(D.mood);
+
+    const total = a1 + a2 + c + d;
+    return Math.round(clamp(total, 0, 100));
+  }
+  function mapScoreToState(score){
+    const s = clamp(safeNum(score, 0), 0, 100);
+    if (s >= 80) return "Happy / Energized";
+    if (s >= 50) return "Neutral / Calm";
+    if (s >= 30) return "Tired / Low Energy";
+    return "Concern / Warning";
+  }
+
+  function shiftDay(yyyy_mm_dd, deltaDays){
+    const d = new Date(yyyy_mm_dd + "T00:00:00");
+    d.setDate(d.getDate() + deltaDays);
+    return d.toISOString().slice(0,10);
+  }
+
+  async function resolveTodayOrYesterdaySelfStatus(medicalDay, todayLogData){
+    const todaySurvey = todayLogData?.survey_v2 || null;
+    if (todaySurvey){
+      const sc = computeDailyScoreFromSurvey(todaySurvey);
+      const label = mapScoreToState(sc);
+
+      try{
+        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+        await setDoc(ref, {
+          selfStatus: { score: sc, label, updatedAtMs: Date.now() },
+          lastUpdate: serverTimestamp()
+        }, { merge:true });
+      } catch(e){
+        console.warn("[SelfStatus] persist failed:", e);
+      }
+
+      return { score: sc, label, from: "today" };
+    }
+
+    const yDay = shiftDay(medicalDay, -1);
+    try{
+      const ySnap = await getDoc(doc(db, "users", userSession.uid, "daily_logs", yDay));
+      if (ySnap.exists()){
+        const yData = ySnap.data() || {};
+        const ySelf = yData.selfStatus || null;
+
+        if (ySelf && typeof ySelf.label === "string") {
+          const yScore = (typeof ySelf.score === "number") ? ySelf.score : null;
+          return { score: yScore, label: ySelf.label, from: "yesterday" };
+        }
+
+        if (yData.survey_v2){
+          const sc = computeDailyScoreFromSurvey(yData.survey_v2);
+          const label = mapScoreToState(sc);
+          return { score: sc, label, from: "yesterday_survey" };
+        }
+      }
+    } catch(e){
+      console.warn("[SelfStatus] yesterday fetch failed:", e);
+    }
+
+    return { score: null, label: "Neutral / Calm", from: "default" };
+  }
+
+  /* -------------------- Mission Reveal Modal -------------------- */
+  function openMissionRevealModal(missionObj, intervalId, medicalDay){
+    const overlay = $("missionRevealOverlay");
+    const body = $("missionRevealBody");
+    if (!overlay || !body) return;
+    body.innerHTML = "";
+    const card = createMissionCard(missionObj, intervalId, medicalDay, false);
+    body.appendChild(card);
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+  }
+  function closeMissionRevealModal(){
+    const overlay = $("missionRevealOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+    $("missionRevealBody").innerHTML = "";
+  }
+
+  /* -------------------- Confirm Modal logic -------------------- */
+  const confirmState = { open:false, fullId:"", medicalDay:"", type:"", missionTitle:"", missionSub:"", missionPng:"" };
+
+  const CONFIRM_TEXT = {
+    WATER: { title:"Hydration check", sub:"Did you drink about 250ml of water?", extra:"Tip: Slow sips are okay. Any water counts." },
+    MED:   { title:"Medication check", sub:"Did you take your medication as scheduled?", extra:"Tip: If you’re unsure, check with your care plan or an adult." },
+    DRESS: { title:"Dressing check", sub:"Did you check or change your dressing?", extra:"Tip: Wash hands first. If something looks off, tell an adult." },
+    CUSTOM:{ title:"Custom mission", sub:"Did you finish the custom mission?", extra:"Tip: Small effort is enough — you’re building a habit." }
+  };
+
+  function isCustomId(id){ return String(id || "").startsWith("CUSTOM_"); }
+  function missionTypeFromMission(m){
+    const id = String(m?.id || "");
+    if (id === "WATER" || id === "MED" || id === "DRESS") return id;
+    if (id.startsWith("CUSTOM_")) return "CUSTOM";
+    return "CUSTOM";
+  }
+
+  function openConfirmModal({ type, fullId, medicalDay, missionTitle, missionSub, missionPng }){
+    const overlay = $("confirmOverlay");
+    if (!overlay) return;
+
+    const t = (type === "WATER" || type === "MED" || type === "DRESS") ? type : "CUSTOM";
+    const copy = CONFIRM_TEXT[t] || CONFIRM_TEXT.CUSTOM;
+
+    $("confirmTitle").textContent = copy.title;
+    $("confirmSub").textContent = copy.sub;
+    $("confirmExtra").textContent = copy.extra || "";
+
+    $("confirmMissionName").textContent = missionTitle || "Mission";
+    $("confirmMissionDesc").textContent = missionSub || "";
+    $("confirmPng").src = missionPng || MISSION_ICON_PNG.INFO;
+
+    const iconEl = $("confirmIcon");
+    if (iconEl){
+      if (t === "WATER") iconEl.innerHTML = `<i class="bi bi-droplet-fill"></i>`;
+      else if (t === "MED") iconEl.innerHTML = `<i class="bi bi-capsule"></i>`;
+      else if (t === "DRESS") iconEl.innerHTML = `<i class="bi bi-bandaid"></i>`;
+      else iconEl.innerHTML = `<i class="bi bi-stars"></i>`;
+    }
+
+    confirmState.open = true;
+    confirmState.fullId = fullId;
+    confirmState.medicalDay = medicalDay;
+    confirmState.type = type;
+    confirmState.missionTitle = missionTitle || "";
+    confirmState.missionSub = missionSub || "";
+    confirmState.missionPng = missionPng || "";
+
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden","false");
+  }
+
+  function closeConfirmModal(){
+    const overlay = $("confirmOverlay");
+    if (!overlay) return;
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden","true");
+    confirmState.open=false;
+    confirmState.fullId="";
+    confirmState.medicalDay="";
+    confirmState.type="";
+    confirmState.missionTitle="";
+    confirmState.missionSub="";
+    confirmState.missionPng="";
+  }
+
+  $("confirmCloseBtn").onclick = closeConfirmModal;
+  $("confirmCancelBtn").onclick = closeConfirmModal;
+  $("confirmOkBtn").onclick = async () => {
+    try{
+      const { fullId, medicalDay, type } = confirmState;
+      closeConfirmModal();
+      await finishMission(fullId, medicalDay, type);
+    } catch(e){
+      console.warn("[Confirm] failed:", e);
+    }
+  };
+
   /* -------------------- Time Utils -------------------- */
   function getNow() {
     const d = new Date(Date.now() + timeOffset * 3600000);
-    $("ui-now").textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    $("realtime-label").textContent = d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
     return d;
   }
   function getMedicalDayID() {
@@ -744,11 +1301,6 @@
     const medDate = new Date(now);
     if (now.getHours() < 9) medDate.setDate(medDate.getDate() - 1);
     return medDate.toISOString().slice(0, 10);
-  }
-  function shiftDay(yyyy_mm_dd, deltaDays){
-    const d = new Date(yyyy_mm_dd + "T00:00:00");
-    d.setDate(d.getDate() + deltaDays);
-    return d.toISOString().slice(0,10);
   }
   function lastNDaysFrom(baseDay, n){
     const days = [];
@@ -814,7 +1366,6 @@
       if (!dayKey) return { due:false, dueTime:null };
       return { due: dayKey === todayKey, dueTime: (dayKey === todayKey ? time : null) };
     }
-
     return { due:false, dueTime:null };
   }
 
@@ -832,13 +1383,16 @@
             day,
             survey_v2: d.survey_v2 || null,
             completedMissions: d.completedMissions || [],
-            customMissionTexts: d.customMissionTexts || []
+            customMissionTexts: d.customMissionTexts || [],
+            customMissions: d.customMissions || {},
+            statusState: d.statusState || null,
+            intervalOutcome: d.intervalOutcome || null,
+            selfStatus: d.selfStatus || null
           });
         } else {
-          out.push({ day, survey_v2: null, completedMissions: [], customMissionTexts: [] });
+          out.push({ day, survey_v2:null, completedMissions:[], customMissionTexts:[], customMissions:{}, statusState:null, intervalOutcome:null, selfStatus:null });
         }
       }
-      console.log("[History] 7d fetched:", out);
       return out;
     } catch(e){
       console.warn("[History] fetch failed:", e);
@@ -846,128 +1400,85 @@
     }
   }
 
-  /* -------------------- Mission & Custom GPT API Logic -------------------- */
-  function makeReqId(prefix="REQ"){
-    return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2,8)}`;
-  }
+  /* -------------------- AI Custom Mission API -------------------- */
+  function makeReqId(prefix="REQ"){ return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2,8)}`; }
   function looksLikeGptMissionPayload(data){
     return !!(data && typeof data === "object" && typeof data.name === "string" && typeof data.desc === "string" && typeof data.icon === "string");
   }
 
   async function fetchCustomMission(index, avoidTitles = new Set()) {
     const reqId = makeReqId(`AI${index}`);
-    AI_DEBUG.lastReqId = reqId;
-
-    const payload = {
-      index,
-      profile: cachedUserProfile || {},
-      history: cachedHistory7d || [],
-      nowISO: new Date().toISOString()
-    };
-
-    console.groupCollapsed(`[AI][${reqId}] request -> /api/generate_mission (index=${index})`);
-    console.log("payload.profile keys:", Object.keys(payload.profile || {}));
-    console.log("payload.history days:", Array.isArray(payload.history) ? payload.history.length : 0);
-    console.log("payload:", payload);
-    console.groupEnd();
+    const csCode = computeCSCode(cachedUserProfile || {}, cachedHistory7d || []);
+    const payload = { index, csCode, profile: cachedUserProfile || {}, history: cachedHistory7d || [], nowISO: new Date().toISOString() };
 
     try {
-      const t0 = performance.now();
       const response = await fetch(API_GENERATE_MISSION_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const t1 = performance.now();
-
-      console.log(`[AI][${reqId}] HTTP status:`, response.status, response.ok ? "(OK)" : "(NOT OK)", `(${Math.round(t1-t0)}ms)`);
 
       if (!response.ok) {
         const t = await response.text().catch(()=> "");
-        AI_DEBUG.errCount += 1;
-        AI_DEBUG.lastErrAt = Date.now();
-        console.warn(`[AI][${reqId}] server returned non-200. body=`, t);
-        showToast({ title: "AI Mission Failed", message: `Server error (${response.status}). Using fallback.`, key: `ai_fail_${reqId}` });
+        console.warn(`[AI][${reqId}] server non-200`, response.status, t);
+        showToast({ title:"AI Mission Failed", message:`Server error (${response.status}). Using fallback.`, key:`ai_fail_${reqId}` });
         throw new Error(`API ${response.status}`);
       }
 
       const data = await response.json();
-      console.log(`[AI][${reqId}] response JSON <-`, data);
-
-      if (looksLikeGptMissionPayload(data)) {
-        AI_DEBUG.okCount += 1;
-        AI_DEBUG.lastOkAt = Date.now();
-        console.log(`[AI][${reqId}] ✅ Looks like GPT mission payload (name/desc/icon present).`);
-      } else {
-        AI_DEBUG.errCount += 1;
-        AI_DEBUG.lastErrAt = Date.now();
-        console.warn(`[AI][${reqId}] ⚠️ Payload missing fields. Will fallback normalization.`);
-      }
 
       const safeIcon = (data && typeof data.icon === "string" && data.icon.startsWith("bi-")) ? data.icon : "bi-stars";
       const safeName = (data && data.name) ? String(data.name) : "Custom Mission";
       const safeDesc = (data && data.desc) ? String(data.desc) : "A small goal tailored for you.";
 
-      // Prevent duplicates in the SAME view
       let finalName = safeName;
-      let finalDesc = safeDesc;
       let guard = 0;
       while (avoidTitles.has(finalName.trim().toLowerCase()) && guard < 3) {
         guard += 1;
         finalName = `${safeName} +`;
-        finalDesc = safeDesc;
       }
 
-      const mission = { id: `CUSTOM_${index}`, title: finalName, sub: finalDesc, icon: safeIcon };
-      console.log(`[AI][${reqId}] ✅ final mission object for UI ->`, mission);
+      const mission = { id: `CUSTOM_1`, title: finalName, sub: safeDesc, icon: safeIcon };
 
       if (looksLikeGptMissionPayload(data)) {
-        showToast({ title: "AI Mission Ready", message: `Custom mission generated.`, key: `ai_ok_${reqId}` });
+        showToast({ title:"AI Mission Ready", message:`Custom mission generated.`, key:`ai_ok_${reqId}` });
       }
-
       return mission;
 
     } catch (e) {
-      console.warn(`[AI][${reqId}] ❌ fetchCustomMission error:`, e);
+      console.warn(`[AI][${reqId}] fetchCustomMission error:`, e);
 
       const fallbacks = [
-        { id: "CUSTOM_1", title: "Body Stretch", sub: "5-min gentle stretch", icon: "bi-wind" },
-        { id: "CUSTOM_2", title: "Nature Breath", sub: "2-min deep breathing", icon: "bi-tree" },
-        { id: "CUSTOM_3", title: "Calm Sip", sub: "Warm tea or water, slow pace", icon: "bi-cup-hot" },
-        { id: "CUSTOM_4", title: "Mini Walk", sub: "3-min light walk", icon: "bi-person-walking" }
+        { id:"CUSTOM_1", title:"Body Stretch", sub:"5-min gentle stretch", icon:"bi-wind" },
+        { id:"CUSTOM_1", title:"Nature Breath", sub:"2-min deep breathing", icon:"bi-tree" },
+        { id:"CUSTOM_1", title:"Calm Sip", sub:"Warm tea or water, slow pace", icon:"bi-cup-hot" },
+        { id:"CUSTOM_1", title:"Mini Walk", sub:"3-min light walk", icon:"bi-person-walking" }
       ];
 
       const lowered = new Set(Array.from(avoidTitles).map(s => String(s).trim().toLowerCase()));
-      const pick = fallbacks.find(f => !lowered.has(f.title.trim().toLowerCase())) || fallbacks[index-1] || fallbacks[0];
-      console.log(`[AI][${reqId}] using fallback mission ->`, pick);
+      const pick = fallbacks.find(f => !lowered.has(f.title.trim().toLowerCase())) || fallbacks[0];
       return pick;
     }
   }
 
-  /* -------------------- Custom mission persistence per interval -------------------- */
+  /* -------------------- Custom mission persistence per interval (ONE SLOT) -------------------- */
   function getIntervalMeta(logData, intervalId){
     const meta = (logData && logData.intervalMeta && logData.intervalMeta[intervalId]) ? logData.intervalMeta[intervalId] : null;
     const fallback = (logData && typeof logData.nextRevealAt === "number") ? logData.nextRevealAt : 0;
-    return {
-      startedAt: meta?.startedAt || 0,
-      nextRevealAt: meta?.nextRevealAt || fallback || 0,
-      lastCompletedAt: meta?.lastCompletedAt || 0,
-      initialFillDone: !!meta?.initialFillDone
-    };
+    return { startedAt: meta?.startedAt || 0, nextRevealAt: meta?.nextRevealAt || fallback || 0, lastCompletedAt: meta?.lastCompletedAt || 0 };
   }
 
-  function getCustomSlots(logData, intervalId){
+  function getCustomSlot(logData, intervalId){
     const cm = logData?.customMissions?.[intervalId];
     const slots = Array.isArray(cm?.slots) ? cm.slots : [];
-    return [slots[0] || null, slots[1] || null];
+    return slots[0] || null;
   }
 
-  function countCustomSlotsForInterval(logData, intervalId){
-    const [a,b] = getCustomSlots(logData, intervalId);
-    return [a,b].filter(Boolean).length;
+  function hasCustomStored(logData, intervalId){
+    return !!getCustomSlot(logData, intervalId);
   }
 
-  async function saveCustomSlot(medicalDay, intervalId, slotIndex, missionObj){
+  async function saveCustomSlot(medicalDay, intervalId, missionObj){
     const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
     const snap = await getDoc(ref);
     const d = snap.exists() ? (snap.data() || {}) : {};
@@ -975,74 +1486,77 @@
     const prevInterval = prev[intervalId] || {};
     const prevSlots = Array.isArray(prevInterval.slots) ? prevInterval.slots.slice(0,2) : [null, null];
 
-    prevSlots[slotIndex] = missionObj;
+    prevSlots[0] = missionObj;
 
     const next = {
       ...prev,
-      [intervalId]: {
-        ...prevInterval,
-        slots: prevSlots.slice(0,2),
-        updatedAtMs: Date.now()
-      }
+      [intervalId]: { ...prevInterval, slots: prevSlots.slice(0,2), updatedAtMs: Date.now() }
     };
 
     await setDoc(ref, { customMissions: next, lastUpdate: serverTimestamp() }, { merge: true });
   }
 
-  async function generateAndSaveCustom(medicalDay, intervalId, slotIndex, avoidTitles){
+  function lowerTitle(m){ return String(m?.title || "").trim().toLowerCase(); }
+
+  async function generateAndSaveCustom(medicalDay, intervalId, avoidTitles){
     cachedHistory7d = await fetchHistoryDays(7);
-
-    const baseIdx = (slotIndex === 0) ? 1 : 2;
-
-    let mission = await fetchCustomMission(baseIdx, avoidTitles);
+    let mission = await fetchCustomMission(1, avoidTitles);
     let key = String(mission.title || "").trim().toLowerCase();
     if (avoidTitles.has(key)) {
-      console.warn("[AI] duplicate on first attempt; retrying once", mission.title);
-      mission = await fetchCustomMission(baseIdx + 2, avoidTitles);
-      key = String(mission.title || "").trim().toLowerCase();
+      mission = await fetchCustomMission(2, avoidTitles);
     }
-
-    await saveCustomSlot(medicalDay, intervalId, slotIndex, mission);
+    await saveCustomSlot(medicalDay, intervalId, mission);
     return mission;
   }
 
   /* -------------------- Mission plan builder -------------------- */
   function buildBasicPoolForInterval(interval, medicalDay){
-    const pool = [{ id: "WATER", title: "Hydration", sub: "Drink 250ml Water", icon: "bi-droplet-fill" }];
+    const pool = [{ id:"WATER", title:"Hydration", sub:"Drink 250ml Water", icon:"bi-droplet-fill" }];
 
     const med = cachedUserProfile?.schedule?.medication || {};
     const medTimes = Array.isArray(med.times) ? med.times : [];
     const dueMedTimes = pickTimesWithinInterval(medTimes, interval);
     if (dueMedTimes.length > 0) {
       const t = dueMedTimes[0];
-      pool.push({ id: "MED", title: "Medication", sub: `Take at ${t}`, icon: "bi-capsule" });
+      pool.push({ id:"MED", title:"Medication", sub:`Take at ${t}`, icon:"bi-capsule" });
     }
 
-    const dress = cachedUserProfile?.schedule?.dressing || { frequency: "none" };
+    const dress = cachedUserProfile?.schedule?.dressing || { frequency:"none" };
     const dressDue = isDressingDueForInterval(dress, interval, medicalDay);
     if (dressDue.due) {
-      const icon = "bi-bandaid";
-      pool.push({ id: "DRESS", title: "Dressing", sub: `Check or change bandage (${dressDue.dueTime})`, icon });
+      pool.push({ id:"DRESS", title:"Dressing", sub:`Check or change bandage (${dressDue.dueTime})`, icon:"bi-bandaid" });
     }
-
-    console.log("[Schedule] basics for interval", interval.id, "medicalDay", medicalDay, "=>", pool.map(x=>x.id));
     return pool;
   }
 
-  function isCustomId(id){
-    return String(id || "").startsWith("CUSTOM_");
-  }
-  function toFullId(intervalId, missionId){
-    return `${intervalId}_${missionId}`;
-  }
+  function toFullId(intervalId, missionId){ return `${intervalId}_${missionId}`; }
 
   /* -------------------- UI helpers for missions -------------------- */
   function createMissionCard(m, intervalId, medicalDay, isDone=false){
     const card = document.createElement("div");
     card.className = "mission-card" + (isDone ? " completed" : "");
-    card.innerHTML = `<div class="icon-badge"><i class="bi ${m.icon || "bi-stars"}"></i></div><div><p class="m-0 fw-bold">${m.title}</p><p class="m-0 small text-muted">${m.sub}</p></div>`;
-    const fullId = toFullId(intervalId, m.id);
-    if (!isDone) card.onclick = () => finishMission(fullId, medicalDay, isCustomId(m.id) ? "CUSTOM" : m.id);
+    card.dataset.missionId = String(m?.id || "");
+    card.dataset.intervalId = String(intervalId || "");
+
+    const png = missionPngSrc(m.id);
+
+    card.innerHTML = `
+      <div class="icon-badge">
+        <img src="${png}" alt="${String(m.title || "mission")}">
+      </div>
+      <div>
+        <p class="m-0 fw-bold" style="font-size:16px">${m.title}</p>
+        <p class="m-0 small text-muted" style="font-size:13.5px">${m.sub}</p>
+      </div>
+    `;
+
+    const fullId = `${intervalId}_${m.id}`;
+    if (!isDone) {
+      card.onclick = () => {
+        const type = isCustomId(m.id) ? "CUSTOM" : m.id;
+        openConfirmModal({ type, fullId, medicalDay, missionTitle:m.title, missionSub:m.sub, missionPng:png });
+      };
+    }
     return card;
   }
 
@@ -1050,10 +1564,12 @@
     const card = document.createElement("div");
     card.className = "mission-card loading";
     card.innerHTML = `
-      <div class="icon-badge"><i class="bi bi-stars"></i></div>
+      <div class="icon-badge">
+        <img src="${MISSION_ICON_PNG.CUSTOM}" alt="loading">
+      </div>
       <div style="flex:1 1 auto;">
-        <p class="m-0 fw-bold">${label}</p>
-        <p class="m-0 small text-muted">This will take a moment.</p>
+        <p class="m-0 fw-bold" style="font-size:16px">${label}</p>
+        <p class="m-0 small text-muted" style="font-size:13.5px">This will take a moment.</p>
       </div>
       <div style="margin-left:auto; display:flex; align-items:center; gap:10px;">
         <div class="spinner-border spinner-border-sm" role="presentation"></div>
@@ -1062,15 +1578,18 @@
     return card;
   }
 
-  function createLockedCard(minutes){
+  function createLockedCard(minutes, onClick){
     const card = document.createElement("div");
-    card.className = "mission-card completed";
+    card.className = "mission-card locked";
     card.innerHTML = `
-      <div class="icon-badge"><i class="bi bi-clock"></i></div>
+      <div class="icon-badge">
+        <img src="${MISSION_ICON_PNG.CUSTOM}" alt="locked">
+      </div>
       <div>
-        <p class="m-0 fw-bold">Next Goal Unlocking</p>
-        <p class="m-0 small text-muted">Available in about ${minutes} min</p>
+        <p class="m-0 fw-bold" style="font-size:16px">Refresh to Unlock</p>
+        <p class="m-0 small text-muted" style="font-size:13.5px">Available in about ${minutes} min • Tap to refresh</p>
       </div>`;
+    if (typeof onClick === "function") card.onclick = onClick;
     return card;
   }
 
@@ -1078,23 +1597,29 @@
     const card = document.createElement("div");
     card.className = "mission-card completed";
     card.innerHTML = `
-      <div class="icon-badge"><i class="bi bi-check2-circle"></i></div>
+      <div class="icon-badge">
+        <img src="${MISSION_ICON_PNG.CUSTOM}" alt="done">
+      </div>
       <div>
-        <p class="m-0 fw-bold">All Missions Completed</p>
-        <p class="m-0 small text-muted">Excellent work for this time window.</p>
-      </div>`;
+        <p class="m-0 fw-bold" style="font-size:16px">All Missions Completed</p>
+        <p class="m-0 small text-muted" style="font-size:13.5px">Excellent work for this time window.</p>
+      </div>
+    `;
     return card;
   }
 
-  function createInfoCard(title, sub, icon="bi-info-circle"){
+  function createInfoCard(title, sub){
     const card = document.createElement("div");
     card.className = "mission-card completed";
     card.innerHTML = `
-      <div class="icon-badge"><i class="bi ${icon}"></i></div>
+      <div class="icon-badge">
+        <img src="${MISSION_ICON_PNG.INFO}" alt="info">
+      </div>
       <div>
-        <p class="m-0 fw-bold">${title}</p>
-        <p class="m-0 small text-muted">${sub}</p>
-      </div>`;
+        <p class="m-0 fw-bold" style="font-size:16px">${title}</p>
+        <p class="m-0 small text-muted" style="font-size:13.5px">${sub}</p>
+      </div>
+    `;
     return card;
   }
 
@@ -1103,249 +1628,271 @@
     oldNode.parentNode.replaceChild(newNode, oldNode);
   }
 
-  function lowerTitle(m){ return String(m?.title || "").trim().toLowerCase(); }
+  /* -------------------- Center message -------------------- */
+  function setCenterMessage(title="Doing great"){ $("statusTitle").textContent = title; }
+  function pickNiceTitleByCompleteness(pct, isRest=false){
+    if (isRest) return "Recovery time — rest and breathe";
+    if (pct >= 100) return "All done — you’re amazing";
+    if (pct >= 80) return "So close — one more mission";
+    if (pct >= 60) return "Great job — keep going";
+    if (pct >= 40) return "Keep it up!";
+    if (pct >= 20) return "Nice start — you’ve got this";
+    return "Life is busy — find a small moment for your mission";
+  }
+  function updateCenterByCompleteness(pct, isRest=false){
+    if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) setIdleCharacterByStatus(currentStatusLabel);
+    setCenterMessage(pickNiceTitleByCompleteness(pct, isRest));
+  }
 
-  function ensureTwoMissionCards(container, interval){
-    const cards = Array.from(container.querySelectorAll(".mission-card"));
-    if (cards.length > MAX_VISIBLE){
-      for (let i = MAX_VISIBLE; i < cards.length; i++) cards[i].remove();
+  /* -------------------- Sleep Stars -------------------- */
+  function computeSleepStarsFromSurvey(surveyV2){
+    const B = surveyV2?.B || null;
+    if (!B) return { stars: 0, msg: "Your next check-in will update this score." };
+
+    const hours = safeNum(B.hours, 0);
+    let score = 0;
+
+    if (hours >= 7 && hours <= 9) score += 40;
+    else if (hours >= 6 && hours < 7) score += 30;
+    else if (hours > 9 && hours <= 10) score += 30;
+    else if (hours >= 5 && hours < 6) score += 18;
+    else if (hours > 10 && hours <= 12) score += 18;
+    else if (hours >= 3 && hours < 5) score += 8;
+
+    const qual = String(B.qual || "");
+    if (qual === "good") score += 30;
+    else if (qual === "woke_often") score += 15;
+    else if (qual === "hardly") score += 5;
+
+    const aw = String(B.awakenings || "");
+    if (aw === "0") score += 20;
+    else if (aw === "1-2") score += 12;
+    else if (aw === "3plus") score += 4;
+
+    const mf = String(B.morningFatigue || "");
+    if (mf === "refreshed") score += 10;
+    else if (mf === "slightly") score += 6;
+    else if (mf === "very") score += 2;
+
+    let stars = 1;
+    if (score >= 90) stars = 5;
+    else if (score >= 75) stars = 4;
+    else if (score >= 55) stars = 3;
+    else if (score >= 35) stars = 2;
+
+    const msg =
+      stars >= 5 ? "Super sleep. Keep it up." :
+      stars === 4 ? "Nice sleep. Great work." :
+      stars === 3 ? "Okay sleep. Try a calm bedtime." :
+      stars === 2 ? "Light sleep. Early bedtime helps." :
+                    "Tough night. Rest a little more today.";
+
+    return { stars, msg };
+  }
+  function renderSleepStars(stars, msg){
+    const el = $("stars");
+    if (!el) return;
+    el.innerHTML = "";
+    const s = Math.max(0, Math.min(5, Number(stars || 0)));
+    for(let i=0; i<5; i++){
+      const on = (s > 0 && i < s);
+      el.innerHTML += `<i class="bi bi-star${on?'-fill on':' off'}"></i>`;
     }
-    while (container.querySelectorAll(".mission-card").length < MAX_VISIBLE){
-      if (!interval){
-        container.appendChild(createInfoCard(
-          "Sleep Time",
-          "It’s sleep time now. Rest your body and let it heal — you did enough for today. See you tomorrow.",
-          "bi-moon-stars"
-        ));
-      } else {
-        container.appendChild(createInfoCard("Awesome Work", "You cleared everything for this window. Keep the streak going.", "bi-shield-check"));
-      }
+    $("sleepStarsSub").textContent = msg || "Your next check-in will update this score.";
+    el.title = "Sleep Score (from your Sleep Status check-in)";
+  }
+
+  /* -------------------- Sensors (demo placeholders) -------------------- */
+  function updateSensors() {
+    const temp = 36.6, heart = 72, stress = "Stable";
+    $("val-temp").innerHTML = `<span class="dot ok"></span> ${temp}°C`;
+    $("val-heart").innerHTML = `<span class="dot ok"></span> ${heart} bpm`;
+    $("val-stress").innerHTML = `<span class="dot ok"></span> ${stress}`;
+
+    $("gif-temp").src = "/static/gifs/temperature_stable.gif";
+    $("gif-heart").src = "/static/gifs/heart_stable.gif";
+    $("gif-stress").src = "/static/gifs/stress_stable.gif";
+  }
+
+  /* -------------------- Self-check banner -------------------- */
+  function computeChildStatusFromSurvey(surveyV2){
+    if (!surveyV2) {
+      return { tier:"none", title:"Self-check is not completed", sub:"Please complete today’s check-in so BioPal can help you better." };
     }
+
+    const A = surveyV2.A || {};
+    const B = surveyV2.B || {};
+    const C = surveyV2.C || {};
+    const D = surveyV2.D || {};
+
+    let score = 60;
+
+    if (A.cond === "good") score += 12;
+    else if (A.cond === "bad") score -= 12;
+
+    const pain = String(A.pain || "");
+    if (pain === "none") score += 10;
+    else if (pain === "mild") score += 4;
+    else if (pain === "moderate") score -= 6;
+    else if (pain === "severe") score -= 14;
+
+    const hours = safeNum(B.hours, 0);
+    if (hours >= 8) score += 10;
+    else if (hours >= 7) score += 7;
+    else if (hours >= 6) score += 3;
+    else if (hours >= 5) score -= 4;
+    else score -= 10;
+
+    const fatigue = safeNum(C.fatigue, 5);
+    score -= clamp(fatigue, 0, 10) * 2;
+
+    const anxiety = safeNum(D.anxiety, 5);
+    score -= clamp(anxiety, 0, 10) * 1.5;
+
+    const mood = String(D.mood || "");
+    if (mood === "good") score += 6;
+    else if (mood === "neutral") score += 2;
+    else if (mood === "tired") score -= 2;
+    else score -= 6;
+
+    score = clamp(score, 0, 100);
+
+    if (score >= 75) return { tier:"great", title:"Check-in finished — you’re doing great", sub:"Keep sipping water and take short breaks. You’ve got this." };
+    if (score >= 50) return { tier:"okay", title:"Check-in finished — nice job", sub:"Go slow today: water, a small rest, and gentle movement." };
+    return { tier:"care", title:"Check-in finished — take extra care today", sub:"Rest more, drink water, and tell an adult if you feel worse." };
   }
 
-  /* -------------------- TODAY PROGRESS -------------------- */
-  function countPlannedCustomToday(logData){
-    const cm = logData?.customMissions || {};
-    let count = 0;
-    for (const itv of INTERVALS){
-      const slots = cm?.[itv.id]?.slots;
-      if (Array.isArray(slots)){
-        count += slots.filter(Boolean).length;
-      }
+  function setSelfCheckBannerBySurvey(surveyV2){
+    const banner = $("selfCheckBanner");
+    if (!banner) return;
+
+    const goBtn = $("selfCheckGoBtn");
+    const doneBtn = $("selfCheckDoneBtn");
+
+    const status = computeChildStatusFromSurvey(surveyV2);
+
+    $("selfCheckTitle").textContent = status.title;
+    $("selfCheckSub").textContent = status.sub;
+
+    banner.classList.add("show");
+
+    if (status.tier === "none") {
+      banner.classList.remove("done");
+      $("selfCheckIcon").innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i>`;
+      goBtn?.classList.remove("hidden");
+      doneBtn?.classList.add("hidden");
+      return;
     }
-    return count;
+
+    banner.classList.add("done");
+    $("selfCheckIcon").innerHTML = `<i class="bi bi-check2-circle"></i>`;
+    goBtn?.classList.add("hidden");
+    doneBtn?.classList.remove("hidden");
+
+    if (status.tier === "great") $("selfCheckIcon").innerHTML = `<i class="bi bi-emoji-smile-fill"></i>`;
+    if (status.tier === "okay") $("selfCheckIcon").innerHTML = `<i class="bi bi-heart-fill"></i>`;
+    if (status.tier === "care") $("selfCheckIcon").innerHTML = `<i class="bi bi-shield-exclamation"></i>`;
   }
 
-  function computePlannedBasicsToday(medicalDay){
-    let total = 0;
-    for (const itv of INTERVALS){
-      total += buildBasicPoolForInterval(itv, medicalDay).length;
-    }
-    return total;
-  }
+  /* -------------------- Interval start marker -------------------- */
+  async function ensureIntervalStarted(medicalDay, intervalId, logData){
+    const meta = getIntervalMeta(logData, intervalId);
+    if (meta.startedAt && meta.startedAt > 0) return meta.startedAt;
 
-  function computeTodayTotals(logData, medicalDay){
-    const plannedBasicsToday = computePlannedBasicsToday(medicalDay);
-    const plannedCustomToday = countPlannedCustomToday(logData);
-
-    const doneToday = Array.isArray(logData?.completedMissions) ? logData.completedMissions.length : 0;
-    const totalToday = Math.max(1, plannedBasicsToday + plannedCustomToday);
-
-    return { doneToday, totalToday, plannedBasicsToday, plannedCustomToday };
-  }
-
-  /* ===================== NEW: Condition Report UI + API ===================== */
-  let reportBusy = false;
-  let reportAbort = null;
-  let reportCache = { key: "", at: 0, data: null };
-
-  function openReportModal(){
-    $("reportOverlay").classList.add("show");
-    $("reportOverlay").setAttribute("aria-hidden", "false");
-  }
-  function closeReportModal(){
-    $("reportOverlay").classList.remove("show");
-    $("reportOverlay").setAttribute("aria-hidden", "true");
-  }
-
-  function setReportLoadingUI({ title="Generating report...", sub="Analyzing last 7 days of check-ins and missions." } = {}){
-    const body = $("reportBody");
-    body.innerHTML = `
-      <div class="report-loading">
-        <div class="spinner-border" role="presentation" aria-hidden="true"></div>
-        <div style="display:flex; flex-direction:column; gap:2px;">
-          <div style="font-weight:950; letter-spacing:-.2px;">${title}</div>
-          <div style="font-weight:800; color:var(--muted); font-size:12px;">${sub}</div>
-        </div>
-      </div>
-      <div class="report-block" style="margin-top:14px;">
-        <h6>What BioPal is checking</h6>
-        <p>Self check-ins (sleep, fatigue, mood), completed missions (hydration/med/dressing/custom), and routine consistency over the last 7 days.</p>
-      </div>
-    `;
-  }
-
-  function escapeHtml(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;").replaceAll("<","&lt;")
-      .replaceAll(">","&gt;").replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  // Accepts any payload shape and normalizes into UI sections safely
-  function renderConditionReportUI(result, meta){
-    const body = $("reportBody");
-
-    const summary = result?.summary ?? result?.overall_summary ?? result?.overall ?? "";
-    const score = result?.score ?? result?.condition_score ?? result?.overall_score ?? null;
-    const risk = result?.risk_level ?? result?.risk ?? result?.status ?? "";
-    const highlights = Array.isArray(result?.highlights) ? result.highlights : (Array.isArray(result?.positives) ? result.positives : []);
-    const concerns = Array.isArray(result?.concerns) ? result.concerns : (Array.isArray(result?.negatives) ? result.negatives : []);
-    const recommendations = Array.isArray(result?.recommendations) ? result.recommendations : (Array.isArray(result?.actions) ? result.actions : []);
-    const next7 = Array.isArray(result?.next_7_days_plan) ? result.next_7_days_plan : [];
-
-    const chips = [];
-    if (typeof score === "number") chips.push(`<span class="report-chip"><i class="bi bi-speedometer2"></i> Score: ${Math.round(score)}</span>`);
-    if (risk) chips.push(`<span class="report-chip"><i class="bi bi-shield-exclamation"></i> ${escapeHtml(risk)}</span>`);
-    chips.push(`<span class="report-chip"><i class="bi bi-calendar-week"></i> Days: ${meta.daysCount}</span>`);
-    chips.push(`<span class="report-chip"><i class="bi bi-check2-circle"></i> Missions: ${meta.missionsCount}</span>`);
-
-    const listToHtml = (arr) => {
-      if (!arr || !arr.length) return `<p style="margin:0; color:var(--muted); font-weight:800; font-size:12px;">No items.</p>`;
-      return `<ul style="margin:0; padding-left:18px;">
-        ${arr.slice(0, 8).map(x => `<li style="margin:6px 0; font-weight:750; font-size:13px; line-height:1.5;">${escapeHtml(x)}</li>`).join("")}
-      </ul>`;
-    };
-
-    body.innerHTML = `
-      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">${chips.join("")}</div>
-
-      <div class="report-block">
-        <h6>Overall</h6>
-        <p>${escapeHtml(summary || "Report generated. Review highlights and recommendations below.")}</p>
-      </div>
-
-      <div class="report-block">
-        <h6>Highlights</h6>
-        ${listToHtml(highlights)}
-      </div>
-
-      <div class="report-block">
-        <h6>Concerns</h6>
-        ${listToHtml(concerns)}
-      </div>
-
-      <div class="report-block">
-        <h6>Recommendations</h6>
-        ${listToHtml(recommendations)}
-      </div>
-
-      <div class="report-block">
-        <h6>Next 7 Days Focus</h6>
-        ${listToHtml(next7)}
-      </div>
-
-      <div class="hint" style="margin-top:12px;">
-        Generated from your last 7 days of check-ins and mission completion history. If anything feels off, consider contacting your care team.
-      </div>
-    `;
-  }
-
-  async function fetchConditionReport({ force=false } = {}){
-    if (!userSession) return;
-    if (reportBusy) return;
-
-    // modal must pop up first (your requirement)
-    openReportModal();
-    setReportLoadingUI();
-
-    reportBusy = true;
-    $("refreshReportBtn").disabled = true;
-
+    const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
     try{
-      if (reportAbort) reportAbort.abort();
-      reportAbort = new AbortController();
-
-      cachedHistory7d = await fetchHistoryDays(7);
-
-      const daysCount = Array.isArray(cachedHistory7d) ? cachedHistory7d.length : 0;
-      const missionsCount = cachedHistory7d.reduce((acc, d) => acc + (Array.isArray(d.completedMissions) ? d.completedMissions.length : 0), 0);
-
-      const cacheKey = hashSnapshot({
-        uid: userSession.uid,
-        profile: cachedUserProfile || {},
-        history: cachedHistory7d || [],
-      });
-
-      const fresh = (Date.now() - reportCache.at) < (15 * 60 * 1000); // 15 min cache
-      if (!force && reportCache.key === cacheKey && fresh && reportCache.data) {
-        console.log("[Report] using in-memory cache");
-        renderConditionReportUI(reportCache.data, { daysCount, missionsCount });
-        return;
+      const snap = await getDoc(ref);
+      const d = snap.exists() ? (snap.data() || {}) : {};
+      const im = d.intervalMeta || {};
+      const cur = im[intervalId] || {};
+      if (!cur.startedAt) {
+        im[intervalId] = { ...cur, startedAt: Date.now(), nextRevealAt: cur.nextRevealAt || 0, lastCompletedAt: cur.lastCompletedAt || 0 };
+        await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge:true });
+        return im[intervalId].startedAt;
       }
-
-      const payload = {
-        profile: cachedUserProfile || {},
-        history: cachedHistory7d || [],
-        nowISO: new Date().toISOString()
-      };
-
-      console.groupCollapsed("[Report] request -> /api/condition_report");
-      console.log("payload:", payload);
-      console.groupEnd();
-
-      const t0 = performance.now();
-      const res = await fetch(API_CONDITION_REPORT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: reportAbort.signal
-      });
-      const t1 = performance.now();
-
-      console.log("[Report] HTTP", res.status, res.ok ? "OK" : "NOT OK", `${Math.round(t1 - t0)}ms`);
-
-      if (!res.ok){
-        const txt = await res.text().catch(()=> "");
-        console.warn("[Report] server error body:", txt);
-        throw new Error(`Report API ${res.status}`);
-      }
-
-      const data = await res.json();
-      console.log("[Report] response JSON <-", data);
-
-      reportCache = { key: cacheKey, at: Date.now(), data };
-      renderConditionReportUI(data, { daysCount, missionsCount });
-
-      showToast({ title: "Report Ready", message: "Condition report generated." , key: "report_ok" });
+      return cur.startedAt || 0;
     } catch(e){
-      if (String(e?.name || "") === "AbortError"){
-        console.log("[Report] aborted");
-        return;
-      }
-      console.warn("[Report] failed:", e);
-      $("reportBody").innerHTML = `
-        <div class="report-block">
-          <h6>Could not generate report</h6>
-          <p style="color:var(--muted);">We couldn’t reach the report service right now. Please try again.</p>
-        </div>
-        <div class="report-block">
-          <h6>Quick fallback</h6>
-          <p style="color:var(--ink);">
-            Keep consistent hydration, keep check-ins daily, and follow your medication/dressing schedule. If symptoms worsen, contact your care team.
-          </p>
-        </div>
-      `;
-      showToast({ title: "Report Failed", message: "Please try again.", key: "report_fail" });
-    } finally {
-      reportBusy = false;
-      $("refreshReportBtn").disabled = false;
+      console.warn("[Interval] ensureIntervalStarted failed:", e);
+      return 0;
     }
   }
-  /* ======================================================================== */
 
-  /* -------------------- Dashboard Logic (UPDATED RULES) -------------------- */
-  async function updateDashboard() {
+  /* =========================================================
+     ✅ NEW: Alarm Engine (NO duplicates, NO sequential)
+     - If there are active missions (max 2 shown), every 10s:
+       pick ONE mission randomly from current active missions,
+       blink that card + play its alarm gif once.
+     - runs forever, and auto-updates when missions change.
+  ========================================================= */
+
+  let alarmEngineTimer = null;
+  let alarmEngineKey = "";
+  let alarmEngineList = []; // current active missions (ONLY current missions)
+
+  function stopAlarmEngine(){
+    if (alarmEngineTimer) clearInterval(alarmEngineTimer);
+    alarmEngineTimer = null;
+    alarmEngineKey = "";
+    alarmEngineList = [];
+    clearMissionBlink();
+  }
+
+  function buildAlarmKey(medicalDay, intervalId, missions){
+    const ids = (Array.isArray(missions) ? missions : []).map(m => String(m?.id || "")).join("|");
+    return `${medicalDay}::${intervalId}::${ids}`;
+  }
+
+  function clearMissionBlink(){
+    const container = $("mission-container");
+    if (!container) return;
+    container.querySelectorAll(".mission-card.is-alarming").forEach(el => el.classList.remove("is-alarming"));
+  }
+
+  function blinkMissionCard(missionId){
+    const container = $("mission-container");
+    if (!container) return;
+    clearMissionBlink();
+    const id = String(missionId || "");
+    const card = container.querySelector(`.mission-card[data-mission-id="${CSS.escape(id)}"]`);
+    if (card) card.classList.add("is-alarming");
+  }
+
+  function pickRandomMission(list){
+    const arr = Array.isArray(list) ? list : [];
+    if (!arr.length) return null;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function startOrUpdateAlarmEngine({ medicalDay, intervalId, missions }){
+    const list = (Array.isArray(missions) ? missions : []).slice(0, MAX_VISIBLE); // only current missions on screen
+    const key = buildAlarmKey(medicalDay, intervalId, list);
+
+    alarmEngineList = list;
+
+    // if missions changed, clear old blink so we don't blink a removed card
+    if (alarmEngineKey !== key) clearMissionBlink();
+    alarmEngineKey = key;
+
+    if (alarmEngineTimer) return; // already running forever
+
+    alarmEngineTimer = setInterval(() => {
+      // if no active missions, do nothing (but keep timer alive)
+      if (!alarmEngineList.length) return;
+
+      // if completion/reminder is playing, skip this tick
+      if (isPlayingCompletion || isPlayingReminder) return;
+
+      // choose ONE mission from current missions, random
+      const chosen = pickRandomMission(alarmEngineList);
+      if (!chosen) return;
+
+      blinkMissionCard(chosen.id);
+      playAlarmOnce(missionTypeFromMission(chosen));
+    }, MISSION_ALARM_MS);
+  }
+
+  /* -------------------- Dashboard Logic -------------------- */
+  async function updateDashboard(opts = {}) {
     if (!userSession) return;
 
     const now = getNow();
@@ -1359,254 +1906,237 @@
     ]);
 
     cachedUserProfile = pSnap.exists() ? pSnap.data() : {};
+    updateGreeting();
+
     const logData = lSnap.exists() ? lSnap.data() : {};
     const completed = logData.completedMissions || [];
-    const hasTodayCheckin = !!(logData.survey_v2 || logData.survey);
 
-    // enable report button after auth + profile loaded
-    if ($("openReportBtn")) $("openReportBtn").disabled = false;
+    const surveyV2 = logData.survey_v2 || null;
+    const hasTodayCheckin = !!surveyV2;
 
-    const today = computeTodayTotals(logData, medicalDay);
+    const selfRes = await resolveTodayOrYesterdaySelfStatus(medicalDay, logData);
+    currentStatusLabel = selfRes.label;
+    currentSelfScore = selfRes.score;
 
-    console.groupCollapsed("[Dash] updateDashboard()");
-    console.log("medicalDay:", medicalDay, "hour:", hr, "interval:", interval ? interval.id : "none");
-    console.log("completedMissions:", completed);
-    console.log("customMissions:", logData.customMissions || {});
-    console.log("intervalMeta:", logData.intervalMeta || {});
-    console.log("intervalSnapshot:", logData.intervalSnapshot || {});
-    console.groupEnd();
+    if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) {
+      setIdleCharacterByStatus(currentStatusLabel);
+    }
+
+    setSelfCheckBannerBySurvey(surveyV2);
+
+    const sleepStars = computeSleepStarsFromSurvey(surveyV2);
+    if (hasTodayCheckin) renderSleepStars(sleepStars.stars, sleepStars.msg);
+    else renderSleepStars(0, "Your next check-in will update this score.");
 
     if (hasTodayCheckin) {
       $("openSurveyBtn").disabled = true;
       $("openSurveyBtn").innerHTML = `<i class="bi bi-check2-circle"></i> Check-in Finished`;
     } else {
       $("openSurveyBtn").disabled = false;
-      $("openSurveyBtn").innerHTML = `<i class="bi bi-clipboard2-pulse"></i> Check-in`;
+      $("openSurveyBtn").innerHTML = `<i class="bi bi-clipboard2-pulse"></i> Daily Check-in`;
     }
 
     const container = $("mission-container");
     container.innerHTML = "";
+    activeBasicsSet = new Set();
 
     if (!interval) {
-      $("interval-label").textContent = "Sleep Window";
-
-      container.appendChild(createInfoCard(
-        "Sleep Time",
-        "It’s sleep time now. Take a full rest — your body is working hard for you. We’ll continue tomorrow.",
-        "bi-moon-stars"
-      ));
-      container.appendChild(createInfoCard(
-        "Gentle Reminder",
-        "If you’re still awake, a small sip of water is enough. No pressure — rest comes first.",
-        "bi-cup-hot"
-      ));
-
-      const statusObj = updateStatus(today.doneToday, today.totalToday);
+      // sleep time: stop mission alarm blink + stop alarm engine list
+      clearMissionBlink();
+      alarmEngineList = [];
+      container.appendChild(createInfoCard("Sleep Time","It’s sleep time now. Take a full rest — your body is working hard for you. We’ll continue tomorrow."));
+      container.appendChild(createInfoCard("Gentle Reminder","If you’re still awake, a small sip of water is enough. No pressure — rest comes first."));
+      updateCenterByCompleteness(0, true);
       updateSensors();
-      updateTopStars({ medicalDay, completed, intervalId: -1, hasTodayCheckin });
-
       return;
     }
-
-    $("interval-label").textContent = interval.label;
 
     const intervalId = interval.id;
     const intervalEndMs = getIntervalEndDate(now, interval).getTime();
     const nowMs = Date.now();
 
-    const meta = getIntervalMeta(logData, intervalId);
-    const isIntervalStart = !meta.startedAt;
-
-    // mark startedAt once per interval/day
-    if (isIntervalStart) {
-      try{
-        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
-        const im = logData.intervalMeta || {};
-        const cur = im[intervalId] || {};
-        im[intervalId] = {
-          ...cur,
-          startedAt: nowMs,
-          nextRevealAt: cur.nextRevealAt || 0,
-          lastCompletedAt: cur.lastCompletedAt || 0,
-          initialFillDone: !!cur.initialFillDone
-        };
-        await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge:true });
-        console.log("[Interval] startedAt set for", intervalId, new Date(nowMs).toLocaleTimeString());
-      } catch(e){
-        console.warn("[Interval] failed to set startedAt:", e);
-      }
-    }
+    const startedAt = await ensureIntervalStarted(medicalDay, intervalId, logData);
 
     const basicPool = buildBasicPoolForInterval(interval, medicalDay);
-
-    const [slot0, slot1] = getCustomSlots(logData, intervalId);
-    const savedCustoms = [slot0, slot1].filter(Boolean);
-
-    const usedTitles = new Set();
     const activeBasics = basicPool.filter(m => !completed.includes(toFullId(intervalId, m.id)));
-    const activeCustoms = savedCustoms.filter(m => !completed.includes(toFullId(intervalId, m.id)));
+    for (const m of activeBasics) if (m.id === "WATER" || m.id === "MED" || m.id === "DRESS") activeBasicsSet.add(m.id);
 
-    for (const m of activeBasics) usedTitles.add(lowerTitle(m));
-    for (const m of activeCustoms) usedTitles.add(lowerTitle(m));
+    const usedTitles = new Set(activeBasics.map(lowerTitle));
+    const customSaved = getCustomSlot(logData, intervalId);
+    const customActive = (customSaved && !completed.includes(toFullId(intervalId, customSaved.id))) ? customSaved : null;
+    if (customActive) usedTitles.add(lowerTitle(customActive));
 
-    // Render active missions (basics priority)
-    let shown = 0;
-    for (const m of activeBasics) {
-      if (shown >= MAX_VISIBLE) break;
-      container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
-      shown++;
-    }
-    for (const m of activeCustoms) {
-      if (shown >= MAX_VISIBLE) break;
-      const t = lowerTitle(m);
-      if (usedTitles.has(t)) continue;
-      usedTitles.add(t);
-      container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
-      shown++;
-    }
+    const onlyOneBasicThisInterval = (basicPool.length === 1);
+    const isBeginningOfInterval = !!startedAt && (nowMs - startedAt) < (5 * 60 * 1000);
+    const allowCustomAtStart = onlyOneBasicThisInterval && isBeginningOfInterval;
 
-    /* ===================== IMPORTANT FIX (YOUR REQUEST) =====================
-       If at the beginning of the interval only Hydration is eligible (or basics < 2),
-       we MUST fill the remaining slot(s) with AI custom mission(s) immediately.
-       Also: do NOT generate multiple times in the same interval -> intervalMeta.initialFillDone guard.
-    ======================================================================= */
-    const metaNow = getIntervalMeta(logData, intervalId);
-    const slotsNow = getCustomSlots(logData, intervalId);
-    const existingCount = slotsNow.filter(Boolean).length;
+    // If custom needs to be generated at interval start
+    if (allowCustomAtStart && !hasCustomStored(logData, intervalId)) {
+      clearMissionBlink();
+      alarmEngineList = [];
 
-    const needNow = Math.max(0, MAX_VISIBLE - shown);
-    const remainingCapacity = Math.max(0, MAX_CUSTOM_PER_INTERVAL - existingCount);
-    const allowedNew = Math.min(needNow, remainingCapacity);
+      const ph = createLoadingCard("Generating custom mission...");
+      if (activeBasics[0]) container.appendChild(createMissionCard(activeBasics[0], intervalId, medicalDay, false));
+      container.appendChild(ph);
 
-    const shouldInitialFill = (!metaNow.initialFillDone) && allowedNew > 0;
-
-    if (shouldInitialFill) {
-      console.log("[AI][InitialFill] basics shown:", shown, "need:", needNow, "existingCustomSlots:", existingCount, "allowedNew:", allowedNew);
-
-      const fillPlan = [];
-      if (!slotsNow[0]) fillPlan.push(0);
-      if (!slotsNow[1]) fillPlan.push(1);
-
-      const placeholders = [];
-      for (let i=0; i<allowedNew; i++){
-        const ph = createLoadingCard("Generating custom mission...");
-        container.appendChild(ph);
-        placeholders.push(ph);
-        shown++;
-      }
-
-      for (let i=0; i<allowedNew; i++){
-        const slotIndex = fillPlan[i];
-        if (slotIndex === undefined) break;
-
-        const ph = placeholders[i];
-        const mission = await generateAndSaveCustom(medicalDay, intervalId, slotIndex, usedTitles);
-        usedTitles.add(lowerTitle(mission));
+      try{
+        const mission = await generateAndSaveCustom(medicalDay, intervalId, usedTitles);
         replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
-      }
+        openMissionRevealModal(mission, intervalId, medicalDay);
 
-      try{
-        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
-        const snapX = await getDoc(ref);
-        const dX = snapX.exists() ? (snapX.data() || {}) : {};
-        const imX = dX.intervalMeta || {};
-        const curX = imX[intervalId] || {};
-        imX[intervalId] = { ...curX, initialFillDone: true, startedAt: curX.startedAt || nowMs };
-        await setDoc(ref, { intervalMeta: imX, lastUpdate: serverTimestamp() }, { merge:true });
-        console.log("[AI][InitialFill] initialFillDone=true for", intervalId);
-      }catch(e){
-        console.warn("[AI][InitialFill] failed to set initialFillDone:", e);
-      }
-    }
+        // ✅ show current missions (max 2), then alarm engine uses only these
+        container.innerHTML = "";
+        const currentMissions = [];
+        if (activeBasics[0]) currentMissions.push(activeBasics[0]);
+        currentMissions.push(mission);
 
-    // Re-check meta after potential initial fill
-    const meta2 = getIntervalMeta(logData, intervalId);
-    const revealPending = (meta2.nextRevealAt || 0) > 0 && nowMs < meta2.nextRevealAt && meta2.nextRevealAt < intervalEndMs;
-
-    const activeShown = Array.from(container.querySelectorAll(".mission-card"))
-      .filter(el => !el.classList.contains("completed") && !el.classList.contains("loading"))
-      .length;
-
-    if (activeShown < MAX_VISIBLE && revealPending) {
-      const mins = Math.max(1, Math.round((meta2.nextRevealAt - nowMs) / 60000));
-      if (container.querySelectorAll(".mission-card").length < MAX_VISIBLE) {
-        container.appendChild(createLockedCard(mins));
-      }
-    }
-
-    const revealDue = (meta2.nextRevealAt || 0) > 0 && nowMs >= meta2.nextRevealAt && meta2.nextRevealAt < intervalEndMs;
-
-    if (revealDue) {
-      const curCustomCount = countCustomSlotsForInterval(logData, intervalId);
-      const hasCapacity = curCustomCount < MAX_CUSTOM_PER_INTERVAL;
-
-      if (hasCapacity) {
-        const activeShown2 = Array.from(container.querySelectorAll(".mission-card"))
-          .filter(el => !el.classList.contains("completed") && !el.classList.contains("loading"))
-          .length;
-
-        if (activeShown2 < MAX_VISIBLE) {
-          const ph = createLoadingCard("Unlocking next custom mission...");
-          if (container.querySelectorAll(".mission-card").length < MAX_VISIBLE) {
-            container.appendChild(ph);
-          } else {
-            const last = Array.from(container.querySelectorAll(".mission-card")).pop();
-            if (last) replaceNode(last, ph);
-          }
-
-          const [s0, s1] = getCustomSlots(logData, intervalId);
-          let pickSlot = (!s0) ? 0 : 1;
-
-          const mission = await generateAndSaveCustom(medicalDay, intervalId, pickSlot, usedTitles);
-          usedTitles.add(lowerTitle(mission));
-          replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
+        for (const m of currentMissions.slice(0, MAX_VISIBLE)) {
+          container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
         }
+
+        startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentMissions.slice(0, MAX_VISIBLE) });
+
+      } catch(e){
+        console.warn("[StartCustom] failed:", e);
+        replaceNode(ph, createInfoCard("Custom Mission", "Could not generate right now. Try refresh later."));
       }
+
+      updateCenterByCompleteness(calcIntervalPct(intervalId, basicPool, logData), false);
+      updateSensors();
+      return;
+    }
+
+    // Reveal timing for custom (kept)
+    const meta = getIntervalMeta(logData, intervalId);
+    const basicsDoneCount = basicPool.filter(m => completed.includes(toFullId(intervalId, m.id))).length;
+    const allBasicsDone = (basicsDoneCount === basicPool.length);
+
+    const nextRevealAt = meta.nextRevealAt || 0;
+    const revealPending = nextRevealAt > 0 && nowMs < nextRevealAt && nextRevealAt < intervalEndMs;
+    const revealDue = nextRevealAt > 0 && nowMs >= nextRevealAt && nextRevealAt < intervalEndMs;
+
+    // If revealDue and no custom stored -> generate it
+    if (revealDue && !hasCustomStored(logData, intervalId)) {
+      clearMissionBlink();
+      alarmEngineList = [];
+
+      container.innerHTML = "";
+      const ph = createLoadingCard("Unlocking custom mission...");
+      const firstBasic = activeBasics[0] || null;
+      if (firstBasic) container.appendChild(createMissionCard(firstBasic, intervalId, medicalDay, false));
+      container.appendChild(ph);
 
       try{
-        const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
-        const snap3 = await getDoc(ref);
-        const d3 = snap3.exists() ? (snap3.data() || {}) : {};
-        const im = d3.intervalMeta || {};
-        const cur = im[intervalId] || {};
-        im[intervalId] = { ...cur, nextRevealAt: 0 };
-        await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge: true });
+        const mission = await generateAndSaveCustom(medicalDay, intervalId, usedTitles);
+        replaceNode(ph, createMissionCard(mission, intervalId, medicalDay, false));
+        openMissionRevealModal(mission, intervalId, medicalDay);
+        showToast({ title:"New Mission Unlocked", message:"A custom mission is ready.", key:`unlocked_${intervalId}_${Date.now()}` });
+
+        // clear nextRevealAt
+        try{
+          const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+          const snap3 = await getDoc(ref);
+          const d3 = snap3.exists() ? (snap3.data() || {}) : {};
+          const im = d3.intervalMeta || {};
+          const cur = im[intervalId] || {};
+          im[intervalId] = { ...cur, nextRevealAt: 0 };
+          await setDoc(ref, { intervalMeta: im, lastUpdate: serverTimestamp() }, { merge: true });
+        } catch(e){
+          console.warn("[Reveal] Failed to clear nextRevealAt:", e);
+        }
+
+        // ✅ show current missions (max 2) only
+        container.innerHTML = "";
+        const currentMissions = [];
+        for (const m of activeBasics) currentMissions.push(m);
+        currentMissions.push(mission);
+
+        for (const m of currentMissions.slice(0, MAX_VISIBLE)) {
+          container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
+        }
+
+        startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentMissions.slice(0, MAX_VISIBLE) });
+
       } catch(e){
-        console.warn("[AI] Failed to clear nextRevealAt:", e);
+        console.warn("[Reveal] generation failed:", e);
+        replaceNode(ph, createInfoCard("Custom Mission", "Could not generate right now. Try refresh later."));
+      }
+
+      updateCenterByCompleteness(calcIntervalPct(intervalId, basicPool, logData), false);
+      updateSensors();
+      return;
+    }
+
+    // ✅ Normal case: current active missions = basics + active custom (then display only first 2)
+    const activeMissions = [];
+    for (const m of activeBasics) activeMissions.push(m);
+    if (customActive) activeMissions.push(customActive);
+
+    if (activeMissions.length > 0) {
+      container.innerHTML = "";
+
+      // show only the current missions on screen (max 2)
+      const currentShown = activeMissions.slice(0, MAX_VISIBLE);
+      for (const m of currentShown) {
+        container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
+      }
+
+      // start the forever alarm engine using only currently shown missions
+      startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentShown });
+
+    } else {
+      // No active missions: clear blink + no alarm targets
+      clearMissionBlink();
+      alarmEngineList = [];
+
+      container.innerHTML = "";
+      if (revealPending && !hasCustomStored(logData, intervalId) && allBasicsDone) {
+        const mins = Math.max(1, Math.round((nextRevealAt - nowMs) / 60000));
+        container.appendChild(createLockedCard(mins, async () => { await updateDashboard({ manualRefresh:true }); }));
+        container.appendChild(createInfoCard("Almost there", "A custom mission will unlock soon. Take a short rest."));
+      } else if (allBasicsDone && !customActive) {
+        container.appendChild(createSuccessCard());
+        container.appendChild(createInfoCard("Next Interval", "New missions will appear in the next time window."));
+      } else {
+        container.appendChild(createInfoCard("Keep Going", "Complete what you see here. BioPal will unlock more when it’s time."));
+        container.appendChild(createInfoCard("Tip", "Small steps count. You’re doing fine."));
       }
     }
 
-    const activeBasicsNow = basicPool.filter(m => !completed.includes(toFullId(intervalId, m.id))).length;
-    const [cs0, cs1] = getCustomSlots(logData, intervalId);
-    const customInSlots = [cs0, cs1].filter(Boolean);
-    const activeCustomsNow = customInSlots.filter(m => !completed.includes(toFullId(intervalId, m.id))).length;
-
-    const basicsDoneCount = basicPool.filter(m => completed.includes(toFullId(intervalId, m.id))).length;
-    const allBasicsDone = basicsDoneCount === basicPool.length;
-
-    if (activeBasicsNow === 0 && activeCustomsNow === 0 && allBasicsDone) {
-      container.innerHTML = "";
-      container.appendChild(createSuccessCard());
-      container.appendChild(createInfoCard("Next Interval", "New missions will appear in the next time window.", "bi-arrow-right-circle"));
-    }
-
-    ensureTwoMissionCards(container, interval);
-
-    const statusObj = updateStatus(today.doneToday, today.totalToday);
+    const pct = calcIntervalPct(intervalId, basicPool, logData);
+    updateCenterByCompleteness(pct, false);
     updateSensors();
-    updateTopStars({ medicalDay, completed, intervalId: intervalId, hasTodayCheckin });
 
-    await persistIntervalSnapshot({ medicalDay, intervalId, statusObj });
+    if (opts.manualRefresh && revealPending) {
+      const mins = Math.max(1, Math.round((nextRevealAt - nowMs) / 60000));
+      showToast({ title:"Not Ready Yet", message:`Custom mission unlocks in ~${mins} min.`, key:`not_ready_${intervalId}` });
+    }
   }
 
+  function calcIntervalPct(intervalId, basicPool, logData){
+    const completed = Array.isArray(logData?.completedMissions) ? logData.completedMissions : [];
+    const basicsGiven = basicPool.length;
+
+    const hasCustom = !!getCustomSlot(logData, intervalId);
+    const meta = getIntervalMeta(logData, intervalId);
+    const customPlanned = hasCustom ? 1 : (meta.nextRevealAt ? 1 : 0);
+
+    const totalGiven = Math.max(1, basicsGiven + customPlanned);
+    const doneInterval = completed.filter(x => String(x).startsWith(`${intervalId}_`)).length;
+
+    return Math.max(0, Math.min(100, Math.round((doneInterval / totalGiven) * 100)));
+  }
+
+  /* -------------------- Finish Mission -------------------- */
   async function finishMission(fullId, medicalDay, type) {
     try {
-      console.log("[Mission] finishMission ->", { fullId, medicalDay, type });
-
       const now = getNow();
       const hr = now.getHours();
       const interval = getIntervalByHour(hr);
       const intervalId = interval ? interval.id : null;
+
+      // If a mission is completed, stop blink immediately (avoid blinking completed item)
+      clearMissionBlink();
 
       playCharacterOnce(type);
 
@@ -1619,26 +2149,19 @@
         list.push(fullId);
 
         const isBasic = (type === "WATER" || type === "MED" || type === "DRESS");
-
         let nextRevealAt = 0;
-        if (interval && intervalId && isBasic) {
-          const existingCustomCount = countCustomSlotsForInterval(d, intervalId);
-          const hasCapacity = existingCustomCount < MAX_CUSTOM_PER_INTERVAL;
 
+        if (interval && intervalId && isBasic) {
+          const basicPool = buildBasicPoolForInterval(interval, medicalDay);
+          const allBasicsDoneAfterThis = basicPool.every(m => list.includes(`${intervalId}_${m.id}`));
+
+          const alreadyHasCustom = hasCustomStored(d, intervalId);
           const end = getIntervalEndDate(now, interval).getTime();
           const completeAt = Date.now();
           const candidate = completeAt + REVEAL_DELAY_MS;
 
-          if (hasCapacity && candidate < end) nextRevealAt = candidate;
-
-          console.log("[Mission] BASIC completion scheduling check",
-            { intervalId, existingCustomCount, hasCapacity,
-              completeAt: new Date(completeAt).toLocaleTimeString(),
-              candidate: new Date(candidate).toLocaleTimeString(),
-              intervalEnd: new Date(end).toLocaleTimeString(),
-              nextRevealAt: nextRevealAt ? new Date(nextRevealAt).toLocaleTimeString() : "none"
-            }
-          );
+          const canSchedule = allBasicsDoneAfterThis && !alreadyHasCustom && (candidate < end);
+          if (canSchedule) nextRevealAt = candidate;
         }
 
         const intervalMeta = d.intervalMeta || {};
@@ -1647,9 +2170,8 @@
           intervalMeta[intervalId] = {
             ...cur,
             startedAt: cur.startedAt || 0,
-            nextRevealAt,
-            lastCompletedAt: Date.now(),
-            initialFillDone: !!cur.initialFillDone
+            nextRevealAt: nextRevealAt || (cur.nextRevealAt || 0),
+            lastCompletedAt: Date.now()
           };
         }
 
@@ -1660,169 +2182,19 @@
           lastUpdate: serverTimestamp()
         }, { merge: true });
 
-        showToast({ title: "Mission Complete!", message: "Great progress." });
+        if (nextRevealAt) {
+          const mins = Math.max(1, Math.round((nextRevealAt - Date.now()) / 60000));
+          showToast({ title:"Great!", message:`Custom mission will unlock in about ${mins} min.`, key:`schedule_${intervalId}_${nextRevealAt}` });
+        } else {
+          showToast({ title:"Mission Complete!", message:"Nice job — keep going.", key:`done_${fullId}` });
+        }
 
-        lastSnapshotHash = "";
         await updateDashboard();
       }
     } catch (e) {
       console.error(e);
     }
   }
-
-  function updateStatus(done, total) {
-    let pct = total > 0 ? Math.round((done/total)*100) : 0;
-    if (pct >= 80) currentStatusLabel = "Happy / Energized";
-    else if (pct >= 50) currentStatusLabel = "Neutral / Calm";
-    else if (pct >= 20) currentStatusLabel = "Tired / Low Energy";
-    else currentStatusLabel = "Concern / Warning";
-
-    $("statusTitle").textContent = currentStatusLabel;
-    $("statusDesc").textContent = `Today's mission progress: ${pct}% (${done}/${total})`;
-    if (!isPlayingCompletion) setIdleCharacterByStatus(currentStatusLabel);
-
-    return { label: currentStatusLabel, pct, done, total };
-  }
-
-  /* -------------------- Sensors -------------------- */
-  function updateSensors() {
-    const temp = 36.6, heart = 72, stress = "Stable";
-    $("val-temp").innerHTML = `<span class="dot ok"></span> ${temp}°C`;
-    $("val-heart").innerHTML = `<span class="dot ok"></span> ${heart} bpm`;
-    $("val-stress").innerHTML = `<span class="dot ok"></span> ${stress}`;
-
-    const gifT = $("gif-temp"), gifH = $("gif-heart"), gifS = $("gif-stress");
-    gifT.src = "/static/gifs/temperature_stable.gif";
-    gifH.src = "/static/gifs/heart_stable.gif";
-    gifS.src = "/static/gifs/stress_stable.gif";
-  }
-
-  /* -------------------- Rating/Stars -------------------- */
-  async function updateTopStars({ medicalDay, completed, intervalId, hasTodayCheckin }){
-    const ratio7d = await computeCheckinHistoryRatio7d(medicalDay);
-    ratingState.checkinStatus = hasTodayCheckin ? "stable" : (ratio7d > 0.5 ? "stable" : "caution");
-
-    const combinedScore = (hasTodayCheckin ? 1 : 0.5) + (completed.length > 0 ? 1 : 0);
-    const stars = clamp(Math.ceil(combinedScore * 2.5), 1, 5);
-
-    const el = $("stars"); el.innerHTML = "";
-    for(let i=0; i<5; i++) el.innerHTML += `<i class="bi bi-star${i<stars?'-fill on':''}"></i>`;
-    $("rating-msg").textContent = stars >= 4 ? "Excellent routine today." : "Keep up the consistency.";
-  }
-
-  async function computeCheckinHistoryRatio7d(medicalDay){
-    try {
-      const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
-      const s = await getDoc(ref);
-      return s.exists() ? 1 : 0.5;
-    } catch(e) { return 0.5; }
-  }
-
-  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-  /* -------------------- Profile Form Logic (UPDATED) -------------------- */
-  function renderMedInputs(containerId, n, defaults = []) {
-    const c = $(containerId); c.innerHTML = "";
-    const standard = ["09:00", "14:00", "21:00"];
-    for (let i = 1; i <= n; i++) {
-      const val = defaults[i-1] || standard[i-1] || "09:00";
-      c.innerHTML += `<div class="field-group"><label>Time ${i}</label><input type="time" class="med-time-input" value="${val}"></div>`;
-    }
-  }
-
-  function toNumberOrEmpty(v){
-    const s = String(v ?? "").trim();
-    if (!s) return "";
-    const n = Number(s);
-    return Number.isFinite(n) ? n : "";
-  }
-
-  $("edit_medFreq").onchange = (e) => renderMedInputs("edit_medTimesContainer", Number(e.target.value));
-
-  $("openProfileBtn").onclick = () => {
-    const d = cachedUserProfile || {};
-    $("edit_gender").value = d.gender || "male";
-
-    // Read weight/height from Firebase correctly
-    $("edit_weight").value = (d.weight ?? "") === "" ? "" : String(d.weight ?? "");
-    $("edit_height").value = (d.height ?? "") === "" ? "" : String(d.height ?? "");
-
-    // NEW fields
-    $("edit_treatmentPhase").value = d.treatmentPhase || "";
-    $("edit_medicalConditions").value = d.medicalConditions || "";
-    $("edit_allergies").value = d.allergies || "";
-    $("edit_activityBaseline").value = d.activityBaseline || "";
-
-    const emg = d.emergencyContact || {};
-    $("edit_emgName").value = emg.name || "";
-    $("edit_emgRelation").value = emg.relationship || "";
-    $("edit_emgPhone").value = emg.phone || "";
-
-    const med = d.schedule?.medication || { timesPerDay: 0 };
-    $("edit_medFreq").value = med.timesPerDay ?? 0;
-    renderMedInputs("edit_medTimesContainer", Number(med.timesPerDay ?? 0), med.times || []);
-
-    const dress = d.schedule?.dressing || { frequency: "none" };
-    $("edit_dressFreq").value = dress.frequency || "none";
-    $("edit_dressDay").value = dress.dayOfWeek || "mon";
-    $("edit_dressTime").value = dress.time || "09:00";
-
-    $("profileDrawer").classList.add("show");
-    $("drawerOverlay").classList.add("show");
-  };
-
-  $("profileEditForm").onsubmit = async (e) => {
-    e.preventDefault();
-
-    const medTimes = Array.from(document.querySelectorAll(".med-time-input"))
-      .map(i => i.value)
-      .filter(Boolean);
-
-    const weightVal = toNumberOrEmpty($("edit_weight").value);
-    const heightVal = toNumberOrEmpty($("edit_height").value);
-
-    // Build update payload (includes NEW fields)
-    const up = {
-      gender: $("edit_gender").value || "other",
-
-      // If empty, we store "" (keeps simple; avoids NaN). You can switch to deleteField later if you prefer.
-      weight: weightVal,
-      height: heightVal,
-
-      treatmentPhase: $("edit_treatmentPhase").value || "",
-      medicalConditions: $("edit_medicalConditions").value || "",
-      allergies: $("edit_allergies").value || "",
-      activityBaseline: $("edit_activityBaseline").value || "",
-
-      emergencyContact: {
-        name: $("edit_emgName").value || "",
-        relationship: $("edit_emgRelation").value || "",
-        phone: $("edit_emgPhone").value || ""
-      },
-
-      "schedule.medication": { timesPerDay: Number($("edit_medFreq").value || 0), times: medTimes.slice(0, Number($("edit_medFreq").value || 0)) },
-      "schedule.dressing": {
-         frequency: $("edit_dressFreq").value || "none",
-         time: $("edit_dressTime").value || "09:00",
-         dayOfWeek: $("edit_dressDay").value || "mon"
-      }
-    };
-
-    console.log("[Profile] updateDoc payload ->", up);
-
-    await updateDoc(doc(db, "users", userSession.uid), up);
-
-    $("profileDrawer").classList.remove("show");
-    $("drawerOverlay").classList.remove("show");
-
-    showToast({ title: "Profile Saved", message: "Updating missions..." });
-
-    // report cache should refresh because profile influences it
-    reportCache = { key:"", at:0, data:null };
-
-    lastSnapshotHash = "";
-    updateDashboard();
-  };
 
   /* -------------------- Survey Wizard Logic -------------------- */
   const updateWizard = () => {
@@ -1872,9 +2244,7 @@
     };
   }
   if (eDressFreq && eDressDayWrap) {
-    eDressFreq.onchange = () => {
-      eDressDayWrap.classList.toggle("hidden", eDressFreq.value !== "weekly");
-    };
+    eDressFreq.onchange = () => { eDressDayWrap.classList.toggle("hidden", eDressFreq.value !== "weekly"); };
   }
 
   $("nextBtn").onclick = async () => {
@@ -1947,81 +2317,205 @@
     }
 
     $("overlay").classList.remove("show");
-    showToast({ title: "Success", message: "Check-in recorded." });
+    showToast({ title:"Saved!", message:"Check-in recorded.", key:"checkin_saved" });
 
-    // report cache should refresh because history changed
-    reportCache = { key:"", at:0, data:null };
-
-    lastSnapshotHash = "";
-    updateDashboard();
+    cachedHistory7d = await fetchHistoryDays(7).catch(()=>[]);
+    await updateDashboard();
   };
 
   $("prevBtn").onclick = () => { currentStep--; updateWizard(); };
   $("openSurveyBtn").onclick = () => { currentStep = 1; updateWizard(); $("overlay").classList.add("show"); };
   $("closeModalBtn").onclick = () => $("overlay").classList.remove("show");
-  $("closeDrawerBtn").onclick = () => { $("profileDrawer").classList.remove("show"); $("drawerOverlay").classList.remove("show"); };
-
   updateWizard();
 
-  /* -------------------- NEW: Report Button Handlers -------------------- */
-  $("openReportBtn").onclick = async () => {
-    // POPUP FIRST (already), then load dynamically
-    await fetchConditionReport({ force:false });
-  };
-  $("refreshReportBtn").onclick = async () => {
-    await fetchConditionReport({ force:true });
-  };
+  /* -------------------- Condition Report (kept minimal UI) -------------------- */
+  let reportBusy = false;
+  let reportCache = { key:"", at:0, data:null };
+
+  function openReportModal(){
+    $("reportOverlay").classList.add("show");
+    $("reportOverlay").setAttribute("aria-hidden","false");
+  }
+  function closeReportModal(){
+    $("reportOverlay").classList.remove("show");
+    $("reportOverlay").setAttribute("aria-hidden","true");
+  }
+  function setReportLoadingUI({ title="Generating report...", sub="Analyzing last 7 days of check-ins and missions." } = {}){
+    const body = $("reportBody");
+    body.innerHTML = `
+      <div class="report-loading">
+        <div class="spinner-border" role="presentation" aria-hidden="true"></div>
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="font-weight:950; letter-spacing:-.2px;">${title}</div>
+          <div style="font-weight:800; color:var(--muted); font-size:12px;">${sub}</div>
+        </div>
+      </div>
+      <div class="report-block" style="margin-top:14px;">
+        <h6>What BioPal is checking</h6>
+        <p>Self check-ins (sleep, fatigue, mood), completed missions (hydration/med/dressing/custom), and routine consistency over the last 7 days.</p>
+      </div>
+    `;
+  }
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+  function renderReportUI(data){
+    const body = $("reportBody");
+    const d = (data && typeof data === "object") ? data : {};
+    const title = escapeHtml(d.title || "BioPal Report");
+    const summary = escapeHtml(d.summary || "Here is your recent condition summary.");
+    const highlights = Array.isArray(d.highlights) ? d.highlights : [];
+    const tips = Array.isArray(d.tips) ? d.tips : [];
+    const warnings = Array.isArray(d.warnings) ? d.warnings : [];
+
+    const listHtml = (arr, icon) => {
+      const a = Array.isArray(arr) ? arr : [];
+      if (!a.length) return `<p style="margin:0; color:var(--muted); font-weight:800; font-size:12px;">No items.</p>`;
+      return a.map(x => `<p style="margin:0 0 8px; display:flex; gap:10px; align-items:flex-start;"><i class="bi ${icon}" style="margin-top:2px;"></i><span>${escapeHtml(x)}</span></p>`).join("");
+    };
+
+    body.innerHTML = `
+      <div class="report-block">
+        <h6>${title}</h6>
+        <p>${summary}</p>
+      </div>
+
+      <div class="report-block">
+        <h6><i class="bi bi-stars"></i> Highlights</h6>
+        ${listHtml(highlights, "bi-check2-circle")}
+      </div>
+
+      <div class="report-block">
+        <h6><i class="bi bi-lightbulb"></i> Tips</h6>
+        ${listHtml(tips, "bi-lightbulb")}
+      </div>
+
+      <div class="report-block">
+        <h6><i class="bi bi-shield-exclamation"></i> Warnings</h6>
+        ${listHtml(warnings, "bi-shield-exclamation")}
+      </div>
+    `;
+  }
+
+  async function fetchConditionReport(force=false){
+    if (!userSession) return;
+    if (reportBusy) return;
+    reportBusy = true;
+
+    const medicalDay = getMedicalDayID();
+    const key = `${userSession.uid}_${medicalDay}`;
+
+    try{
+      const now = Date.now();
+      if (!force && reportCache.data && reportCache.key === key && (now - reportCache.at) < 60_000) {
+        renderReportUI(reportCache.data);
+        return;
+      }
+
+      setReportLoadingUI();
+
+      cachedHistory7d = await fetchHistoryDays(7);
+      const payload = { profile: cachedUserProfile || {}, history: cachedHistory7d || [], medicalDay };
+
+      const res = await fetch(API_CONDITION_REPORT_URL, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const t = await res.text().catch(()=> "");
+        throw new Error(`Report API ${res.status}: ${t}`);
+      }
+
+      const data = await res.json();
+      reportCache = { key, at: Date.now(), data };
+      renderReportUI(data);
+    } catch(e){
+      console.warn("[Report] failed:", e);
+      $("reportBody").innerHTML = `<div class="report-block"><h6>Report unavailable</h6><p>Could not generate the report right now. Try again later.</p></div>`;
+    } finally{
+      reportBusy = false;
+    }
+  }
+
   $("closeReportBtn").onclick = closeReportModal;
   $("closeReportBtn2").onclick = closeReportModal;
+  $("refreshReportBtn").onclick = () => fetchConditionReport(true);
 
-  // allow ESC to close report modal (no impact on existing design)
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      if ($("reportOverlay")?.classList.contains("show")) closeReportModal();
-      if ($("overlay")?.classList.contains("show")) $("overlay").classList.remove("show");
-    }
-  });
-  /* ----------------------------------------------------- */
+  $("closeMissionRevealBtn").onclick = closeMissionRevealModal;
+  $("closeMissionRevealBtn2").onclick = closeMissionRevealModal;
 
-  /* -------------------- Auth & Init -------------------- */
-  onAuthStateChanged(auth, u => {
-    if (u) {
-      userSession = u;
-      $("logoutBtn").disabled = false;
-      $("openReportBtn").disabled = false;  // enable report button after login
-      updateDashboard();
-    } else {
-      window.location.href = "/login";
-    }
-  });
+  $("selfCheckGoBtn").onclick = () => { currentStep = 1; updateWizard(); $("overlay").classList.add("show"); };
+  $("selfCheckDoneBtn").onclick = () => { currentStep = 1; updateWizard(); $("overlay").classList.add("show"); };
 
-  $("logoutBtn").onclick = () => signOut(auth);
-  $("test-warp-hour").onclick = () => { timeOffset += 1; lastSnapshotHash=""; updateDashboard(); };
-
+  /* -------------------- Debug buttons -------------------- */
+  $("test-skip-1h").onclick = async () => { timeOffset += 1; await updateDashboard({ debugSkip:true }); };
+  $("test-skip-3h").onclick = async () => { timeOffset += 3; await updateDashboard({ debugSkip:true }); };
   $("test-reset").onclick = async () => {
+    if (!userSession) return;
+    const medicalDay = getMedicalDayID();
     try{
-      const day = getMedicalDayID();
-      const ref = doc(db, "users", userSession.uid, "daily_logs", day);
-
-      console.log("[Reset] Deleting daily log doc for:", day);
-      await deleteDoc(ref);
-
-      cachedHistory7d = [];
-      lastSnapshotHash = "";
-      reportCache = { key:"", at:0, data:null };
-
-      showToast({ title: "Reset Complete", message: "Today's data was cleared." , key: `reset_${day}` });
-
-      await updateDashboard();
+      await deleteDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay));
+      showToast({ title:"Reset", message:"Today’s log cleared (debug).", key:"reset_today" });
+      cachedHistory7d = await fetchHistoryDays(7);
+      await updateDashboard({ debugReset:true });
     } catch(e){
-      console.warn("[Reset] failed:", e);
-      showToast({ title: "Reset Failed", message: "Could not clear today. Please try again.", key: "reset_fail" });
+      console.warn("[Debug reset] failed:", e);
     }
   };
 
-  setInterval(updateDashboard, 60000);
-  getNow();
-</script>
+  /* -------------------- Auth -------------------- */
+  function tickClock(){
+    getNow();
+    window.setTimeout(tickClock, 1000);
+  }
 
+  function startReminderLoop(){
+    window.setInterval(() => {
+      maybePlayReminderGif();
+    }, REMINDER_EVERY_MS);
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      $("logoutBtn").disabled = true;
+      $("openSurveyBtn").disabled = true;
+      setCenterMessage("Please sign in to continue.");
+      stopAlarmEngine();
+      return;
+    }
+
+    userSession = user;
+
+    $("logoutBtn").disabled = false;
+    $("logoutBtn").onclick = async () => {
+      try{
+        await signOut(auth);
+        stopAlarmEngine();
+        window.location.href = "/login";
+      } catch(e){
+        console.warn("[Logout] failed:", e);
+      }
+    };
+
+    tickClock();
+
+    cachedHistory7d = await fetchHistoryDays(7);
+    await updateDashboard();
+
+    // ✅ start forever engines
+    startReminderLoop();
+
+    // alarm engine starts after updateDashboard builds current missions,
+    // but we also ensure timer is created here (safe no-op until list is set)
+    startOrUpdateAlarmEngine({ medicalDay:getMedicalDayID(), intervalId:"", missions:[] });
+  });
+</script>
 </body>
 </html>

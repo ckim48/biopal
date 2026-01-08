@@ -35,6 +35,7 @@
       border-radius:32px;border:1px solid var(--border);
       box-shadow:0 25px 50px -12px rgba(0,0,0,.05);
       padding:40px;
+      position:relative;
     }
 
     .steps-container{display:flex;justify-content:space-between;margin-bottom:32px;position:relative}
@@ -50,15 +51,13 @@
     }
 
     h1{font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:-1px}
-    .subtitle{color:var(--muted);font-size:15px;margin-bottom:32px;font-weight:500}
+    .subtitle{color:var(--muted);font-size:15px;margin-bottom:24px;font-weight:500}
 
     .step-content{display:none;animation:slideUp .4s ease}
     .step-content.active{display:block}
     @keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-
+    /* one row per input */
     .field{margin-bottom:18px}
     label{
       display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:var(--ink);
@@ -86,7 +85,7 @@
 
     .info-box{
       font-size:12px;color:var(--muted);background:#f8fafc;padding:14px;border-radius:14px;
-      border:1px solid var(--border);margin-top:10px;line-height:1.5;
+      border:1px solid var(--border);margin:0 0 14px;line-height:1.5;
     }
 
     .section{
@@ -103,10 +102,68 @@
     }
 
     .hidden{display:none !important}
+
+    /* Teen modal */
+    .modal-overlay{
+      position:fixed;inset:0;
+      background:rgba(2,6,23,.55);
+      display:none;
+      align-items:center;justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal-overlay.show{display:flex}
+    .modal-card{
+      width:100%;max-width:520px;
+      background:rgba(255,255,255,.98);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:0 30px 70px rgba(2,6,23,.18);
+      padding:18px;
+    }
+    .modal-head{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      margin-bottom:8px;
+    }
+    .modal-title{
+      font-weight:900;letter-spacing:-.6px;font-size:16px;color:var(--ink);
+      margin:0;
+    }
+    .modal-close{
+      border:none;background:#f1f5f9;color:var(--muted);
+      border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer;
+    }
+    .modal-body{
+      color:var(--muted);font-size:13px;line-height:1.55;margin:8px 0 12px;
+    }
+    .modal-actions{display:flex;gap:10px;margin-top:10px}
+    .modal-actions .btn{
+      padding:12px 14px;border-radius:14px;font-size:14px;
+    }
+    .btn-ack{background:var(--ink);color:#fff}
+    .btn-secondary{background:#f1f5f9;color:var(--muted)}
   </style>
 </head>
 
 <body>
+  <!-- Teen guidance modal -->
+  <div class="modal-overlay" id="teenModal" role="dialog" aria-modal="true" aria-labelledby="teenTitle">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3 class="modal-title" id="teenTitle">A quick note for teens</h3>
+        <button type="button" class="modal-close" id="teenCloseBtn" aria-label="Close">Close</button>
+      </div>
+      <div class="modal-body">
+        It looks like you may be under 20. Please complete this registration with a parent or guardian, and make sure the information you enter is accurate.
+        If you’re unsure about any medical details, you can leave optional fields blank and update later.
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ack" id="teenOkBtn">I Understand</button>
+        <button type="button" class="btn btn-secondary" id="teenBackBtn">Go Back</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="steps-container">
       <div class="step-dot active" id="dot-1">1</div>
@@ -121,83 +178,250 @@
     <form id="registerForm" novalidate>
       <!-- STEP 1 -->
       <div class="step-content active" id="step-1">
+        <div class="info-box">
+          Create your login details. You’ll confirm health and schedule information in the next steps.
+        </div>
+
         <div class="field">
           <label>Email Address</label>
           <input type="email" id="email" placeholder="name@example.com" required>
         </div>
-        <div class="grid">
-          <div class="field">
-            <label>Password</label>
-            <input type="password" id="password" placeholder="Min. 6 chars" required minlength="6">
-          </div>
-          <div class="field">
-            <label>Confirm Password</label>
-            <input type="password" id="confirmPassword" placeholder="Repeat" required minlength="6">
-          </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Min. 6 chars" required minlength="6">
+        </div>
+
+        <div class="field">
+          <label>Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat" required minlength="6">
         </div>
       </div>
 
       <!-- STEP 2 -->
       <div class="step-content" id="step-2">
-        <div class="grid-3">
+        <div class="info-box">
+          Share clinical basics so BioPal can tailor reminders and insights to your care context.
+        </div>
+
+        <div class="section">
+          <h3>Body Basics</h3>
+
           <div class="field">
             <label>Birth Year</label>
-            <input type="number" id="birthYear" placeholder="YYYY" min="1920" max="2024" required>
+            <input type="number" id="birthYear" placeholder="YYYY" min="1920" max="2026" required>
           </div>
+
           <div class="field">
             <label>Gender</label>
             <select id="sex" required>
               <option value="" disabled selected>Select</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
+              <option value="not_prefer">Prefer not to say</option>
             </select>
           </div>
+
           <div class="field">
             <label>Height (cm)</label>
             <input type="number" id="height" placeholder="cm" step="0.1" required>
           </div>
-        </div>
 
-        <div class="grid">
           <div class="field">
             <label>Current Weight (kg)</label>
             <input type="number" id="weight" placeholder="kg" step="0.1" required>
           </div>
-          <div class="field">
-            <label>Treatment Phase</label>
-            <select id="treatmentPhase" required>
-              <option value="" disabled selected>Select</option>
-              <option value="active">Active</option>
-              <option value="maintenance">Maintenance</option>
-              <option value="recovery">Recovery</option>
-            </select>
-          </div>
         </div>
 
-        <div class="field">
-          <label>Cancer Type</label>
-          <input type="text" id="cancerType" placeholder="e.g. Stage II Breast Cancer" required>
+        <div class="section">
+          <h3>Diagnosis Context</h3>
+
+          <div class="field">
+            <label>Do you currently have a cancer diagnosis?</label>
+            <select id="hasCancer" required>
+              <option value="" disabled selected>Select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No / Not diagnosed</option>
+            </select>
+          </div>
+
+          <div id="cancerFields" class="hidden">
+            <div class="field">
+              <label>Cancer Type</label>
+              <select id="cancerTypeSelect" required>
+                <option value="" disabled selected>Select</option>
+                <option value="breast">Breast</option>
+                <option value="lung">Lung</option>
+                <option value="colorectal">Colorectal</option>
+                <option value="prostate">Prostate</option>
+                <option value="stomach">Stomach</option>
+                <option value="liver">Liver</option>
+                <option value="pancreatic">Pancreatic</option>
+                <option value="ovarian">Ovarian</option>
+                <option value="cervical">Cervical</option>
+                <option value="leukemia">Leukemia</option>
+                <option value="lymphoma">Lymphoma</option>
+                <option value="melanoma">Melanoma</option>
+                <option value="brain">Brain</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="field hidden" id="cancerTypeOtherWrap">
+              <label>Specify Cancer Type</label>
+              <input type="text" id="cancerTypeOther" placeholder="Enter cancer type">
+            </div>
+
+            <!-- OPTIONAL (only shown when hasCancer=yes); NOT required -->
+            <div class="field">
+              <label>Stage (if known)</label>
+              <select id="cancerStage">
+                <option value="" selected>Skip / Not sure</option>
+                <option value="0">Stage 0</option>
+                <option value="1">Stage I</option>
+                <option value="2">Stage II</option>
+                <option value="3">Stage III</option>
+                <option value="4">Stage IV</option>
+                <option value="unknown">Unknown</option>
+              </select>
+            </div>
+
+            <!-- OPTIONAL; NOT required -->
+            <div class="field">
+              <label>How long since diagnosis? (optional)</label>
+              <select id="diagnosisAge">
+                <option value="" selected>Skip</option>
+                <option value="lt1m">Less than 1 month</option>
+                <option value="1to3m">1–3 months</option>
+                <option value="3to6m">3–6 months</option>
+                <option value="6to12m">6–12 months</option>
+                <option value="1to2y">1–2 years</option>
+                <option value="gt2y">More than 2 years</option>
+              </select>
+            </div>
+
+            <!-- OPTIONAL; NOT required -->
+            <div class="field">
+              <label>Current Treatment Stage (optional)</label>
+              <select id="treatmentPhase">
+                <option value="" selected>Skip</option>
+                <option value="active">Active treatment</option>
+                <option value="maintenance">Maintenance / ongoing management</option>
+                <option value="recovery">Recovery / post-treatment</option>
+                <option value="watchful_waiting">Surveillance / watchful waiting</option>
+              </select>
+            </div>
+
+            <!-- OPTIONAL; NOT required -->
+            <div class="field">
+              <label>Time in current treatment stage (optional)</label>
+              <select id="phaseDuration">
+                <option value="" selected>Skip</option>
+                <option value="lt1m">Less than 1 month</option>
+                <option value="1to3m">1–3 months</option>
+                <option value="3to6m">3–6 months</option>
+                <option value="6to12m">6–12 months</option>
+                <option value="1to2y">1–2 years</option>
+                <option value="gt2y">More than 2 years</option>
+              </select>
+            </div>
+
+            <!-- OPTIONAL; NOT required -->
+            <div class="field">
+              <label>Primary care setting (optional)</label>
+              <select id="careSetting">
+                <option value="" selected>Skip</option>
+                <option value="home">Mostly at home</option>
+                <option value="outpatient">Outpatient (home + visits)</option>
+                <option value="hospitalized">Currently hospitalized</option>
+                <option value="rehab">Rehab / care facility</option>
+              </select>
+            </div>
+
+            <!-- OPTIONAL; NOT required -->
+            <div class="field">
+              <label>Hospital/clinic visits frequency (optional)</label>
+              <select id="visitFrequency">
+                <option value="" selected>Skip</option>
+                <option value="weekly2plus">2+ times per week</option>
+                <option value="weekly1">About once per week</option>
+                <option value="biweekly">Every 2 weeks</option>
+                <option value="monthly">About once per month</option>
+                <option value="rare">Rarely / only as needed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="info-box" style="margin:0;">
+            If you select “No / Not diagnosed,” diagnosis-specific questions will be skipped automatically.
+          </div>
         </div>
       </div>
 
       <!-- STEP 3 -->
       <div class="step-content" id="step-3">
-        <div class="field">
-          <label>Activity Baseline</label>
-          <select id="energyBaseline" required>
-            <option value="high">Mobile (Regular movement)</option>
-            <option value="mid">Partial (Frequent rest)</option>
-            <option value="low">Resting (Bed-based)</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Medical Conditions / Allergies</label>
-          <textarea id="conditions" placeholder="e.g. Diabetes, Penicillin allergy..."></textarea>
+        <div class="info-box">
+          Please fill this out as an average for the recent week. This helps BioPal set realistic daily goals and reminders.
         </div>
 
         <div class="section">
-          <h3>Medication</h3>
+          <h3>Daily Wellness Baseline (Recent Week)</h3>
+
+          <div class="field">
+            <label>Hydration (average cups/day)</label>
+            <select id="hydration" required>
+              <option value="" disabled selected>Select</option>
+              <option value="lt2">0–2 cups/day</option>
+              <option value="2to4">2–4 cups/day</option>
+              <option value="4to6">4–6 cups/day</option>
+              <option value="6to8">6–8 cups/day</option>
+              <option value="gt8">8+ cups/day</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Diet quality (recent week)</label>
+            <select id="dietQuality" required>
+              <option value="" disabled selected>Select</option>
+              <option value="low">Low (irregular meals / low appetite)</option>
+              <option value="mid">Moderate (mostly regular meals)</option>
+              <option value="high">High (balanced meals most days)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Exercise (average minutes/day)</label>
+            <select id="exerciseMinutes" required>
+              <option value="" disabled selected>Select</option>
+              <option value="0">0 minutes/day</option>
+              <option value="lt10">1–10 minutes/day</option>
+              <option value="10to20">10–20 minutes/day</option>
+              <option value="20to40">20–40 minutes/day</option>
+              <option value="gt40">40+ minutes/day</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Activity baseline</label>
+            <select id="energyBaseline" required>
+              <option value="high">Mobile (regular movement)</option>
+              <option value="mid">Partial (frequent rest)</option>
+              <option value="low">Resting (bed-based)</option>
+            </select>
+          </div>
+
+          <!-- OPTIONAL -->
+          <div class="field">
+            <label>Medical Conditions / Allergies (optional)</label>
+            <textarea id="conditions" placeholder="e.g. Diabetes, Penicillin allergy..."></textarea>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Medication Reminders</h3>
+          <div class="info-box" style="margin:0 0 12px;">
+            Medication reminders help you stay on schedule for pills, injections, or prescribed routines. Choose “No medication” if this is not needed.
+          </div>
 
           <div class="field" style="margin-bottom:12px;">
             <label>How many times per day?</label>
@@ -212,16 +436,19 @@
           <div id="medTimesWrap" class="hidden">
             <div class="field">
               <label>Medication Times</label>
-              <div id="medTimesContainer" class="grid"></div>
+              <div id="medTimesContainer"></div>
             </div>
-            <div class="info-box">
+            <div class="info-box" style="margin:0;">
               Choose the exact time(s) you usually take medication.
             </div>
           </div>
         </div>
 
         <div class="section">
-          <h3>Dressing</h3>
+          <h3>Dressing / Wound Care Reminders</h3>
+          <div class="info-box" style="margin:0 0 12px;">
+            Dressing reminders support wound care routines (e.g., changing dressings or checking a site). If you don’t have a schedule, select “No dressing schedule.”
+          </div>
 
           <div class="field" style="margin-bottom:12px;">
             <label>How often?</label>
@@ -233,48 +460,62 @@
           </div>
 
           <div id="dressingWrap" class="hidden">
-            <div class="grid">
-              <div class="field" id="dressingDayWrap" style="display:none;">
-                <label>Day of Week</label>
-                <select id="dressingDay">
-                  <option value="mon">Mon</option>
-                  <option value="tue">Tue</option>
-                  <option value="wed">Wed</option>
-                  <option value="thu">Thu</option>
-                  <option value="fri">Fri</option>
-                  <option value="sat">Sat</option>
-                  <option value="sun">Sun</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>Time</label>
-                <input type="time" id="dressingTime" value="09:00">
-              </div>
+            <div class="field" id="dressingDayWrap" style="display:none;">
+              <label>Day of Week</label>
+              <select id="dressingDay">
+                <option value="mon">Mon</option>
+                <option value="tue">Tue</option>
+                <option value="wed">Wed</option>
+                <option value="thu">Thu</option>
+                <option value="fri">Fri</option>
+                <option value="sat">Sat</option>
+                <option value="sun">Sun</option>
+              </select>
             </div>
 
-            <div class="info-box">
+            <div class="field">
+              <label>Time</label>
+              <input type="time" id="dressingTime" value="09:00">
+            </div>
+
+            <div class="info-box" style="margin:0;">
               If weekly, select the day and time. If daily, select the time.
             </div>
           </div>
-        </div>
-
-        <div class="info-box">
-          Physical metrics help AI detect weight fluctuations, which are important during treatment.
         </div>
       </div>
 
       <!-- STEP 4 -->
       <div class="step-content" id="step-4">
-        <div class="field">
-          <label>Emergency Contact</label>
-          <input type="text" id="emergencyContact" placeholder="Name and Relationship" required>
-        </div>
-        <div class="field">
-          <label>Emergency Phone</label>
-          <input type="tel" id="emergencyPhone" placeholder="010-0000-0000" required>
+        <div class="info-box">
+          Add a trusted contact in case caregivers or clinicians need support reaching someone quickly.
         </div>
 
-        <div class="field" style="margin-top:24px;">
+        <div class="section">
+          <h3>Emergency Contact</h3>
+
+          <div class="field">
+            <label>Contact Name</label>
+            <input type="text" id="emergencyName" placeholder="Full name" required>
+          </div>
+
+          <div class="field">
+            <label>Relationship</label>
+            <input type="text" id="emergencyRelationship" placeholder="e.g., Spouse, Parent, Friend" required>
+          </div>
+
+          <div class="field">
+            <label>Phone of Emergency Contact</label>
+            <input type="tel" id="emergencyPhone" placeholder="010-0000-0000" required>
+          </div>
+
+          <div class="field">
+            <label>Email of Emergency Contact (optional)</label>
+            <input type="email" id="emergencyEmail" placeholder="contact@example.com">
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:18px;">
           <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-transform:none;letter-spacing:0;">
             <input type="checkbox" id="consent" required style="width:auto;margin-top:3px;">
             <span style="font-size:13px;font-weight:500;color:var(--ink);">
@@ -301,10 +542,134 @@
     // ----------------------------
     let currentStep = 1;
     const totalSteps = 4;
-    const titles = ["Create Account", "Body & Clinical", "Baseline & Schedule", "Care Team"];
+    const titles = ["Create Account", "Clinical Profile", "Lifestyle & Care Routine", "Emergency & Support"];
+    const subtitles = [
+      "Step 1 of 4: Sign in securely.",
+      "Step 2 of 4: Your clinical basics (diagnosis fields adjust automatically).",
+      "Step 3 of 4: Recent-week averages and reminders.",
+      "Step 4 of 4: Support contact and consent."
+    ];
 
     const nextBtn = document.getElementById("nextBtn");
     const prevBtn = document.getElementById("prevBtn");
+
+    // ----------------------------
+    // Teen modal logic
+    // - triggers when Birth Year implies age 13-19 (inclusive)
+    // - shows once per session unless birth year changes again
+    // ----------------------------
+    const birthYearEl = document.getElementById("birthYear");
+    const teenModal = document.getElementById("teenModal");
+    const teenCloseBtn = document.getElementById("teenCloseBtn");
+    const teenOkBtn = document.getElementById("teenOkBtn");
+    const teenBackBtn = document.getElementById("teenBackBtn");
+
+    let teenModalAcknowledged = false;
+
+    function isTeenByYear(year){
+      const y = Number(year);
+      if (!y || y < 1900) return false;
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const ageApprox = currentYear - y; // simple year-based
+      return ageApprox >= 13 && ageApprox <= 19;
+    }
+
+    function openTeenModal(){
+      if (teenModalAcknowledged) return;
+      teenModal.classList.add("show");
+    }
+    function closeTeenModal(){
+      teenModal.classList.remove("show");
+    }
+
+    teenCloseBtn.addEventListener("click", closeTeenModal);
+    teenOkBtn.addEventListener("click", () => {
+      teenModalAcknowledged = true;
+      closeTeenModal();
+    });
+    teenBackBtn.addEventListener("click", () => {
+      closeTeenModal();
+      // keep not acknowledged; user likely wants to change birth year or ask parent
+      birthYearEl.focus();
+    });
+
+    // Close if click outside card
+    teenModal.addEventListener("click", (e) => {
+      if (e.target === teenModal) closeTeenModal();
+    });
+
+    // Trigger on blur/change of birth year (only when on Step 2)
+    function maybeShowTeenModal(){
+      if (currentStep !== 2) return;
+      const y = birthYearEl.value;
+      if (isTeenByYear(y)){
+        openTeenModal();
+      }
+    }
+    birthYearEl.addEventListener("change", () => {
+      // if they edit year again, allow modal again (fresh warning)
+      teenModalAcknowledged = false;
+      maybeShowTeenModal();
+    });
+    birthYearEl.addEventListener("blur", maybeShowTeenModal);
+
+    // ----------------------------
+    // Dynamic: cancer diagnosis toggle
+    // ----------------------------
+    const hasCancer = document.getElementById("hasCancer");
+    const cancerFields = document.getElementById("cancerFields");
+
+    const cancerTypeSelect = document.getElementById("cancerTypeSelect");
+    const cancerTypeOtherWrap = document.getElementById("cancerTypeOtherWrap");
+    const cancerTypeOther = document.getElementById("cancerTypeOther");
+
+    function setRequired(el, yes){
+      if (!el) return;
+      if (yes) el.setAttribute("required","required");
+      else el.removeAttribute("required");
+    }
+
+    function syncCancerTypeUI(){
+      const v = (cancerTypeSelect && cancerTypeSelect.value) ? cancerTypeSelect.value : "";
+      const cancerOn = hasCancer.value === "yes";
+
+      if (cancerOn && v === "other"){
+        cancerTypeOtherWrap.classList.remove("hidden");
+        setRequired(cancerTypeOther, true);
+      } else {
+        cancerTypeOtherWrap.classList.add("hidden");
+        setRequired(cancerTypeOther, false);
+        cancerTypeOther.value = "";
+      }
+    }
+
+    function syncCancerDiagnosisUI(){
+      const v = hasCancer.value;
+
+      if (v === "yes"){
+        cancerFields.classList.remove("hidden");
+        setRequired(cancerTypeSelect, true);
+      } else {
+        cancerFields.classList.add("hidden");
+        setRequired(cancerTypeSelect, false);
+
+        if (cancerTypeSelect) cancerTypeSelect.value = "";
+        if (cancerTypeOther) cancerTypeOther.value = "";
+        if (cancerTypeOtherWrap) cancerTypeOtherWrap.classList.add("hidden");
+
+        const ids = ["cancerStage","diagnosisAge","treatmentPhase","phaseDuration","careSetting","visitFrequency"];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+      }
+      syncCancerTypeUI();
+    }
+
+    hasCancer.addEventListener("change", syncCancerDiagnosisUI);
+    cancerTypeSelect.addEventListener("change", syncCancerTypeUI);
+    syncCancerDiagnosisUI();
 
     // ----------------------------
     // Medication UI (0/1/2/3 times per day)
@@ -324,7 +689,7 @@
         wrap.className = "field";
         wrap.innerHTML = `
           <label>Time ${i}</label>
-          <input type="time" class="med-time" value="${defaults[i-1] || "09:00"}">
+          <input type="time" class="med-time" value="${defaults[i-1] || "09:00"}" required>
         `;
         medTimesContainer.appendChild(wrap);
       }
@@ -384,10 +749,12 @@
 
         if (el.type === "checkbox"){
           if (!el.checked) ok = false;
-        } else {
-          if (!el.value) ok = false;
+          return;
         }
-        if (el.type !== "checkbox") markInvalid(el, !el.value);
+
+        const hasValue = !!String(el.value || "").trim();
+        if (!hasValue) ok = false;
+        markInvalid(el, !hasValue);
       });
 
       if (step === 1){
@@ -422,7 +789,7 @@
     // ----------------------------
     function updateWizard(){
       document.getElementById("step-title").innerText = titles[currentStep - 1];
-      document.getElementById("step-subtitle").innerText = `Step ${currentStep} of ${totalSteps}`;
+      document.getElementById("step-subtitle").innerText = subtitles[currentStep - 1];
       prevBtn.style.display = currentStep === 1 ? "none" : "block";
       nextBtn.innerText = currentStep === totalSteps ? "Finalize Account" : "Continue";
     }
@@ -432,6 +799,15 @@
     // ----------------------------
     nextBtn.onclick = async () => {
       if (!validateStep(currentStep)) return;
+
+      // If leaving Step 2, and teen birth year is detected, show modal once (block forward until acknowledged)
+      if (currentStep === 2){
+        const y = birthYearEl.value;
+        if (isTeenByYear(y) && !teenModalAcknowledged){
+          openTeenModal();
+          return;
+        }
+      }
 
       if (currentStep < totalSteps){
         document.getElementById(`step-${currentStep}`).classList.remove("active");
@@ -495,6 +871,23 @@
           }
         };
 
+        const cancerOn = document.getElementById("hasCancer").value === "yes";
+        const cancerTypeFinal = (cancerOn && cancerTypeSelect.value === "other")
+          ? (document.getElementById("cancerTypeOther").value || "").trim()
+          : (cancerOn ? (cancerTypeSelect.value || "") : null);
+
+        const clinical = {
+          hasCancer: cancerOn,
+          cancerType: cancerTypeFinal,
+          cancerTypeCategory: cancerOn ? (cancerTypeSelect.value || null) : null,
+          stage: cancerOn ? (document.getElementById("cancerStage").value || null) : null,
+          diagnosisSince: cancerOn ? (document.getElementById("diagnosisAge").value || null) : null,
+          treatmentPhase: cancerOn ? (document.getElementById("treatmentPhase").value || null) : null,
+          treatmentStageDuration: cancerOn ? (document.getElementById("phaseDuration").value || null) : null,
+          careSetting: cancerOn ? (document.getElementById("careSetting").value || null) : null,
+          visitFrequency: cancerOn ? (document.getElementById("visitFrequency").value || null) : null
+        };
+
         const profile = {
           uid: user.uid,
           email,
@@ -504,19 +897,22 @@
             heightCm: Number(document.getElementById("height").value),
             weightKg: Number(document.getElementById("weight").value)
           },
-          clinical: {
-            cancerType: document.getElementById("cancerType").value.trim(),
-            treatmentPhase: document.getElementById("treatmentPhase").value
-          },
+          clinical,
           baseline: {
-            energyLevel: document.getElementById("energyBaseline").value,
+            hydration: document.getElementById("hydration").value,
+            dietQuality: document.getElementById("dietQuality").value,
+            exerciseMinutes: document.getElementById("exerciseMinutes").value,
+            activityBaseline: document.getElementById("energyBaseline").value,
             conditions: document.getElementById("conditions").value.trim()
           },
           schedule,
           emergency: {
-            contact: document.getElementById("emergencyContact").value.trim(),
-            phone: document.getElementById("emergencyPhone").value.trim()
+            name: document.getElementById("emergencyName").value.trim(),
+            relationship: document.getElementById("emergencyRelationship").value.trim(),
+            phone: document.getElementById("emergencyPhone").value.trim(),
+            email: (document.getElementById("emergencyEmail").value || "").trim()
           },
+          teenNoticeAcknowledged: isTeenByYear(document.getElementById("birthYear").value) ? teenModalAcknowledged : false,
           createdAt: serverTimestamp(),
           setupComplete: true
         };

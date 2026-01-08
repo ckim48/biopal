@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Profile Settings</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --sky: #0ea5e9; --sky2: #38bdf8; --ink: #0b1220; --bg: #f6fbff;
+      --panel: rgba(255, 255, 255, .86); --wire: rgba(2, 6, 23, .08);
+      --soft: rgba(14, 165, 233, .08); --muted: #64748b;
+      --shadow: 0 12px 34px -18px rgba(2, 6, 23, .22);
+      --border: rgba(2, 6, 23, .08);
+      --bad: #ef4444;
+    }
+
+    * { box-sizing: border-box; outline: none; }
+    body {
+      margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(900px 520px at 18% 10%, rgba(56, 189, 248, .20), transparent 55%),
+                  linear-gradient(180deg, var(--bg) 0%, #ffffff 100%);
+      color: var(--ink); -webkit-font-smoothing: antialiased; padding-bottom: 80px;
+      min-height: 100vh;
+    }
+
+    /* --- SYNCHRONIZED NAVBAR START --- */
+    .nav {
+      position: sticky; top: 16px; z-index: 100;
+      max-width: 1200px; width: calc(100% - 24px);
+      margin: 16px auto;
+      background: rgba(255, 255, 255, .70);
+      backdrop-filter: blur(18px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 12px 18px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: var(--shadow);
+      gap: 12px;
+    }
+    .nav-left { display: flex; align-items: center; gap: 12px; min-width: 260px; }
+    .nav-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+
+    .nav-greet {
+      display: flex; flex-direction: column;
+      line-height: 1.08; padding: 6px 2px; min-width: 200px;
+    }
+    .nav-greet .hello { font-weight: 950; letter-spacing: -.35px; font-size: 15px; }
+    .nav-greet .sub { font-weight: 850; font-size: 13px; color: rgba(100, 116, 139, .95); margin-top: 3px; }
+
+    .btn {
+      padding: 12px 18px; border-radius: 14px; border: none;
+      font-weight: 800; font-size: 14px; cursor: pointer;
+      transition: all .18s ease; display: inline-flex;
+      align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none;
+    }
+    .nav-right .btn-ghost {
+      background: var(--soft); color: var(--sky);
+      border: 1px solid rgba(14,165,233, 0.2); font-weight: 700;
+    }
+    .nav-right .btn-ghost:hover {
+      background: var(--sky); color: white; border-color: var(--sky); transform: translateY(-1px);
+    }
+    .btn-dark { background: var(--ink); color: white; }
+
+    #logoutBtn {
+      background: rgba(239, 68, 68, 0.08); color: var(--bad);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+    #logoutBtn:hover { background: var(--bad); color: white; border-color: var(--bad); }
+
+    @media (max-width: 768px) {
+      .nav { padding: 12px 14px; }
+      .nav-left, .nav-greet { min-width: unset; }
+    }
+    /* --- SYNCHRONIZED NAVBAR END --- */
+
+    .page-container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+
+    .glass-card {
+      background: var(--panel); backdrop-filter: blur(24px); border-radius: 32px;
+      border: 1px solid rgba(14, 165, 233, .16); box-shadow: var(--shadow);
+      display: flex; overflow: visible; min-height: auto;
+    }
+
+    .tabs-sidebar {
+      width: 260px; background: rgba(2, 6, 23, 0.02); border-right: 1px solid var(--wire);
+      padding: 32px 16px; display: flex; flex-direction: column; gap: 8px; align-self: stretch;
+    }
+
+    .tab-btn {
+      padding: 14px 18px; border-radius: 16px; border: none; background: transparent;
+      color: var(--muted); font-weight: 700; font-size: 14px; text-align: left;
+      display: flex; align-items: center; gap: 12px; transition: all 0.2s;
+    }
+    .tab-btn i { font-size: 18px; }
+    .tab-btn:hover { background: rgba(14, 165, 233, 0.05); }
+    .tab-btn.active { background: white; color: var(--sky); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+    .tab-content { flex: 1; padding: 45px; overflow: visible; }
+    .tab-pane { display: none; animation: fadeIn 0.4s ease; }
+    .tab-pane.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { font-weight: 900; font-size: 26px; letter-spacing: -1px; margin-bottom: 8px; }
+    .sub-text { color: var(--muted); font-size: 14px; margin-bottom: 35px; font-weight: 500; }
+
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .field { margin-bottom: 22px; }
+    label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; }
+    input, select, textarea {
+      width: 100%; padding: 13px 16px; border-radius: 14px; border: 1px solid var(--wire);
+      background: rgba(14, 165, 233, 0.03); font-weight: 600; font-size: 14px; transition: all 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--sky); background: white; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+
+    .section-divider { font-weight: 800; font-size: 12px; color: var(--sky); margin: 30px 0 15px; text-transform: uppercase; border-bottom: 1px solid var(--soft); padding-bottom: 6px; }
+    .hidden { display: none !important; }
+
+    .btn-save {
+      background: var(--ink); color: white; border: none; padding: 16px 35px; border-radius: 18px;
+      font-weight: 800; font-size: 16px; margin-top: 30px; transition: all 0.2s; width: 100%;
+    }
+    .btn-save:hover { transform: translateY(-2px); opacity: 0.9; }
+
+    @media (max-width: 850px) {
+      .glass-card { flex-direction: column; }
+      .tabs-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--wire); flex-direction: row; overflow-x: auto; align-self: auto; }
+      .field-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="nav">
+    <div class="nav-left">
+      <div class="nav-greet" id="navGreeting" aria-label="Greeting">
+        <div class="hello" id="helloLine">Hi, there</div>
+        <div class="sub" id="greetSub">Welcome back</div>
+      </div>
+    </div>
+    <div class="nav-right">
+      <a href="/dashboard" class="btn btn-ghost">
+        <i class="bi bi-grid-fill"></i> Dashboard
+      </a>
+      <a href="/chatbot" class="btn btn-ghost">
+        <i class="bi bi-chat-dots-fill"></i> Chatbot
+      </a>
+      <a href="/profile" class="btn btn-ghost" id="profileNavBtn">
+        <i class="bi bi-person-circle"></i> Profile
+      </a>
+      <a href="{{ url_for('main') }}" class="btn btn-dark rounded-pill px-4 fw-bold me-2">BioPal App</a>
+      <button id="logoutBtn" class="btn btn-ghost">
+        <i class="bi bi-box-arrow-right"></i> Exit
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-container">
+    <div class="glass-card">
+      <div class="tabs-sidebar">
+        <button class="tab-btn active" onclick="switchTab('account', this)"><i class="bi bi-person-circle"></i> Account</button>
+        <button class="tab-btn" onclick="switchTab('clinical', this)"><i class="bi bi-clipboard2-pulse"></i> Clinical</button>
+        <button class="tab-btn" onclick="switchTab('lifestyle', this)"><i class="bi bi-heart-pulse"></i> Lifestyle</button>
+        <button class="tab-btn" onclick="switchTab('care', this)"><i class="bi bi-alarm"></i> Care Schedule</button>
+        <button class="tab-btn" onclick="switchTab('support', this)"><i class="bi bi-telephone"></i> Support</button>
+      </div>
+
+      <div class="tab-content">
+        <form id="profileForm">
+
+          <div id="account" class="tab-pane active">
+            <h2>Account Details</h2>
+            <p class="sub-text">Update your identity and body metrics.</p>
+            <div class="field"><label>Email Address</label><input type="email" id="email" disabled></div>
+            <div class="field-grid">
+              <div class="field"><label>Birth Year</label><input type="number" id="birthYear"></div>
+              <div class="field">
+                <label>Gender</label>
+                <select id="sex">
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="not_prefer">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-grid">
+              <div class="field"><label>Height (cm)</label><input type="number" id="height" step="0.1"></div>
+              <div class="field"><label>Weight (kg)</label><input type="number" id="weight" step="0.1"></div>
+            </div>
+          </div>
+
+          <div id="clinical" class="tab-pane">
+            <h2>Clinical Profile</h2>
+            <p class="sub-text">Detailed diagnosis and care setting information.</p>
+            <div class="field">
+              <label>Current Cancer Diagnosis?</label>
+              <select id="hasCancer">
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+            <div id="cancerFields">
+              <div class="field-grid">
+                <div class="field">
+                  <label>Cancer Type</label>
+                  <select id="cancerTypeSelect">
+                    <option value="breast">Breast</option><option value="lung">Lung</option>
+                    <option value="colorectal">Colorectal</option><option value="prostate">Prostate</option>
+                    <option value="stomach">Stomach</option><option value="liver">Liver</option>
+                    <option value="pancreatic">Pancreatic</option><option value="leukemia">Leukemia</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Stage</label>
+                  <select id="cancerStage">
+                    <option value="">Skip</option><option value="0">Stage 0</option><option value="1">Stage I</option>
+                    <option value="2">Stage II</option><option value="3">Stage III</option><option value="4">Stage IV</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                    <label>Diagnosis Duration</label>
+                    <select id="diagnosisAge">
+                        <option value="">Skip</option><option value="lt1m">&lt; 1 month</option><option value="1to3m">1-3 months</option>
+                        <option value="3to6m">3-6 months</option><option value="6to12m">6-12 months</option><option value="gt2y">&gt; 2 years</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Treatment Phase</label>
+                    <select id="treatmentPhase">
+                      <option value="active">Active Treatment</option><option value="maintenance">Maintenance</option>
+                      <option value="recovery">Recovery</option><option value="watchful_waiting">Surveillance</option>
+                    </select>
+                </div>
+              </div>
+              <div class="field-grid">
+                <div class="field">
+                    <label>Care Setting</label>
+                    <select id="careSetting">
+                        <option value="home">Mostly Home</option><option value="outpatient">Outpatient</option>
+                        <option value="hospitalized">Hospitalized</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Visit Frequency</label>
+                    <select id="visitFrequency">
+                        <option value="">Skip</option>
+                        <option value="weekly2plus">2+ times per week</option>
+                        <option value="weekly1">About once per week</option>
+                        <option value="biweekly">Every 2 weeks</option>
+                        <option value="monthly">About once per month</option>
+                        <option value="rare">Rarely / only as needed</option>
+                    </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="lifestyle" class="tab-pane">
+            <h2>Lifestyle Baseline</h2>
+            <p class="sub-text">Wellness averages based on your recent week.</p>
+            <div class="field-grid">
+              <div class="field"><label>Avg. Hydration</label>
+                <select id="hydration">
+                  <option value="">Select</option>
+                  <option value="lt2">0–2 cups/day</option>
+                  <option value="2to4">2–4 cups/day</option>
+                  <option value="4to6">4–6 cups/day</option>
+                  <option value="6to8">6–8 cups/day</option>
+                  <option value="gt8">8+ cups/day</option>
+                </select>
+              </div>
+              <div class="field"><label>Diet Quality</label>
+                <select id="dietQuality">
+                    <option value="low">Low</option><option value="mid">Moderate</option><option value="high">High</option>
+                </select>
+              </div>
+            </div>
+            <div class="field-grid">
+                <div class="field"><label>Daily Exercise</label>
+                    <select id="exerciseMinutes">
+                      <option value="0">0 mins</option><option value="lt10">1-10 mins</option>
+                      <option value="10to20">10-20 mins</option>
+                      <option value="gt40">40+ mins</option>
+                    </select>
+                </div>
+                <div class="field"><label>Activity Baseline</label>
+                  <select id="energyBaseline">
+                    <option value="high">Mobile</option><option value="mid">Partial Rest</option><option value="low">Bed-based</option>
+                  </select>
+                </div>
+            </div>
+            <div class="field"><label>Medical Conditions / Allergies</label><textarea id="conditions" rows="3"></textarea></div>
+          </div>
+
+          <div id="care" class="tab-pane">
+            <h2>Care Reminders</h2>
+            <p class="sub-text">Manage medication and dressing intervals.</p>
+            <div class="section-divider">Medication Routine</div>
+            <div class="field"><label>Times per day</label>
+              <select id="medFreq">
+                <option value="0">None</option><option value="1">1 time/day</option><option value="2">2 times/day</option><option value="3">3 times/day</option>
+              </select>
+            </div>
+            <div id="medTimesContainer" class="field-grid"></div>
+
+            <div class="section-divider">Dressing / Wound Care</div>
+            <div class="field-grid">
+              <div class="field"><label>Frequency</label>
+                <select id="dressingFreq">
+                  <option value="none">None</option><option value="daily">Daily</option><option value="weekly">Weekly</option>
+                </select>
+              </div>
+              <div class="field"><label>Time</label><input type="time" id="dressingTime"></div>
+            </div>
+          </div>
+
+          <div id="support" class="tab-pane">
+            <h2>Emergency Support</h2>
+            <p class="sub-text">Who to contact in case of an emergency.</p>
+            <div class="field"><label>Contact Name</label><input type="text" id="emergencyName"></div>
+            <div class="field-grid">
+              <div class="field"><label>Relationship</label><input type="text" id="emergencyRelationship"></div>
+              <div class="field"><label>Phone</label><input type="tel" id="emergencyPhone"></div>
+            </div>
+            <div class="field"><label>Contact Email</label><input type="email" id="emergencyEmail"></div>
+          </div>
+
+          <button type="submit" id="saveBtn" class="btn-save">Save All Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from "/static/js/firebase/config.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const $ = id => document.getElementById(id);
+
+    // ✅ SAME AS DASHBOARD PAGE: navbar greeting helper
+    function setNavName(nameLike){
+      const raw = String(nameLike || "there").trim();
+      const clean = raw.includes("@") ? raw.split("@")[0] : raw;
+      if ($("helloLine")) $("helloLine").textContent = `Hi, ${clean || "there"}`;
+      if ($("greetSub")) $("greetSub").textContent = "Welcome back";
+    }
+
+    // Global Tab Switcher
+    window.switchTab = (tabId, btn) => {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      $(tabId).classList.add('active');
+      btn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // UI Helpers
+    const renderMedInputs = (n, times = []) => {
+      const container = $('medTimesContainer');
+      container.innerHTML = "";
+      for (let i = 1; i <= n; i++) {
+        container.innerHTML += `<div class="field"><label>Time ${i}</label><input type="time" class="med-time-val" value="${times[i-1] || '09:00'}"></div>`;
+      }
+    };
+
+    $('medFreq').onchange = (e) => renderMedInputs(Number(e.target.value));
+    $('hasCancer').onchange = (e) => $('cancerFields').classList.toggle('hidden', e.target.value === 'no');
+
+    // Auth & Data Loading
+    onAuthStateChanged(auth, async user => {
+      if (!user) return location.href = "/login";
+
+      // ✅ quick greeting immediately
+      setNavName(user.displayName || user.email || "there");
+
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) {
+        const d = snap.data() || {};
+
+        // ✅ final greeting from Firestore (username preferred)
+        const bestName = d.username || d.displayName || d.name || user.displayName || user.email || "there";
+        setNavName(bestName);
+
+        // Populate Fields
+        $('email').value = d.email || "";
+        $('birthYear').value = d.body?.birthYear || "";
+        $('sex').value = d.body?.sex || "";
+        $('height').value = d.body?.heightCm || "";
+        $('weight').value = d.body?.weightKg || "";
+        $('hasCancer').value = d.clinical?.hasCancer ? "yes" : "no";
+        $('hasCancer').dispatchEvent(new Event('change'));
+        $('cancerTypeSelect').value = d.clinical?.cancerTypeCategory || "";
+        $('cancerStage').value = d.clinical?.stage || "";
+        $('diagnosisAge').value = d.clinical?.diagnosisSince || "";
+        $('treatmentPhase').value = d.clinical?.treatmentPhase || "";
+        $('careSetting').value = d.clinical?.careSetting || "";
+        $('visitFrequency').value = d.clinical?.visitFrequency || "";
+        $('hydration').value = d.baseline?.hydration || "";
+        $('dietQuality').value = d.baseline?.dietQuality || "";
+        $('exerciseMinutes').value = d.baseline?.exerciseMinutes || "";
+        $('energyBaseline').value = d.baseline?.activityBaseline || "";
+        $('conditions').value = d.baseline?.conditions || "";
+        $('medFreq').value = d.schedule?.medication?.timesPerDay || 0;
+        renderMedInputs(Number($('medFreq').value), d.schedule?.medication?.times);
+        $('dressingFreq').value = d.schedule?.dressing?.frequency || "none";
+        $('dressingTime').value = d.schedule?.dressing?.time || "";
+        $('emergencyName').value = d.emergency?.name || "";
+        $('emergencyRelationship').value = d.emergency?.relationship || "";
+        $('emergencyPhone').value = d.emergency?.phone || "";
+        $('emergencyEmail').value = d.emergency?.email || "";
+      }
+    });
+
+    // Form Submission
+    $('profileForm').onsubmit = async e => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const medTimes = [...document.querySelectorAll('.med-time-val')].map(i => i.value);
+
+      const updateData = {
+        "body.birthYear": Number($('birthYear').value),
+        "body.sex": $('sex').value,
+        "body.heightCm": Number($('height').value),
+        "body.weightKg": Number($('weight').value),
+        "clinical.hasCancer": $('hasCancer').value === 'yes',
+        "clinical.cancerTypeCategory": $('cancerTypeSelect').value,
+        "clinical.stage": $('cancerStage').value,
+        "clinical.diagnosisSince": $('diagnosisAge').value,
+        "clinical.treatmentPhase": $('treatmentPhase').value,
+        "clinical.careSetting": $('careSetting').value,
+        "clinical.visitFrequency": $('visitFrequency').value,
+        "baseline.hydration": $('hydration').value,
+        "baseline.dietQuality": $('dietQuality').value,
+        "baseline.exerciseMinutes": $('exerciseMinutes').value,
+        "baseline.activityBaseline": $('energyBaseline').value,
+        "baseline.conditions": $('conditions').value,
+        "schedule.medication": { timesPerDay: Number($('medFreq').value), times: medTimes },
+        "schedule.dressing": { frequency: $('dressingFreq').value, time: $('dressingTime').value },
+        "emergency.name": $('emergencyName').value,
+        "emergency.relationship": $('emergencyRelationship').value,
+        "emergency.phone": $('emergencyPhone').value,
+        "emergency.email": $('emergencyEmail').value
+      };
+
+      try {
+        await updateDoc(doc(db, "users", user.uid), updateData);
+        alert("Profile updated successfully!");
+      } catch (err) { alert("Error: " + err.message); }
+    };
+
+    // Logout Functionality
+    $('logoutBtn').onclick = async () => {
+      await signOut(auth);
+      window.location.href = "/login";
+    };
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
