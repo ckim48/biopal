@@ -4,15 +4,21 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBX4q-sOcYbPAkzQCaKuQkrMPUuxmMPi4E",
-  authDomain: "cancer-4dce7.firebaseapp.com",
-  projectId: "cancer-4dce7",
-  storageBucket: "cancer-4dce7.firebasestorage.app",
-  messagingSenderId: "886892546006",
-  appId: "1:886892546006:web:a24b1d1e09dbdf219d8677",
-  measurementId: "G-2CB8SDWRLL"
+  apiKey: "AIzaSyBHSlHAY8XzwOu6kbkmMYzcEWT6qwgry0g",
+  authDomain: "immunisphere.firebaseapp.com",
+  projectId: "immunisphere",
+  storageBucket: "immunisphere.firebasestorage.app",
+  messagingSenderId: "424436998430",
+  appId: "1:424436998430:web:597374776d04ee5cc4e90f"
 };
-
+//const firebaseConfig = {
+//  apiKey: "AIzaSyBHSlHAY8XzwOu6kbkmMYzcEWT6qwgry0g",
+//  authDomain: "immunisphere.firebaseapp.com",
+//  projectId: "immunisphere",
+//  storageBucket: "immunisphere.firebasestorage.app",
+//  messagingSenderId: "424436998430",
+//  appId: "1:424436998430:web:597374776d04ee5cc4e90f"
+//};
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);

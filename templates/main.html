@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
+<link rel="icon" type="image/png" sizes="32x32" href="../static/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../static/apple-touch-icon.png">
   <style>
     :root{
       --sky:#0ea5e9; --sky2:#38bdf8; --ink:#0b1220; --bg:#f6fbff;
@@ -147,8 +148,14 @@
     }
     .btn-green:hover{ transform: translateY(-1px); border-color: rgba(16,185,129,.40); }
 
-    .page{ min-height:calc(100vh - 120px); display:flex; align-items:center; justify-content:center; padding:12px; }
-    .board{ width:min(1200px, 100%); border:1px solid rgba(14,165,233,.16); border-radius:28px; background:var(--panel); backdrop-filter:blur(18px); box-shadow: 0 22px 54px -38px rgba(2,6,23,.45); padding:22px; position:relative; overflow:hidden; }
+.page{
+  min-height:auto;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:12px;
+  padding-top:6px;
+}    .board{ width:min(1200px, 100%); border:1px solid rgba(14,165,233,.16); border-radius:28px; background:var(--panel); backdrop-filter:blur(18px); box-shadow: 0 22px 54px -38px rgba(2,6,23,.45); padding:22px; position:relative; overflow:hidden; }
     .pill{ background:rgba(255,255,255,.72); border-radius:18px; padding:12px 16px; display:flex; align-items:center; gap:12px; border:1px solid rgba(2,6,23,.06); }
 
     .topbar{
@@ -174,12 +181,12 @@
     .sleep-pill{
       padding:12px 14px;
       border-radius:20px;
-      background: rgba(255,255,255,.74);
-      border:1px solid rgba(2,6,23,.08);
-      box-shadow: 0 14px 28px -24px rgba(2,6,23,.32);
+/*      background: rgba(255,255,255,.74);*/
+/*      border:1px solid rgba(2,6,23,.08);*/
+/*      box-shadow: 0 14px 28px -24px rgba(2,6,23,.32);*/
       display:flex;
       align-items:center;
-      justify-content:space-between;
+/*      justify-content:space-between;*/
       gap:12px;
     }
     .sleep-left{ display:flex; align-items:center; gap:10px; min-width: 0; }
@@ -196,7 +203,7 @@
       border:1px solid rgba(245,158,11,.18);
       flex:0 0 auto;
     }
-    .sleep-stars i{ font-size:18px; line-height:1; }
+    .sleep-stars i{ font-size:21px; margin-right: 3px; line-height:1; }
     .sleep-stars .on{ color:#f59e0b; }
     .sleep-stars .off{ color:rgba(2,6,23,.22); }
 
@@ -439,41 +446,147 @@
       0%,100%{ transform: translateY(0); filter:saturate(1); }
       50%{ transform: translateY(-2px); filter:saturate(1.25); }
     }
+    .sensor-card.is-warning {
+  border-color: var(--bad) !important;
+  background: rgba(239, 68, 68, 0.05); /* Very light red tint */
+  box-shadow: 0 12px 24px -12px rgba(239, 68, 68, 0.4);
+  animation: sensorBump 1.2s ease-in-out infinite;
+}
+
+@keyframes sensorBump {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+    .level-line{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+.level-badge{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:6px 14px; border-radius:999px;
+  margin: 0 auto;
+  text-align:center;
+  font-weight:950; letter-spacing:.2px; font-size:14px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.06);
+}
+.level-badge.l1{color:#fecaca; background:white; border-color:rgba(239,68,68,.25)}
+.level-badge.l2{color:#fed7aa; background:white; border-color:rgba(245,158,11,.25)}
+.level-badge.l3{color:#57A0EB; background:white; border-color:rgba(59,130,246,.25)}
+.level-badge.l4{color:#36D190; background:white; border-color:rgba(34,197,94,.25)}
+.level-msg{font-weight:950; font-size:15px; letter-spacing:-.2px}
+.character-box{
+  position:relative;            /* makes overlay align to the box */
+  display:inline-block;
+  border-radius:22px;           /* match your design */
+  overflow:hidden;              /* keeps overlay inside rounded corners */
+}
+
+.alarm-text-overlay{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  font-size:22px;
+  letter-spacing:-.3px;
+  color:#fff;
+  text-align:center;
+  background:rgba(2,6,23,.55);
+  backdrop-filter:blur(6px);
+  z-index:20;
+  opacity:0;
+  transition:opacity .25s ease;
+  pointer-events:none;
+}
+
+.alarm-text-overlay.show{ opacity:1; }
+.hidden{ display:none !important; }
+
   </style>
 </head>
 
 <body>
   <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
 
-  <nav class="nav">
-    <div class="nav-left">
-      <div class="nav-greet" id="navGreeting" aria-label="Greeting">
-        <div class="hello" id="helloLine">Hi, there</div>
-        <div class="sub" id="greetSub">Welcome back</div>
-      </div>
+   <nav class="nav">
+  <div class="nav-left">
+    <div class="nav-greet" id="navGreeting" aria-label="Greeting">
+      <div class="hello" id="helloLine">Hi, there</div>
+      <div class="sub" id="greetSub">Weekly Missions</div>
     </div>
-    <div class="nav-right">
-      <a href="/dashboard" class="btn btn-ghost nav-btn-dash">
-        <i class="bi bi-grid-fill"></i> Dashboard
-      </a>
+  </div>
+<div id="openSurveyBtn" class="d-none">
 
-      <a href="/chatbot" class="btn btn-ghost nav-btn-chat">
-        <i class="bi bi-chat-dots-fill"></i> Chatbot
-      </a>
+</div>
+  <div class="nav-right" style="display: flex; align-items: center; gap: 8px;">
+    <a href="/dashboard" class="btn btn-ghost" id="refreshBtn">
+      <i class="bi bi-grid-fill"></i> Dashboard
+    </a>
 
-      <a href="/profile" class="btn btn-ghost nav-btn-user" id="profileNavBtn">
-        <i class="bi bi-person-circle"></i> Profile
-      </a>
+    <a href="/chatbot" class="btn btn-ghost">
+      <i class="bi bi-chat-dots-fill"></i> Chatbot
+    </a>
 
-      <button id="openSurveyBtn" class="btn btn-primary" disabled>
-        <i class="bi bi-clipboard2-pulse"></i> Daily Check-in
+    <a href="/resource" class="btn btn-ghost">
+      <i class="bi bi-journal-text"></i> Resources
+    </a>
+
+    <a href="{{ url_for('main') }}" class="btn btn-ghost">
+      <i class="bi bi-hearts"></i> BioPal App
+    </a>
+
+    <div class="dropdown">
+      <button
+        class="btn btn-ghost settings-btn"
+        type="button"
+        id="settingsMenuBtn"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        aria-label="Settings menu"
+        title="Settings"
+        style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border-radius: 12px;"
+      >
+        <i class="bi bi-gear-fill" style="font-size: 1.1rem;"></i>
       </button>
 
-      <button id="logoutBtn" class="btn btn-ghost nav-btn-exit" disabled>
-        <i class="bi bi-box-arrow-right"></i> Exit
-      </button>
+      <ul class="dropdown-menu dropdown-menu-end menu" aria-labelledby="settingsMenuBtn"
+          style="min-width:240px; border-radius:18px; border:1px solid rgba(2,6,23,.10); box-shadow:var(--shadow-xl); overflow:hidden; margin-top: 10px;">
+
+        <li class="dropdown-header"
+            style="font-weight:950; letter-spacing:-.2px; padding:12px 14px; color:var(--ink);
+                   background:rgba(248,250,252,.95); border-bottom:1px solid rgba(2,6,23,.08);">
+          Account
+        </li>
+
+        <li>
+          <a class="dropdown-item" href="/profile"
+             style="padding:10px 14px; font-weight:800; display:flex; align-items:center; gap:10px;">
+            <i class="bi bi-person-circle" style="width:22px; font-size:1.05rem; color:rgba(15,23,42,.85);"></i>
+            Profile
+          </a>
+        </li>
+
+        <li id="menuLoginItem" style="display:none;">
+          <a class="dropdown-item" href="/login"
+             style="padding:10px 14px; font-weight:800; display:flex; align-items:center; gap:10px;">
+            <i class="bi bi-box-arrow-in-right" style="width:22px; font-size:1.05rem; color:rgba(15,23,42,.85);"></i>
+            Login
+          </a>
+        </li>
+
+        <li><hr class="dropdown-divider" style="margin:0; border-top-color:rgba(2,6,23,.08);"></li>
+
+        <li id="menuLogoutItem">
+          <button class="dropdown-item danger" id="logoutBtn"
+                  style="padding:10px 14px; font-weight:900; display:flex; align-items:center; gap:10px;
+                         color:var(--bad); background:transparent; border:0; width:100%; text-align:left;">
+            <i class="bi bi-box-arrow-right" style="width:22px; font-size:1.05rem; color:var(--bad);"></i>
+            Logout
+          </button>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <div class="selfcheck-wrap">
     <div class="selfcheck-banner" id="selfCheckBanner" role="status" aria-live="polite">
@@ -501,13 +614,16 @@
       <div class="topbar">
         <div class="sleep-wrap">
           <div class="sleep-pill">
-            <div class="sleep-left">
-              <div class="sleep-meta">
-                <p class="sleep-title">Sleep Score</p>
-                <p class="sleep-sub" id="sleepStarsSub">Your next check-in will update this score.</p>
-              </div>
-            </div>
-            <div class="sleep-stars" id="stars" title="Sleep Score"></div>
+
+<div class="sleep-stars d-flex align-items-center gap-2">
+  <div id="stars"></div>
+
+  <i class="bi bi-question-circle-fill text-muted"
+     data-bs-toggle="tooltip"
+     data-bs-placement="top"
+     data-bs-title="This score is based on your sleep check-in (hours, quality, awakenings, and morning fatigue)."
+     style="font-size:14px; cursor:help;"></i>
+</div>
           </div>
         </div>
 
@@ -527,9 +643,14 @@
         </div>
 
         <div class="col-lg-4 text-center">
-          <div class="character-box">
-            <img id="characterSprite" src="/static/gifs/character2.gif" alt="Guardian">
-          </div>
+<div class="character-box">
+  <img id="characterSprite" src="/static/gifs/character2.gif" alt="Guardian">
+
+  <div id="alarmTextOverlay" class="alarm-text-overlay hidden">
+    It’s time to do your mission
+  </div>
+</div>
+
 
           <div class="center-feedback">
             <div class="feedback-card" aria-live="polite">
@@ -868,9 +989,9 @@
   const REMINDER_EVERY_MS = 5 * 60 * 1000;
 
   const REMINDER_GIF = {
-    WATER: "/static/gifs/hydration_time.gif",
-    DRESS: "/static/gifs/dressing_time.gif",
-    MED:   "/static/gifs/medication.gif"
+    WATER: "/static/gifs/hydration_alarm.gif",
+    MED:   "/static/gifs/medication_alarm.gif",
+    DRESS: "/static/gifs/dressing_alarm.gif"
   };
   const REMINDER_DURATION_MS = 2400;
 
@@ -977,11 +1098,11 @@
 
   const ALARM_GIF = {
     WATER: "/static/gifs/hydration_alarm.gif",
-    MED:   "/static/gifs/medicine_alarm.gif",
+    MED:   "/static/gifs/medicaiton_alarm.gif",
     DRESS: "/static/gifs/dressing_alarm.gif",
     CUSTOM:"/static/gifs/custom_alarm.gif"
   };
-  const ALARM_LOOP_MS = 2400;
+  const ALARM_LOOP_MS = 1000;
 
   let currentStatusLabel = "Neutral / Calm";
   let currentSelfScore = null;
@@ -1002,9 +1123,50 @@
     img.src = `${src}`;
   }
 
+const ALARM_TEXT_DURATION_MS = 2500;
+
+  function showAlarmText(message = "It’s time to do your mission"){
+  const el = $("alarmTextOverlay");
+  if (!el) return;
+
+  el.textContent = message;
+  el.classList.remove("hidden");
+  el.classList.add("show");
+
+  setTimeout(() => {
+    el.classList.remove("show");
+    setTimeout(() => el.classList.add("hidden"), 250);
+  }, ALARM_TEXT_DURATION_MS);
+}
+function playAlarmOnce(type){
+  if (isPlayingCompletion || isPlayingReminder) return;
+
+  const t = (type === "WATER" || type === "MED" || type === "DRESS") ? type : "CUSTOM";
+  const gif = ALARM_GIF[t];
+  if (!gif) return;
+
+  stopAlarmAnim();
+  isPlayingAlarm = true;
+
+
+  showAlarmText("It’s time to do your mission");
+
+
+  setTimeout(() => {
+    setCharacterSrc(gif);
+
+    alarmTimer = setTimeout(() => {
+      isPlayingAlarm = false;
+      setIdleCharacterByStatus(currentStatusLabel);
+    }, ALARM_LOOP_MS);
+
+  }, ALARM_TEXT_DURATION_MS);
+}
+
   function setIdleCharacterByStatus(label){
     const idleSrc = STATUS_IDLE_GIF[label] || STATUS_IDLE_GIF["Neutral / Calm"];
     setCharacterSrc(idleSrc);
+
   }
 
   function stopReminderAnim(){
@@ -1042,7 +1204,7 @@
     stopReminderAnim();
     isPlayingReminder = true;
 
-    setCharacterSrc(gif);
+    playAlarmOnce(type);
 
     reminderTimer = setTimeout(() => {
       isPlayingReminder = false;
@@ -1050,22 +1212,7 @@
     }, REMINDER_DURATION_MS);
   }
 
-  /* ✅ alarm: one loop only */
-  function playAlarmOnce(type){
-    if (isPlayingCompletion || isPlayingReminder) return;
-    const t = (type === "WATER" || type === "MED" || type === "DRESS") ? type : "CUSTOM";
-    const gif = ALARM_GIF[t];
-    if (!gif) return;
 
-    stopAlarmAnim();
-    isPlayingAlarm = true;
-    setCharacterSrc(gif);
-
-    alarmTimer = setTimeout(() => {
-      isPlayingAlarm = false;
-      setIdleCharacterByStatus(currentStatusLabel);
-    }, ALARM_LOOP_MS);
-  }
 
   function weightedPick(types){
     const w = [];
@@ -1630,18 +1777,50 @@
 
   /* -------------------- Center message -------------------- */
   function setCenterMessage(title="Doing great"){ $("statusTitle").textContent = title; }
-  function pickNiceTitleByCompleteness(pct, isRest=false){
-    if (isRest) return "Recovery time — rest and breathe";
-    if (pct >= 100) return "All done — you’re amazing";
-    if (pct >= 80) return "So close — one more mission";
-    if (pct >= 60) return "Great job — keep going";
-    if (pct >= 40) return "Keep it up!";
-    if (pct >= 20) return "Nice start — you’ve got this";
-    return "Life is busy — find a small moment for your mission";
+function pickNiceTitleByCompleteness(_, isRest = false) {
+  if (isRest) {
+    return `
+      <div class="level-line"><span class="level-badge l2">REST</span></div>
+      <div class="level-msg">Recovery time — rest and breathe</div>
+    `;
   }
+
+  let level = 2;
+  let msg = "Keep going — every mission counts";
+
+  switch (currentStatusLabel) {
+    case "Happy / Energized":   // character1.gif
+      level = 4;
+      msg = "Excellent work — maintain your mission completions to keep this level";
+      break;
+
+    case "Neutral / Calm":      // character2.gif
+      level = 3;
+      msg = "Great progress — keep completing your missions";
+      break;
+
+    case "Tired / Low Energy":  // character3.gif
+      level = 2;
+      msg = "Nice start — keep working on your missions";
+      break;
+
+    case "Concern / Warning":   // character4.gif
+      level = 1;
+      msg = "You can do better — start with one small mission";
+      break;
+  }
+
+  return `
+    <div class="level-line"><span class="level-badge l${level}">LEVEL ${level}</span></div>
+    <div class="level-msg">${msg}</div>
+  `;
+}
+
   function updateCenterByCompleteness(pct, isRest=false){
     if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) setIdleCharacterByStatus(currentStatusLabel);
-    setCenterMessage(pickNiceTitleByCompleteness(pct, isRest));
+//    setCenterMessage(pickNiceTitleByCompleteness(pct, isRest));
+    $("statusTitle").innerHTML = pickNiceTitleByCompleteness(pct, isRest);
+
   }
 
   /* -------------------- Sleep Stars -------------------- */
@@ -1698,21 +1877,107 @@
       const on = (s > 0 && i < s);
       el.innerHTML += `<i class="bi bi-star${on?'-fill on':' off'}"></i>`;
     }
-    $("sleepStarsSub").textContent = msg || "Your next check-in will update this score.";
-    el.title = "Sleep Score (from your Sleep Status check-in)";
+
   }
 
-  /* -------------------- Sensors (demo placeholders) -------------------- */
-  function updateSensors() {
-    const temp = 36.6, heart = 72, stress = "Stable";
-    $("val-temp").innerHTML = `<span class="dot ok"></span> ${temp}°C`;
-    $("val-heart").innerHTML = `<span class="dot ok"></span> ${heart} bpm`;
-    $("val-stress").innerHTML = `<span class="dot ok"></span> ${stress}`;
+ async function updateSensors() {
+  // ---- helpers ----
+  const STATUSES = ["Stable", "Caution", "Warning"];
 
-    $("gif-temp").src = "/static/gifs/temperature_stable.gif";
-    $("gif-heart").src = "/static/gifs/heart_stable.gif";
-    $("gif-stress").src = "/static/gifs/stress_stable.gif";
+  const pickStatus = () => {
+    const r = Math.random();
+    if (r < 0.65) return "Stable";
+    if (r < 0.90) return "Caution";
+    return "Warning";
+  };
+
+  const dotClassFor = (status) => {
+    if (status === "Stable") return "ok";
+    if (status === "Caution") return "warn";
+    return "bad";
+  };
+
+  const tempGif = (status) =>
+    status === "Stable"  ? "/static/gifs/temperature_stable.gif" :
+    status === "Caution" ? "/static/gifs/temperature_caution.gif" :
+                           "/static/gifs/temperature_warning.gif";
+
+  const heartGif = (status) =>
+    status === "Stable"  ? "/static/gifs/heart_stable.gif" :
+    status === "Caution" ? "/static/gifs/heart_caution.gif" :
+                           "/static/gifs/heart_warning.gif";
+
+  const stressGif = (status) =>
+    status === "Stable"  ? "/static/gifs/stress_stable.gif" :
+    status === "Caution" ? "/static/gifs/stress_caution.gif" :
+                           "/static/gifs/stress_warning.gif";
+
+  const randBetween = (a, b) => +(a + Math.random() * (b - a)).toFixed(1);
+  const randInt = (a, b) => Math.floor(a + Math.random() * (b - a + 1));
+
+  // ---- pick statuses ----
+  const tempStatus = pickStatus();
+  const heartStatus = pickStatus();
+  const stressStatus = pickStatus();
+
+  // ---- sensor values ----
+  const temp =
+    tempStatus === "Stable"  ? randBetween(36.3, 36.8) :
+    tempStatus === "Caution" ? randBetween(37.1, 37.7) :
+                               randBetween(38.0, 39.2);
+
+  const heart =
+    heartStatus === "Stable"  ? randInt(65, 85) :
+    heartStatus === "Caution" ? randInt(90, 110) :
+                                randInt(115, 145);
+
+  const stress = stressStatus;
+
+  // ---- UI updates & Warning Animations ----
+  const tempCard = $("val-temp").closest('.sensor-card');
+  const heartCard = $("val-heart").closest('.sensor-card');
+  const stressCard = $("val-stress").closest('.sensor-card');
+
+  // Update Temperature
+  $("val-temp").innerHTML = `<span class="dot ${dotClassFor(tempStatus)}"></span> ${temp}°C (${tempStatus})`;
+  $("gif-temp").src = tempGif(tempStatus);
+  tempCard.classList.toggle('is-warning', tempStatus === "Warning");
+
+  // Update Heart Rate
+  $("val-heart").innerHTML = `<span class="dot ${dotClassFor(heartStatus)}"></span> ${heart} bpm (${heartStatus})`;
+  $("gif-heart").src = heartGif(heartStatus);
+  heartCard.classList.toggle('is-warning', heartStatus === "Warning");
+
+  // Update Stress
+  $("val-stress").innerHTML = `<span class="dot ${dotClassFor(stressStatus)}"></span> ${stress}`;
+  $("gif-stress").src = stressGif(stressStatus);
+  stressCard.classList.toggle('is-warning', stressStatus === "Warning");
+
+  // ---- Save current status in Firestore ----
+  try {
+    if (!userSession?.uid) return;
+    const medicalDay = getMedicalDayID();
+    const payload = {
+      sensorStatus: {
+        temp:  { value: temp, unit: "C",   status: tempStatus },
+        heart: { value: heart, unit: "bpm", status: heartStatus },
+        stress:{ value: stress,            status: stressStatus }
+      },
+      sensorUpdatedAt: serverTimestamp()
+    };
+    const anyWarning = [tempStatus, heartStatus, stressStatus].includes("Warning");
+    if (anyWarning) {
+      await maybeSendSensorWarningEmail({
+        medicalDay,
+        sensorStatus: payload.sensorStatus, // temp/heart/stress with value+status
+      });
+    }
+
+    await setDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay), payload, { merge: true });
+  } catch (e) {
+    console.warn("[updateSensors] Firestore save failed:", e);
   }
+}
 
   /* -------------------- Self-check banner -------------------- */
   function computeChildStatusFromSurvey(surveyV2){
@@ -2509,13 +2774,80 @@
     cachedHistory7d = await fetchHistoryDays(7);
     await updateDashboard();
 
-    // ✅ start forever engines
     startReminderLoop();
 
-    // alarm engine starts after updateDashboard builds current missions,
-    // but we also ensure timer is created here (safe no-op until list is set)
     startOrUpdateAlarmEngine({ medicalDay:getMedicalDayID(), intervalId:"", missions:[] });
   });
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+
+
+const API_SENSOR_WARNING_EMAIL_URL = "/api/sensor_warning_email";
+
+async function maybeSendSensorWarningEmail({ medicalDay, sensorStatus }) {
+  // Basic validation
+  if (!userSession?.uid) {
+    console.warn("[Email] skipped: no userSession yet");
+    return;
+  }
+  if (!medicalDay || !sensorStatus) return;
+
+  // Only send when at least one is WARNING
+  const anyWarning =
+    sensorStatus?.temp?.status === "Warning" ||
+    sensorStatus?.heart?.status === "Warning" ||
+    sensorStatus?.stress?.status === "Warning";
+
+  if (!anyWarning) return;
+
+  // Throttle: at most once per 30 minutes per medicalDay
+  const THROTTLE_MS = 30 * 60 * 1000;
+
+  const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? (snap.data() || {}) : {};
+  const lastSent = Number(data?.sensorWarningEmailSentAtMs || 0);
+
+//  if (Date.now() - lastSent < THROTTLE_MS) {
+//    console.warn("[Email] throttled");
+//    return;
+//  }
+
+  // Mark as sent FIRST (prevents double-send if user refreshes fast)
+  await setDoc(ref, { sensorWarningEmailSentAtMs: Date.now() }, { merge: true });
+
+  // Call backend to actually send email
+  try {
+    console.warn("[Email] sending warning email...", { medicalDay, sensorStatus });
+
+    const res = await fetch(API_SENSOR_WARNING_EMAIL_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+    email: userSession.email,
+    uid: userSession.uid,
+        medicalDay,
+        sensorStatus
+      })
+    });
+
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      console.warn("[Email] backend failed:", res.status, t);
+      return;
+    }
+
+    console.warn("[Email] sent");
+  } catch (e) {
+    console.warn("[Email] fetch failed:", e);
+  }
+}
+
+
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

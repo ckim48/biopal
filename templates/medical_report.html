@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BioPal • Medical Report</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --sky:#0ea5e9; --ink:#0b1220; --soft:rgba(14,165,233,.08);
+      --muted:#64748b; --border:rgba(2,6,23,.08); --shadow:0 12px 34px -18px rgba(2,6,23,.22);
+      --bad:#ef4444;
+
+      --ink2:#0f172a; --muted2:#64748b; --bg2:#f8fafc; --card:#fff;
+      --edge:rgba(2,6,23,.08); --shadow2:0 20px 50px rgba(2,6,23,.06); --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      background:
+        radial-gradient(900px 520px at 18% 10%, rgba(56,189,248,.20), transparent 55%),
+        radial-gradient(900px 520px at 85% 75%, rgba(14,165,233,.16), transparent 60%),
+        linear-gradient(180deg, #fbfdff 0%, var(--bg2) 100%);
+      color:var(--ink2);
+      -webkit-font-smoothing:antialiased;
+      padding-bottom:120px;
+    }
+
+    /* Navbar */
+    .nav{
+      position:sticky; top:16px; z-index:100;
+      max-width:1200px; margin:16px auto;
+      background:rgba(255,255,255,.70);
+      backdrop-filter:blur(18px);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:12px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      box-shadow:var(--shadow);
+    }
+    .nav-left{ display:flex; align-items:center; gap:12px; min-width:260px; }
+    .nav-right{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+    .nav-greet{ display:flex; flex-direction:column; line-height:1.08; padding:6px 2px; min-width:200px; }
+    .nav-greet .hello{ font-weight:950; letter-spacing:-.35px; font-size:15px; }
+    .nav-greet .sub{ font-weight:850; font-size:13px; color:rgba(100,116,139,.95); margin-top:3px; }
+
+    .btn{
+      padding:12px 18px; border-radius:14px; border:none;
+      font-weight:800; font-size:14px; cursor:pointer;
+      transition:all .18s ease;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      text-decoration:none; user-select:none;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg, var(--ink), #101a33);
+      color:#fff;
+      box-shadow:0 14px 26px -18px rgba(2,6,23,.55);
+    }
+    .btn-ghost{
+      background: var(--soft);
+      color: var(--sky);
+      border: 1px solid rgba(14,165,233, 0.2);
+      font-weight:700;
+    }
+    .btn-ghost:hover{ background: var(--sky); color:#fff; border-color:var(--sky); transform:translateY(-1px); }
+
+    #logoutBtn{
+      background: rgba(239, 68, 68, 0.08);
+      color: var(--bad);
+      border:1px solid rgba(239, 68, 68, 0.15);
+    }
+    #logoutBtn:hover{ background: var(--bad); color:#fff; }
+
+    /* Page */
+    .page{ max-width:1100px; margin:0 auto; padding:2rem 1.25rem 3rem; }
+    .head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+    .title h1{margin:0;font-size:1.6rem;letter-spacing:-.02em;color:var(--ink2);font-weight:900;}
+    .title p{margin:.25rem 0 0;color:var(--muted2);font-weight:600;}
+
+    .controls{
+      display:flex; gap:.75rem; flex-wrap:wrap; align-items:center;
+      background:rgba(255,255,255,.8);
+      border:1px solid var(--edge);
+      border-radius:999px;
+      padding:.55rem .6rem;
+      box-shadow:0 10px 30px rgba(2,6,23,.04);
+    }
+    .chip{
+      border:1px solid rgba(2,6,23,.08);
+      background:#fff;
+      border-radius:999px;
+      padding:.55rem .75rem;
+      font-weight:800;
+      color:var(--ink2);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:40px;
+    }
+    .chip b{ font-weight:950; }
+    .controls .btn{ border-radius:999px; padding:.6rem .9rem; font-weight:900; }
+    .btn-primary-lite{ background:#0f172a; color:#fff; border:none; }
+    .btn-ghost-lite{ background:#f1f5f9; color:#0f172a; border:none; }
+
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;margin-top:1rem;}
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}}
+    .card{background:var(--card);border:1px solid var(--edge);border-radius:var(--radius);box-shadow:var(--shadow2);padding:1.05rem;}
+    .card h2{margin:0 0 .75rem;font-size:1rem;letter-spacing:-.01em;font-weight:900;color:var(--ink2);}
+    .muted{color:var(--muted2);font-weight:600;}
+    .section{margin-top:1rem;border-top:1px solid rgba(2,6,23,.06);padding-top:1rem;}
+    ul{margin:.5rem 0 0;padding-left:1.1rem;}
+    li{margin:.35rem 0;color:var(--ink2);font-weight:650;}
+    .pillrow{display:flex;gap:.5rem;flex-wrap:wrap;margin:.2rem 0;}
+    .pill{border:1px solid var(--edge);background:#f8fafc;border-radius:999px;padding:.35rem .6rem;font-weight:900;color:var(--ink2);font-size:.85rem;}
+
+    .loader{display:none;margin-top:1rem;border-radius:16px;border:1px dashed rgba(2,6,23,.18);padding:1rem;color:var(--muted2);font-weight:800;background:rgba(255,255,255,.6);}
+    .loader.show{display:block;}
+    .error{display:none;margin-top:1rem;border-radius:16px;border:1px solid rgba(239,68,68,.25);padding:1rem;color:#991b1b;font-weight:800;background:rgba(254,242,242,.85);white-space:pre-line;}
+    .error.show{display:block;}
+
+    .auth-banner{
+      display:none;
+      max-width:1100px;
+      margin:0 auto;
+      padding:0 1.25rem;
+    }
+    .auth-banner.show{ display:block; }
+
+    @media (max-width:768px){
+      .nav{ padding:12px 14px; }
+      .nav-left{ min-width: unset; }
+      .nav-greet{ min-width: unset; }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav">
+    <div class="nav-left">
+      <div class="nav-greet">
+        <div class="hello" id="helloLine">Hi, there</div>
+        <div class="sub" id="greetSub">Checking your login…</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="/dashboard" class="btn btn-ghost"><i class="bi bi-grid-fill"></i> Dashboard</a>
+      <a href="/chatbot" class="btn btn-ghost"><i class="bi bi-chat-dots-fill"></i> Chatbot</a>
+      <a href="/resource" class="btn btn-ghost"><i class="bi bi-book"></i> Resources</a>
+      <a href="/profile" class="btn btn-ghost"><i class="bi bi-person-circle"></i> Profile</a>
+      <a href="/medical_report" class="btn btn-ghost" aria-current="page"><i class="bi bi-graph-up"></i> Report</a>
+      <a href="/selfcheck" class="btn btn-primary"><i class="bi bi-clipboard2-pulse"></i> Daily Check-in</a>
+      <button id="logoutBtn" class="btn btn-ghost" type="button"><i class="bi bi-box-arrow-right"></i> Exit</button>
+    </div>
+  </nav>
+
+  <div class="auth-banner" id="authBanner">
+    <div class="error show" id="authError">
+      You are not logged in (Firebase auth is not available on this page yet).
+      Click “Go to Login” and sign in again.
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="head">
+      <div class="title">
+        <h1>Medical Report (Supportive)</h1>
+        <p>Generated from your recent check-ins and routine logs. Not medical advice.</p>
+      </div>
+
+      <div class="controls">
+        <div class="chip">
+          <span class="muted">Cancer type:</span> <b id="cancerTypeText">Loading…</b>
+        </div>
+        <button class="btn btn-primary-lite" id="btnGenerate">Generate</button>
+        <button class="btn btn-ghost-lite" id="btnRefresh">Refresh</button>
+      </div>
+    </div>
+
+    <div class="loader" id="loader">Loading your data and generating your report…</div>
+    <div class="error" id="errorBox"></div>
+
+    <div class="grid">
+      <div class="card">
+        <h2 id="reportTitle">Your BioPal Medical Report</h2>
+        <div class="muted" id="metaLine">Data range: —</div>
+
+        <div class="section">
+          <h2>Summary</h2>
+          <div class="muted" id="disclaimer"></div>
+          <p id="summary" style="margin:.6rem 0 0;color:var(--ink2);font-weight:700;line-height:1.55;"></p>
+        </div>
+
+        <div class="section">
+          <h2>What this can mean</h2>
+          <ul id="meaningList"></ul>
+        </div>
+
+        <div class="section">
+          <h2>Self-care focus (next 7 days)</h2>
+          <ul id="focusList"></ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Trend snapshot</h2>
+        <div class="pillrow" id="trendPills"></div>
+
+        <div class="section">
+          <h2>Questions for your clinician</h2>
+          <ul id="qList"></ul>
+        </div>
+
+        <div class="section">
+          <h2>Red flags (contact a clinician)</h2>
+          <ul id="rfList"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "{{ url_for('static', filename='js/firebase/config.js') }}";
+
+    import {
+      onAuthStateChanged,
+      signOut,
+      setPersistence,
+      browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    import {
+      doc, getDoc, collection, getDocs, query, orderBy, limit
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const el = (id) => document.getElementById(id);
+
+    function setLoading(on){
+      el("loader").classList.toggle("show", !!on);
+      el("btnGenerate").disabled = !!on;
+      el("btnRefresh").disabled = !!on;
+    }
+
+    function setError(msg){
+      const box = el("errorBox");
+      if (!msg){ box.classList.remove("show"); box.textContent=""; return; }
+      box.classList.add("show");
+      box.textContent = msg;
+    }
+
+    function listToUl(list, ulId){
+      const ul = el(ulId);
+      ul.innerHTML = "";
+      (list || []).forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        ul.appendChild(li);
+      });
+      if (!ul.children.length){
+        const li = document.createElement("li");
+        li.textContent = "No items available yet.";
+        ul.appendChild(li);
+      }
+    }
+
+    function renderReport(r){
+      el("reportTitle").textContent = r.title || "Your BioPal Medical Report";
+      el("disclaimer").textContent = r.disclaimer || "";
+      el("summary").textContent = r.high_level_summary || "";
+
+      const du = r.data_used || {};
+      const focus = r.cancer_type_focus || "cancer";
+      el("metaLine").textContent = `Focus: ${focus} • Days: ${du.days_included ?? 0} • Range: ${du.date_range || "—"}`;
+
+      listToUl(r.what_this_can_mean, "meaningList");
+      listToUl(r.self_care_focus_next_7_days, "focusList");
+      listToUl(r.questions_for_your_clinician, "qList");
+      listToUl(r.red_flags_to_contact_a_clinician, "rfList");
+
+      const ts = r.trend_snapshot || {};
+      const items = [
+        ["Pain", ts.pain_trend],
+        ["Fatigue", ts.fatigue_trend],
+        ["Mood", ts.mood_trend],
+        ["Routine", ts.routine_trend],
+      ];
+      const wrap = el("trendPills");
+      wrap.innerHTML = "";
+      items.forEach(([k,v]) => {
+        const d = document.createElement("div");
+        d.className = "pill";
+        d.textContent = `${k}: ${v || "Not enough data"}`;
+        wrap.appendChild(d);
+      });
+    }
+
+    function greetingSublineByTime(now){
+      const h = now.getHours();
+      if (h >= 5 && h < 12) return "Good morning • Stay steady today";
+      if (h >= 12 && h < 17) return "Good afternoon • Small steps count";
+      if (h >= 17 && h < 22) return "Good evening • Keep it gentle";
+      return "Late night • Prioritize rest";
+    }
+
+    function pickProfile(profileDoc){
+      const clinical = profileDoc?.clinical || {};
+      const body = profileDoc?.body || {};
+      const baseline = profileDoc?.baseline || {};
+      const schedule = profileDoc?.schedule || {};
+      return {
+        body: {
+          birthYear: body.birthYear ?? null,
+          sex: body.sex ?? null,
+          heightCm: body.heightCm ?? null,
+          weightKg: body.weightKg ?? null,
+        },
+        clinical: {
+          hasCancer: clinical.hasCancer ?? null,
+          cancerType: clinical.cancerType ?? null,
+          cancerTypeCategory: clinical.cancerTypeCategory ?? null,
+          stage: clinical.stage ?? null,
+          diagnosisSince: clinical.diagnosisSince ?? null,
+          treatmentPhase: clinical.treatmentPhase ?? null,
+          careSetting: clinical.careSetting ?? null,
+          visitFrequency: clinical.visitFrequency ?? null,
+        },
+        baseline: {
+          hydration: baseline.hydration ?? null,
+          dietQuality: baseline.dietQuality ?? null,
+          exerciseMinutes: baseline.exerciseMinutes ?? null,
+          activityBaseline: baseline.activityBaseline ?? null,
+          conditions: baseline.conditions ?? null,
+        },
+        schedule: {
+          medication: schedule.medication ?? null,
+          dressing: schedule.dressing ?? null,
+        }
+      };
+    }
+
+    function pickDayLog(d){
+      const survey = d?.survey_v2 || {};
+      const A = survey?.A || {};
+      const C = survey?.C || {};
+      const D = survey?.D || {};
+      return {
+        dayId: d.dayId || d.date || "",
+        mood: D.mood ?? null,
+        condition: A.cond ?? null,
+        pain: A.pain ?? null,
+        fatigue_0_10: C.fatigue ?? null,
+        completedMissionsCount: Array.isArray(d.completedMissions) ? d.completedMissions.length : null,
+        completedMissions: Array.isArray(d.completedMissions) ? d.completedMissions.slice(0, 24) : [],
+        notes: (d.note || d.notes || "").toString().slice(0, 220)
+      };
+    }
+
+    function deriveCancerTypeForReport(profileDoc){
+      const clinical = profileDoc?.clinical || {};
+      const hasCancer = !!clinical.hasCancer;
+      if (!hasCancer) return "not diagnosed";
+      const ct = (clinical.cancerType || "").toString().trim();
+      const cat = (clinical.cancerTypeCategory || "").toString().trim();
+      return ct || cat || "cancer";
+    }
+
+    async function fetchRecentLogs(uid){
+      // Try your most likely subcollection first:
+      // registration page didn't create logs; your app may use "daily_logs"
+      const tryCols = ["daily_logs", "days"];
+      let lastErr = null;
+
+      for (const colName of tryCols){
+        try{
+          const ref = collection(db, "users", uid, colName);
+          const qy = query(ref, orderBy("dayId", "desc"), limit(14));
+          const snaps = await getDocs(qy);
+          const history = [];
+          snaps.forEach(s => history.push(pickDayLog(s.data() || {})));
+          return { history, usedCollection: colName };
+        }catch(e){
+          lastErr = e;
+          continue;
+        }
+      }
+      throw lastErr || new Error("Failed to load logs.");
+    }
+
+    async function loadUserData(u){
+      // Profile
+      const pSnap = await getDoc(doc(db, "users", u.uid));
+      const profileDoc = pSnap.exists() ? pSnap.data() : {};
+      const profile = pickProfile(profileDoc);
+
+      // Logs
+      const { history } = await fetchRecentLogs(u.uid);
+
+      const ids = history.map(x => x.dayId).filter(Boolean);
+      const dateRange = ids.length ? `${ids[ids.length-1]} to ${ids[0]}` : "";
+
+      return { profile, history, dateRange, profileDoc };
+    }
+
+    async function generateReportForUser(u){
+      setError("");
+      setLoading(true);
+      try{
+        const { profile, history, dateRange, profileDoc } = await loadUserData(u);
+
+        const cancerType = deriveCancerTypeForReport(profileDoc);
+        el("cancerTypeText").textContent = cancerType;
+
+        const resp = await fetch("/api/medical_report_from_client", {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify({
+            cancerType,
+            profile,
+            history,
+            nowISO: new Date().toISOString(),
+            dateRange
+          })
+        });
+
+        const data = await resp.json();
+        if (!data.ok) throw new Error(data.error || "Failed to generate report.");
+
+        const r = data.report || {};
+        r.data_used = r.data_used || {};
+        if (!r.data_used.date_range && dateRange) r.data_used.date_range = dateRange;
+        if (!r.data_used.days_included) r.data_used.days_included = history.length;
+
+        renderReport(r);
+      }catch(err){
+        const msg = err?.message ? String(err.message) : "Something went wrong.";
+
+        if (msg.includes("Missing or insufficient permissions")){
+          setError(
+`Missing or insufficient permissions.
+
+Your Firestore rules are blocking reads for:
+- users/{uid}
+- users/{uid}/daily_logs (or users/{uid}/days)
+
+This page is correct, but Firestore will refuse until rules allow the signed-in user to read their own docs.
+
+If you paste your Firestore rules, I’ll rewrite them safely (user can only read/write their own data).`
+          );
+        } else {
+          setError(msg);
+        }
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    // Buttons
+    el("btnGenerate").addEventListener("click", async () => {
+      const u = auth.currentUser;
+      if (!u) {
+        setError("Not logged in yet. Please wait 1–2 seconds, or re-open after login.");
+        return;
+      }
+      await generateReportForUser(u);
+    });
+
+    el("btnRefresh").addEventListener("click", async () => {
+      const u = auth.currentUser;
+      if (!u) {
+        setError("Not logged in yet. Please wait 1–2 seconds, or re-open after login.");
+        return;
+      }
+      await generateReportForUser(u);
+    });
+
+    el("logoutBtn").addEventListener("click", async () => {
+      try{
+        await signOut(auth);
+        window.location.href = "/login";
+      }catch(e){
+        setError("Failed to log out. Please try again.");
+      }
+    });
+
+    // ✅ Critical: persistence + auth-ready gate
+    (async () => {
+      try{
+        await setPersistence(auth, browserLocalPersistence);
+      }catch(e){
+        // If this fails, auth can still work, but may not persist across reloads.
+      }
+
+      onAuthStateChanged(auth, async (u) => {
+        if (!u){
+          el("authBanner").classList.add("show");
+          el("greetSub").textContent = "Not logged in";
+          el("cancerTypeText").textContent = "—";
+          // Do NOT immediately redirect (it can look like “logged out” flicker).
+          // Provide a clear path instead:
+          el("authError").textContent =
+            "Not logged in. Please go to /login and sign in again. If you just logged in, refresh this page once.";
+          return;
+        }
+
+        // logged in
+        el("authBanner").classList.remove("show");
+        el("greetSub").textContent = greetingSublineByTime(new Date());
+
+        // Load profile once for greeting
+        try{
+          const pSnap = await getDoc(doc(db, "users", u.uid));
+          const profileDoc = pSnap.exists() ? pSnap.data() : {};
+          const name = profileDoc?.username || profileDoc?.displayName || profileDoc?.name || (u.email || "there");
+          const nice = String(name).split("@")[0] || "there";
+          el("helloLine").textContent = `Hi, ${nice}`;
+          el("cancerTypeText").textContent = deriveCancerTypeForReport(profileDoc);
+        }catch(e){
+          el("helloLine").textContent = `Hi, ${String(u.email || "there").split("@")[0]}`;
+          el("cancerTypeText").textContent = "cancer";
+        }
+
+        // Auto-generate
+        await generateReportForUser(u);
+      });
+    })();
+  </script>
+</body>
+</html>

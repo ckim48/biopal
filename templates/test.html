@@ -29,7 +29,7 @@
       backdrop-filter: blur(14px);
     }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-    .smallmuted{ color:var(--muted); font-weight:700; font-size: 13px; }
+    .smallmuted{ color:var(--muted); font-weight:800; font-size: 13px; }
     .btnx{ border-radius: 14px; font-weight: 900; padding: 10px 14px; }
     pre{
       background: rgba(2,6,23,.04);
@@ -41,6 +41,20 @@
       overflow:auto;
       font-size: 12.5px;
     }
+    .opt{
+      display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap;
+      padding:12px; border:1px solid var(--line); border-radius:16px;
+      background:rgba(255,255,255,.65);
+    }
+    .opt .form-check{ margin:0; }
+    .hint{ font-size:12px; color:var(--muted); font-weight:700; }
+    .badge-soft{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      background:rgba(14,165,233,.10);
+      border:1px solid rgba(14,165,233,.18);
+      font-weight:900; font-size:12px;
+    }
   </style>
 </head>
 
@@ -50,7 +64,7 @@
       <div>
         <h1 class="fw-black" style="font-weight:900; letter-spacing:-.4px;">Seed Mock Data</h1>
         <p class="smallmuted mb-0">
-          Creates <span class="mono">daily_logs</span> for the last 7 medical days for the currently signed-in user.
+          Seeds <span class="mono">daily_logs</span> for the last 7 medical days for the currently signed-in user.
         </p>
       </div>
       <div class="d-flex gap-2">
@@ -71,12 +85,49 @@
           <button class="btn btn-outline-secondary btnx" id="btnDry" disabled>Dry-run preview</button>
         </div>
       </div>
+
+      <hr style="border-color:var(--line); opacity:1;">
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <div class="smallmuted">Options</div>
+        <div class="badge-soft">
+          Medical day rule: before 09:00 counts as yesterday
+        </div>
+      </div>
+
+      <div class="opt">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="optSurvey" checked>
+          <label class="form-check-label smallmuted" for="optSurvey">Seed self check-in (<span class="mono">survey_v2</span>)</label>
+          <div class="hint">Matches your Daily Check-in structure (A–E).</div>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="optLowComplete" checked>
+          <label class="form-check-label smallmuted" for="optLowComplete">Low completion mode</label>
+          <div class="hint">User gets missions but completes almost none.</div>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="optSeedSchedule" checked>
+          <label class="form-check-label smallmuted" for="optSeedSchedule">Seed example schedule</label>
+          <div class="hint">Adds med times + dressing schedule to <span class="mono">users/{uid}</span> so missions appear.</div>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="optForceMissions" checked>
+          <label class="form-check-label smallmuted" for="optForceMissions">Ensure missions “exist”</label>
+          <div class="hint">Creates <span class="mono">intervalMeta</span> and (optionally) a stored custom mission slot.</div>
+        </div>
+      </div>
+
       <hr style="border-color:var(--line); opacity:1;">
 
       <div class="smallmuted mb-2">What it writes</div>
       <ul class="smallmuted mb-0">
         <li><span class="mono">users/{uid}/daily_logs/{YYYY-MM-DD}</span></li>
-        <li>Fields: <span class="mono">survey_v2</span>, <span class="mono">completedMissions</span>, <span class="mono">intervalMeta</span>, <span class="mono">mockSeed</span>, <span class="mono">lastUpdate</span></li>
+        <li>Fields: <span class="mono">survey_v2</span>, <span class="mono">completedMissions</span>, <span class="mono">intervalMeta</span>, <span class="mono">customMissions</span>, <span class="mono">selfStatus</span>, <span class="mono">mockSeed</span>, <span class="mono">lastUpdate</span></li>
+        <li><span class="mono">users/{uid}</span> (optional): <span class="mono">schedule</span></li>
       </ul>
     </div>
 
@@ -140,6 +191,10 @@
   function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
   function randInt(lo, hi){ return Math.floor(lo + Math.random() * (hi - lo + 1)); }
 
+  /* =========================================================
+     ✅ EXACT same "survey_v2" SHAPE as your Daily Check-in
+     A,B,C,D,E with same keys used in your dashboard code.
+  ========================================================= */
   function buildSurveyV2(dayIndex){
     // dayIndex: 0=today, 6=6 days ago (we’ll vary values smoothly)
     const cond = randPick(["good","average","average","bad"]);
@@ -162,30 +217,85 @@
     };
   }
 
-  function buildCompletedMissions(){
-    // your code checks completedMissions = ["09-12_WATER", ...]
-    // We'll create a believable set: some water done, sometimes med, sometimes dress.
+  /* =========================================================
+     ✅ Same selfStatus logic shape used in your dashboard
+     selfStatus: { score, label, updatedAtMs }
+  ========================================================= */
+  function safeNum(v, fallback=0){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : fallback;
+  }
+  function scoreA1(cond){
+    const v = String(cond || "");
+    if (v === "good") return 30;
+    if (v === "average") return 15;
+    if (v === "bad") return 0;
+    return 0;
+  }
+  function scoreA2(pain){
+    const v = String(pain || "");
+    if (v === "none") return 20;
+    if (v === "mild") return 15;
+    if (v === "moderate") return 10;
+    if (v === "severe") return 0;
+    return 0;
+  }
+  function scoreC(fatigue){
+    const f = clamp(safeNum(fatigue, 10), 0, 10);
+    return (10 - f) * 2.5;
+  }
+  function scoreD(mood){
+    const v = String(mood || "");
+    if (v === "good") return 25;
+    if (v === "neutral") return 15;
+    return 5;
+  }
+  function computeDailyScoreFromSurvey(surveyV2){
+    if (!surveyV2) return null;
+    const A = surveyV2.A || {};
+    const C = surveyV2.C || {};
+    const D = surveyV2.D || {};
+    const total = scoreA1(A.cond) + scoreA2(A.pain) + scoreC(C.fatigue) + scoreD(D.mood);
+    return Math.round(clamp(total, 0, 100));
+  }
+  function mapScoreToState(score){
+    const s = clamp(safeNum(score, 0), 0, 100);
+    if (s >= 80) return "Happy / Energized";
+    if (s >= 50) return "Neutral / Calm";
+    if (s >= 30) return "Tired / Low Energy";
+    return "Concern / Warning";
+  }
+
+  /* =========================================================
+     ✅ Missions: make user "gets missions but completes almost none"
+     - completedMissions uses your format: ["09-12_WATER", ...]
+  ========================================================= */
+  function buildCompletedMissions({ lowComplete = true } = {}){
     const out = [];
 
+    // probabilities:
+    // - lowComplete => almost none completed
+    // - normal => believable completions
     for (const iv of INTERVALS){
-      // WATER is often done
-      if (Math.random() < 0.75) out.push(`${iv.id}_WATER`);
-
-      // MED + DRESS occasionally done
-      if (Math.random() < 0.45) out.push(`${iv.id}_MED`);
-      if (Math.random() < 0.25) out.push(`${iv.id}_DRESS`);
-
-      // Sometimes a custom mission exists & completed
-      if (Math.random() < 0.20) out.push(`${iv.id}_CUSTOM_1`);
+      if (lowComplete){
+        // almost none
+        if (Math.random() < 0.08) out.push(`${iv.id}_WATER`);
+        if (Math.random() < 0.03) out.push(`${iv.id}_MED`);
+        if (Math.random() < 0.02) out.push(`${iv.id}_DRESS`);
+        if (Math.random() < 0.01) out.push(`${iv.id}_CUSTOM_1`);
+      } else {
+        // your original "believable" set
+        if (Math.random() < 0.75) out.push(`${iv.id}_WATER`);
+        if (Math.random() < 0.45) out.push(`${iv.id}_MED`);
+        if (Math.random() < 0.25) out.push(`${iv.id}_DRESS`);
+        if (Math.random() < 0.20) out.push(`${iv.id}_CUSTOM_1`);
+      }
     }
 
-    // Deduplicate
     return Array.from(new Set(out));
   }
 
   function buildIntervalMeta(){
-    // Not strictly required (your dashboard can create startedAt),
-    // but having it makes things look “filled”.
     const meta = {};
     const base = Date.now() - 1000*60*60*2; // 2 hours ago-ish
     for (const iv of INTERVALS){
@@ -198,56 +308,133 @@
     return meta;
   }
 
-  function makeDailyLogDoc(dayStr, dayIndex){
+  // Optional: store a custom mission slot per interval (matches your daily_logs.customMissions[intervalId].slots[0])
+  function buildCustomMissionsStored(){
+    const custom = {};
+    for (const iv of INTERVALS){
+      // store one slot so the dashboard can show a custom mission if your logic reads stored custom
+      custom[iv.id] = {
+        slots: [{
+          id: "CUSTOM_1",
+          title: randPick(["Body Stretch","Nature Breath","Mini Walk","Calm Sip"]),
+          sub: randPick(["5-min gentle stretch","2-min deep breathing","3-min light walk","Warm tea or water, slow pace"]),
+          icon: randPick(["bi-wind","bi-tree","bi-person-walking","bi-cup-hot"])
+        }],
+        updatedAtMs: Date.now()
+      };
+    }
+    return custom;
+  }
+
+  // Optional: seed schedule on users/{uid} so missions appear (MED/DRESS due)
+  function buildExampleSchedule(){
     return {
-      survey_v2: buildSurveyV2(dayIndex),
-      completedMissions: buildCompletedMissions(),
-      intervalMeta: buildIntervalMeta(),
-      mockSeed: {
-        tag: "seed7d_v1",
-        day: dayStr,
-        createdAtMs: Date.now()
-      },
+      schedule: {
+        medication: { times: ["09:30","13:00","18:30"] },
+        dressing: { frequency: "weekly", dayOfWeek: "wed", time: "10:00" }
+      }
+    };
+  }
+
+  function makeDailyLogDoc(dayStr, dayIndex, opts){
+    const { seedSurvey=true, lowComplete=true, forceMissions=true } = opts || {};
+    const survey_v2 = seedSurvey ? buildSurveyV2(dayIndex) : null;
+
+    const completedMissions = forceMissions
+      ? buildCompletedMissions({ lowComplete })
+      : [];
+
+    const intervalMeta = forceMissions ? buildIntervalMeta() : {};
+
+    // selfStatus (same structure your dashboard uses)
+    const selfStatus = (seedSurvey && survey_v2)
+      ? {
+          score: computeDailyScoreFromSurvey(survey_v2),
+          label: mapScoreToState(computeDailyScoreFromSurvey(survey_v2)),
+          updatedAtMs: Date.now()
+        }
+      : null;
+
+    // (optional) store custom mission slots so the user "has missions" (but will not complete them in lowComplete mode)
+    const customMissions = forceMissions ? buildCustomMissionsStored() : null;
+
+    const payload = {
+      completedMissions,
+      intervalMeta,
+      mockSeed: { tag: "seed7d_v2", day: dayStr, createdAtMs: Date.now() },
       lastUpdate: serverTimestamp()
     };
+
+    if (seedSurvey) payload.survey_v2 = survey_v2;
+    if (seedSurvey && selfStatus) payload.selfStatus = selfStatus;
+    if (forceMissions && customMissions) payload.customMissions = customMissions;
+
+    return payload;
   }
 
   async function dryRun(uid){
     const base = getMedicalDayID(new Date());
     const days = lastNDaysFrom(base, 7);
 
+    const opts = readOpts();
+
     log("=== DRY RUN PREVIEW ===");
+    log(`Options: ${JSON.stringify(opts)}`);
+    log("");
+
+    if (opts.seedSchedule){
+      log(`users/${uid} (merge)`);
+      log(JSON.stringify({ ...buildExampleSchedule(), __note:"[schedule merge]" }, null, 2));
+      log("------------------------------------------------------------");
+    }
+
     for (let i=0; i<days.length; i++){
       const day = days[i];
-      const sample = makeDailyLogDoc(day, i);
+      const sample = makeDailyLogDoc(day, i, opts);
       log(`users/${uid}/daily_logs/${day}`);
-      log(JSON.stringify({
-        ...sample,
-        lastUpdate: "[serverTimestamp()]"
-      }, null, 2));
+      log(JSON.stringify({ ...sample, lastUpdate: "[serverTimestamp()]" }, null, 2));
       log("------------------------------------------------------------");
     }
     log("Dry-run complete.");
+  }
+
+  function readOpts(){
+    return {
+      seedSurvey: !!$("optSurvey")?.checked,
+      lowComplete: !!$("optLowComplete")?.checked,
+      seedSchedule: !!$("optSeedSchedule")?.checked,
+      forceMissions: !!$("optForceMissions")?.checked
+    };
   }
 
   async function seed7days(uid){
     setStatus("Seeding…");
     const base = getMedicalDayID(new Date());
     const days = lastNDaysFrom(base, 7);
+    const opts = readOpts();
 
     log(`Seeding for UID: ${uid}`);
     log(`Medical base day: ${base}`);
     log(`Days: ${days.join(", ")}`);
+    log(`Options: ${JSON.stringify(opts)}`);
+
+    // Optional: seed user schedule so MED/DRESS can appear in dashboard
+    if (opts.seedSchedule){
+      try{
+        await setDoc(doc(db, "users", uid), buildExampleSchedule(), { merge:true });
+        log(`✅ wrote users/${uid} (schedule merge)`);
+      } catch(e){
+        log(`⚠️ failed writing users/${uid} schedule: ${e?.message || e}`);
+      }
+    }
 
     for (let i=0; i<days.length; i++){
       const day = days[i];
       const ref = doc(db, "users", uid, "daily_logs", day);
-
-      const payload = makeDailyLogDoc(day, i);
+      const payload = makeDailyLogDoc(day, i, opts);
 
       // merge so you don’t destroy real fields if they exist
       await setDoc(ref, payload, { merge:true });
-
       log(`✅ wrote daily_logs/${day} (merge)`);
     }
 
@@ -270,8 +457,9 @@
       }
       const d = snap.data() || {};
       const tag = d?.mockSeed?.tag || "";
-      if (tag !== "seed7d_v1"){
-        log(`⚠️ skipped daily_logs/${day} (not tagged seed7d_v1)`);
+      // delete both v1 and v2 tags safely
+      if (tag !== "seed7d_v1" && tag !== "seed7d_v2"){
+        log(`⚠️ skipped daily_logs/${day} (not tagged seed7d_v1/seed7d_v2)`);
         continue;
       }
       await deleteDoc(ref);
@@ -299,7 +487,8 @@
     $("btnSeed").onclick = () => seed7days(user.uid);
     $("btnDelete").onclick = () => deleteSeeded(user.uid);
 
-    log("Ready. Click 'Dry-run preview' to inspect payload, then 'Seed last 7 days'.");
+    log("Ready. Use Dry-run preview first, then Seed last 7 days.");
+    log("Low completion mode is ON by default (missions mostly not completed).");
   });
 </script>
 </body>
