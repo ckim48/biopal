@@ -6,6 +6,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth
 const firebaseConfig = {
   apiKey: "AIzaSyBHSlHAY8XzwOu6kbkmMYzcEWT6qwgry0g",
   authDomain: "immunisphere.firebaseapp.com",
+  databaseURL: "https://immunisphere-default-rtdb.firebaseio.com",
   projectId: "immunisphere",
   storageBucket: "immunisphere.firebasestorage.app",
   messagingSenderId: "424436998430",
