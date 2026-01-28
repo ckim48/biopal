@@ -42,15 +42,7 @@ OPENAI_MODEL = "gpt-4o-mini"
 #     "appId": "1:886892546006:web:a24b1d1e09dbdf219d8677",
 #     "measurementId": "G-2CB8SDWRLL",
 # }
-FIREBASE_WEB_CONFIG = {
-  "apiKey": "AIzaSyBHSlHAY8XzwOu6kbkmMYzcEWT6qwgry0g",
-  "authDomain": "immunisphere.firebaseapp.com",
-  "databaseURL": "https://immunisphere-default-rtdb.firebaseio.com",
-  "projectId": "immunisphere",
-  "storageBucket": "immunisphere.firebasestorage.app",
-  "messagingSenderId": "424436998430",
-  "appId": "1:424436998430:web:597374776d04ee5cc4e90f"
-}
+
 # SERVER Admin credential (Service Account) — you must fill these from the JSON you downloaded:
 # Firebase Console -> Project Settings -> Service Accounts -> Generate new private key
 # Then copy the fields into this dict.
