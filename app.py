@@ -29,7 +29,6 @@ app.secret_key = "change-this-to-a-random-secret-key"
 OPENAI_MODEL = "gpt-4o-mini"
 
 
-
 # -----------------------------
 # Firebase (SERVER Admin SDK)
 # -----------------------------
@@ -101,6 +100,9 @@ def register():
 def main():
     return render_template("main.html")
 
+@app.get("/forgot")
+def forgot_password():
+    return render_template("forgot_password.html")
 
 # -----------------------------
 # Session login/logout
@@ -1166,7 +1168,7 @@ def generate_ai_missions():
 
     missions = [
         {"category": "diet", "title": "Diet & Hydration", "icon": "bi-apple", "cards": make_cards_for_category("diet")},
-        {"category": "exercise", "title": "Safe Movement", "icon": "bi-figure-walking", "cards": make_cards_for_category("exercise")},
+        {"category": "exercise", "title": "Safe Movement", "icon": "bi-activity", "cards": make_cards_for_category("exercise")},
         {"category": "sleep", "title": "Rest & Sleep", "icon": "bi-moon-stars", "cards": make_cards_for_category("sleep")},
         {"category": "mindset", "title": "Mental Well-being", "icon": "bi-heart-pulse", "cards": make_cards_for_category("mindset")},
     ]

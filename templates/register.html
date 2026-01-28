@@ -8,8 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" sizes="32x32" href="../static/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../static/favicon.png">
   <link rel="apple-touch-icon" sizes="180x180" href="../static/apple-touch-icon.png">
+
   <style>
     :root{
       --primary:#0070f3;
@@ -58,7 +59,6 @@
     .step-content.active{display:block}
     @keyframes slideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 
-    /* one row per input */
     .field{margin-bottom:18px}
     label{
       display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:var(--ink);
@@ -104,7 +104,6 @@
 
     .hidden{display:none !important}
 
-    /* Teen modal */
     .modal-overlay{
       position:fixed;inset:0;
       background:rgba(2,6,23,.55);
@@ -171,10 +170,11 @@
       <div class="step-dot" id="dot-2">2</div>
       <div class="step-dot" id="dot-3">3</div>
       <div class="step-dot" id="dot-4">4</div>
+      <div class="step-dot" id="dot-5">5</div>
     </div>
 
     <h1 id="step-title">Create Account</h1>
-    <p class="subtitle" id="step-subtitle">Step 1 of 4: Secure your BioPal portal.</p>
+    <p class="subtitle" id="step-subtitle">Step 1 of 5: Sign in securely.</p>
 
     <form id="registerForm" novalidate>
       <!-- STEP 1 -->
@@ -273,21 +273,19 @@
               <input type="text" id="cancerTypeOther" placeholder="Enter cancer type">
             </div>
 
-            <!-- OPTIONAL (only shown when hasCancer=yes); NOT required -->
             <div class="field">
               <label>Stage (if known)</label>
               <select id="cancerStage">
-                <option value="" selected>Skip / Not sure</option>
+                <option value="" selected>Not sure/Unknown</option>
                 <option value="0">Stage 0</option>
                 <option value="1">Stage I</option>
                 <option value="2">Stage II</option>
                 <option value="3">Stage III</option>
                 <option value="4">Stage IV</option>
-                <option value="unknown">Unknown</option>
+                <option value="not_applicable">Not applicable</option>
               </select>
             </div>
 
-            <!-- OPTIONAL; NOT required -->
             <div class="field">
               <label>How long since diagnosis? (optional)</label>
               <select id="diagnosisAge">
@@ -301,7 +299,6 @@
               </select>
             </div>
 
-            <!-- OPTIONAL; NOT required -->
             <div class="field">
               <label>Current Treatment Stage (optional)</label>
               <select id="treatmentPhase">
@@ -313,7 +310,6 @@
               </select>
             </div>
 
-            <!-- OPTIONAL; NOT required -->
             <div class="field">
               <label>Time in current treatment stage (optional)</label>
               <select id="phaseDuration">
@@ -327,19 +323,18 @@
               </select>
             </div>
 
-            <!-- OPTIONAL; NOT required -->
             <div class="field">
               <label>Primary care setting (optional)</label>
               <select id="careSetting">
                 <option value="" selected>Skip</option>
-                <option value="home">Mostly at home</option>
-                <option value="outpatient">Outpatient (home + visits)</option>
-                <option value="hospitalized">Currently hospitalized</option>
-                <option value="rehab">Rehab / care facility</option>
+                <option value="morethanonce">More than once per week</option>
+                <option value="weekly">Weekly</option>
+                <option value="2weeks">Every 2 weeks</option>
+                <option value="monthly">Monthly</option>
+                <option value="rarely">Rarely / as needed</option>
               </select>
             </div>
 
-            <!-- OPTIONAL; NOT required -->
             <div class="field">
               <label>Hospital/clinic visits frequency (optional)</label>
               <select id="visitFrequency">
@@ -411,7 +406,6 @@
             </select>
           </div>
 
-          <!-- OPTIONAL -->
           <div class="field">
             <label>Medical Conditions / Allergies (optional)</label>
             <textarea id="conditions" placeholder="e.g. Diabetes, Penicillin allergy..."></textarea>
@@ -526,7 +520,30 @@
         </div>
       </div>
 
-      <div class="btn-group">
+      <!-- STEP 5: Email Verification -->
+      <div class="step-content" id="step-5">
+        <div class="info-box">
+          We sent a verification email to <b id="verifyEmailText"></b>.
+          Please click the link in that email to verify your account.
+        </div>
+
+        <div class="section">
+          <h3>Verify to finish</h3>
+          <div class="modal-body" style="margin:0;">
+            After verifying, come back here and press <b>I Verified</b>.
+            If you don’t see the email, check spam/junk.
+          </div>
+
+          <div class="modal-actions" style="margin-top:14px;">
+            <button type="button" class="btn btn-secondary" id="resendBtn">Resend Email</button>
+            <button type="button" class="btn btn-ack" id="verifiedBtn">I Verified</button>
+          </div>
+
+          <div class="modal-body" id="verifyStatus" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="btn-group" id="navButtons">
         <button type="button" class="btn btn-prev" id="prevBtn" style="display:none;">Back</button>
         <button type="button" class="btn btn-next" id="nextBtn">Continue</button>
       </div>
@@ -535,29 +552,33 @@
 
   <script type="module">
     import { auth, db } from "{{ url_for('static', filename='js/firebase/config.js') }}";
-    import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import {
+      createUserWithEmailAndPassword,
+      sendEmailVerification,
+      reload
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // ----------------------------
     // Wizard state
     // ----------------------------
     let currentStep = 1;
-    const totalSteps = 4;
-    const titles = ["Create Account", "Clinical Profile", "Lifestyle & Care Routine", "Emergency & Support"];
+    const totalSteps = 5;
+    const titles = ["Create Account", "Clinical Profile", "Lifestyle & Care Routine", "Emergency & Support", "Verify Email"];
     const subtitles = [
-      "Step 1 of 4: Sign in securely.",
-      "Step 2 of 4: Your clinical basics (diagnosis fields adjust automatically).",
-      "Step 3 of 4: Recent-week averages and reminders.",
-      "Step 4 of 4: Support contact and consent."
+      "Step 1 of 5: Sign in securely.",
+      "Step 2 of 5: Your clinical basics (diagnosis fields adjust automatically).",
+      "Step 3 of 5: Recent-week averages and reminders.",
+      "Step 4 of 5: Support contact and consent.",
+      "Step 5 of 5: Verify your email to finish."
     ];
 
     const nextBtn = document.getElementById("nextBtn");
     const prevBtn = document.getElementById("prevBtn");
+    const navButtons = document.getElementById("navButtons");
 
     // ----------------------------
     // Teen modal logic
-    // - triggers when Birth Year implies age 13-19 (inclusive)
-    // - shows once per session unless birth year changes again
     // ----------------------------
     const birthYearEl = document.getElementById("birthYear");
     const teenModal = document.getElementById("teenModal");
@@ -572,7 +593,7 @@
       if (!y || y < 1900) return false;
       const now = new Date();
       const currentYear = now.getFullYear();
-      const ageApprox = currentYear - y; // simple year-based
+      const ageApprox = currentYear - y;
       return ageApprox >= 13 && ageApprox <= 19;
     }
 
@@ -591,25 +612,18 @@
     });
     teenBackBtn.addEventListener("click", () => {
       closeTeenModal();
-      // keep not acknowledged; user likely wants to change birth year or ask parent
       birthYearEl.focus();
     });
-
-    // Close if click outside card
     teenModal.addEventListener("click", (e) => {
       if (e.target === teenModal) closeTeenModal();
     });
 
-    // Trigger on blur/change of birth year (only when on Step 2)
     function maybeShowTeenModal(){
       if (currentStep !== 2) return;
       const y = birthYearEl.value;
-      if (isTeenByYear(y)){
-        openTeenModal();
-      }
+      if (isTeenByYear(y)) openTeenModal();
     }
     birthYearEl.addEventListener("change", () => {
-      // if they edit year again, allow modal again (fresh warning)
       teenModalAcknowledged = false;
       maybeShowTeenModal();
     });
@@ -673,7 +687,7 @@
     syncCancerDiagnosisUI();
 
     // ----------------------------
-    // Medication UI (0/1/2/3 times per day)
+    // Medication UI
     // ----------------------------
     const medFreq = document.getElementById("medFreq");
     const medTimesWrap = document.getElementById("medTimesWrap");
@@ -711,7 +725,7 @@
     syncMedUI();
 
     // ----------------------------
-    // Dressing UI (none/daily/weekly + time + day if weekly)
+    // Dressing UI
     // ----------------------------
     const dressingFreq = document.getElementById("dressingFreq");
     const dressingWrap = document.getElementById("dressingWrap");
@@ -791,8 +805,38 @@
     function updateWizard(){
       document.getElementById("step-title").innerText = titles[currentStep - 1];
       document.getElementById("step-subtitle").innerText = subtitles[currentStep - 1];
+
+      // Step 5 uses custom buttons (Resend / I Verified)
+      if (currentStep === 5){
+        navButtons.style.display = "none";
+        return;
+      } else {
+        navButtons.style.display = "flex";
+      }
+
       prevBtn.style.display = currentStep === 1 ? "none" : "block";
-      nextBtn.innerText = currentStep === totalSteps ? "Finalize Account" : "Continue";
+      nextBtn.innerText = currentStep === 4 ? "Finalize Account" : "Continue";
+      nextBtn.disabled = false;
+    }
+
+    function goToStep(next){
+      if (next < 1 || next > totalSteps) return;
+
+      const curStepEl = document.getElementById(`step-${currentStep}`);
+      const curDot = document.getElementById(`dot-${currentStep}`);
+
+      if (curStepEl) curStepEl.classList.remove("active");
+      if (curDot) curDot.classList.remove("active");
+
+      currentStep = next;
+
+      const nextStepEl = document.getElementById(`step-${currentStep}`);
+      const nextDot = document.getElementById(`dot-${currentStep}`);
+
+      if (nextStepEl) nextStepEl.classList.add("active");
+      if (nextDot) nextDot.classList.add("active");
+
+      updateWizard();
     }
 
     // ----------------------------
@@ -801,7 +845,6 @@
     nextBtn.onclick = async () => {
       if (!validateStep(currentStep)) return;
 
-      // If leaving Step 2, and teen birth year is detected, show modal once (block forward until acknowledged)
       if (currentStep === 2){
         const y = birthYearEl.value;
         if (isTeenByYear(y) && !teenModalAcknowledged){
@@ -810,35 +853,26 @@
         }
       }
 
-      if (currentStep < totalSteps){
-        document.getElementById(`step-${currentStep}`).classList.remove("active");
+      if (currentStep < 4){
         document.getElementById(`dot-${currentStep}`).classList.add("completed");
+        goToStep(currentStep + 1);
+        return;
+      }
 
-        currentStep++;
-        document.getElementById(`step-${currentStep}`).classList.add("active");
-        document.getElementById(`dot-${currentStep}`).classList.add("active");
-
-        updateWizard();
-      } else {
+      if (currentStep === 4){
         await finalizeAccount();
       }
     };
 
     prevBtn.onclick = () => {
       if (currentStep <= 1) return;
-
-      document.getElementById(`step-${currentStep}`).classList.remove("active");
-      document.getElementById(`dot-${currentStep}`).classList.remove("active");
-
-      currentStep--;
-      document.getElementById(`step-${currentStep}`).classList.add("active");
-      document.getElementById(`dot-${currentStep}`).classList.remove("completed");
-
-      updateWizard();
+      // remove completed mark on the step we're going back to
+      document.getElementById(`dot-${currentStep - 1}`).classList.remove("completed");
+      goToStep(currentStep - 1);
     };
 
     // ----------------------------
-    // Finalize + Firestore save
+    // Finalize + Firestore save + Send verification
     // ----------------------------
     async function finalizeAccount(){
       const pass = document.getElementById("password").value;
@@ -846,7 +880,7 @@
       if (pass !== confirm) return alert("Passwords do not match.");
 
       nextBtn.disabled = true;
-      nextBtn.innerText = "Syncing...";
+      nextBtn.innerText = "Creating account...";
 
       try{
         const email = document.getElementById("email").value.trim();
@@ -861,10 +895,7 @@
         const dressFreq = document.getElementById("dressingFreq").value;
 
         const schedule = {
-          medication: {
-            timesPerDay: medN,
-            times: medTimes
-          },
+          medication: { timesPerDay: medN, times: medTimes },
           dressing: {
             frequency: dressFreq,
             dayOfWeek: (dressFreq === "weekly") ? document.getElementById("dressingDay").value : null,
@@ -915,19 +946,74 @@
           },
           teenNoticeAcknowledged: isTeenByYear(document.getElementById("birthYear").value) ? teenModalAcknowledged : false,
           createdAt: serverTimestamp(),
-          setupComplete: true
+
+          // lock until verified
+          setupComplete: false,
+          emailVerified: false
         };
 
+        // Save initial profile (incomplete until verified)
         await setDoc(doc(db, "users", user.uid), profile);
 
-        alert("Account setup complete!");
-        window.location.href = "{{ url_for('login') }}";
+        // Send verification email
+        nextBtn.innerText = "Sending verification...";
+        await sendEmailVerification(user);
+
+        // mark step 4 completed and go to step 5
+        document.getElementById("dot-4").classList.add("completed");
+        document.getElementById("verifyEmailText").innerText = email;
+
+        goToStep(5);
+
       } catch (error){
         alert(error.message);
         nextBtn.disabled = false;
         nextBtn.innerText = "Finalize Account";
       }
     }
+
+    // ----------------------------
+    // Step 5 buttons
+    // ----------------------------
+    const resendBtn = document.getElementById("resendBtn");
+    const verifiedBtn = document.getElementById("verifiedBtn");
+    const verifyStatus = document.getElementById("verifyStatus");
+
+    resendBtn.addEventListener("click", async () => {
+      try{
+        verifyStatus.textContent = "Resending verification email...";
+        if (!auth.currentUser) throw new Error("No signed-in user.");
+        await sendEmailVerification(auth.currentUser);
+        verifyStatus.textContent = "Verification email sent again. Check inbox/spam.";
+      } catch(e){
+        verifyStatus.textContent = e.message || "Failed to resend.";
+      }
+    });
+
+    verifiedBtn.addEventListener("click", async () => {
+      try{
+        verifyStatus.textContent = "Checking verification status...";
+        if (!auth.currentUser) throw new Error("No signed-in user.");
+        await reload(auth.currentUser);
+
+        if (!auth.currentUser.emailVerified){
+          verifyStatus.textContent = "Not verified yet. Click the link in your email, then press “I Verified” again.";
+          return;
+        }
+
+        // finalize setup in Firestore
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
+          emailVerified: true,
+          setupComplete: true,
+          verifiedAt: serverTimestamp()
+        }, { merge: true });
+
+        alert("Email verified — account setup complete!");
+        window.location.href = "{{ url_for('login') }}";
+      } catch(e){
+        verifyStatus.textContent = e.message || "Verification check failed.";
+      }
+    });
 
     updateWizard();
   </script>

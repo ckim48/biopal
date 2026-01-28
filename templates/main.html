@@ -252,6 +252,48 @@
     .gif-slot img{ width:100%; height:100%; object-fit:cover; }
     .character-box{ background:rgba(255,255,255,.72); border-radius:22px; width:100%; aspect-ratio:1/1; overflow:hidden; border:1px solid rgba(14,165,233,.14); }
     .character-box img{ width:100%; height:100%; object-fit:cover; }
+    /* ===== Ultra-smooth GIF crossfade (double-buffer) ===== */
+    .gif-stack{ position:absolute; inset:0; }
+    .gif-layer{
+      position:absolute; inset:0;
+      width:100%; height:100%;
+      object-fit:cover;
+      opacity:0;
+      transform:scale(1.06);
+      filter: blur(14px);
+      transition:
+    opacity 3.2s cubic-bezier(.22,1,.36,1),
+    transform 3.8s cubic-bezier(.22,1,.36,1),
+    filter 3.8s cubic-bezier(.22,1,.36,1);
+      will-change: opacity, transform, filter;
+      backface-visibility:hidden;
+      transform-origin: 50% 50%;
+    }
+    .gif-layer.is-front{
+      opacity:1;
+      transform:scale(1);
+      filter: blur(0px);
+    }
+    /* subtle glow during swap (keeps it feeling “deep”) */
+    .character-box.is-swapping::after{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(240px 140px at 50% 30%, rgba(56,189,248,.18), transparent 60%);
+      opacity:0;
+      pointer-events:none;
+      animation: gifGlow 1.25s ease forwards;
+      z-index: 15;
+    }
+    @keyframes gifGlow{
+      0%{ opacity:0; }
+      35%{ opacity:1; }
+      100%{ opacity:0; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .gif-layer{ transition:none; filter:none; transform:none; }
+      .character-box.is-swapping::after{ display:none; }
+    }
+
     .sensor-value{ margin-top:6px; display:flex; align-items:center; gap:8px; font-weight:900; font-size:1.05rem; }
     .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
     .dot.ok{ background:var(--ok); } .dot.warn{ background:var(--warn); } .dot.bad{ background:var(--bad); }
@@ -467,8 +509,8 @@
   border:1px solid rgba(255,255,255,.10);
   background:rgba(255,255,255,.06);
 }
-.level-badge.l1{color:#fecaca; background:white; border-color:rgba(239,68,68,.25)}
-.level-badge.l2{color:#fed7aa; background:white; border-color:rgba(245,158,11,.25)}
+.level-badge.l1{color:#ED7EE5; background:white; border-color:#ED7EE5;}
+.level-badge.l2{color:#F0B159; background:white; border-color:rgba(245,158,11,.45)}
 .level-badge.l3{color:#57A0EB; background:white; border-color:rgba(59,130,246,.25)}
 .level-badge.l4{color:#36D190; background:white; border-color:rgba(34,197,94,.25)}
 .level-msg{font-weight:950; font-size:15px; letter-spacing:-.2px}
@@ -490,13 +532,54 @@
   letter-spacing:-.3px;
   color:#fff;
   text-align:center;
-  background:rgba(2,6,23,.55);
+  background:rgba(2,6,23,.80);
   backdrop-filter:blur(6px);
   z-index:20;
   opacity:0;
   transition:opacity .25s ease;
   pointer-events:none;
 }
+
+    /* Mission completion screen over the character GIF */
+    .gif-overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(2,6,23,.55);
+      backdrop-filter: blur(6px);
+      border-radius: 26px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .45s ease;
+    }
+    .gif-overlay.show{ opacity:1; }
+    .gif-overlay .gif-overlay-inner{
+      text-align:center;
+      width:100%;
+      max-width: 320px;
+      padding:14px 16px;
+      border-radius:16px;
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(15,23,42,.10);
+      box-shadow: 0 16px 34px rgba(2,6,23,.20);
+      color:#0f172a;
+    }
+    .gif-overlay .gif-overlay-title{
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+    .gif-overlay .gif-overlay-sub{
+      margin-top:6px;
+      font-size: 13px;
+      color: rgba(15,23,42,.65);
+      font-weight:700;
+    }
+
 
 .alarm-text-overlay.show{ opacity:1; }
 .hidden{ display:none !important; }
@@ -560,9 +643,94 @@
   color:#0b1220;
   opacity:.9;
 }
+/* ===== FIX RANGE INPUT FILL EDGE ISSUE ===== */
+input[type="range"]{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Track */
+input[type="range"]::-webkit-slider-runnable-track{
+  height: 8px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      to right,
+      var(--sky) 0%,
+      var(--sky) var(--range-fill, 0%),
+      rgba(14,165,233,.15) var(--range-fill, 0%),
+      rgba(14,165,233,.15) 100%
+    );
+}
+
+input[type="range"]::-moz-range-track{
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(14,165,233,.15);
+}
+
+/* Fill (Firefox) */
+input[type="range"]::-moz-range-progress{
+  height: 8px;
+  border-radius: 999px;
+  background: var(--sky);
+}
+
+/* Thumb */
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sky);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 10px rgba(14,165,233,.4);
+  margin-top: -5px; /* centers thumb perfectly */
+}
+
+input[type="range"]::-moz-range-thumb{
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sky);
+  border: 2px solid #fff;
+}
 
 
-  </style>
+
+    /* Center GIF ultra-smooth fade (fade-out -> src swap -> fade-in) */
+.gif-fade{
+  opacity:1;
+  transform:scale(1);
+  transition:
+    opacity 2.2s cubic-bezier(.4,0,.2,1),
+    transform 2.2s cubic-bezier(.4,0,.2,1);
+  will-change:opacity,transform;
+}
+.gif-fade.is-fading{
+  opacity:0;
+  transform:scale(.97);
+}
+
+/* Disable interaction inside Mission Reveal Modal */
+#missionRevealModal .mission-card,
+#missionRevealModal .mission-card *{
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+
+/* Static mission cards used ONLY inside Mission Reveal Modal */
+.mission-card-static{
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+</style>
 </head>
 
 <body>
@@ -711,21 +879,41 @@
 
         <div class="col-lg-4 text-center">
 <div class="character-box">
-  <img id="characterSprite" src="/static/gifs/character2.gif" alt="Guardian">
+  <div class="gif-stack" id="characterGifStack" aria-label="Guardian">
+  <img id="characterSprite" class="gif-layer is-front" src="/static/gifs/character2.gif" alt="Guardian" data-current-src="/static/gifs/character2.gif">
+  <img id="characterSpriteB" class="gif-layer" src="/static/gifs/character2.gif" alt="" aria-hidden="true">
+</div>
 
   <div id="alarmTextOverlay" class="alarm-text-overlay hidden">
     It’s time to do your mission
   </div>
+<div id="returnTextOverlay" class="alarm-text-overlay hidden">
+  Let’s keep going
+</div>
+  <div id="missionCompleteOverlay" class="gif-overlay" aria-hidden="true">
+    <div class="gif-overlay-inner">
+      <div class="gif-overlay-title">Mission completed!</div>
+      <div class="gif-overlay-sub">Great job — keep going.</div>
+    </div>
+  </div>
 </div>
 
 
-          <div class="center-feedback">
-            <div class="feedback-card" aria-live="polite">
-              <div class="feedback-inner">
-                <h5 id="statusTitle">Synchronizing…</h5>
-              </div>
-            </div>
-          </div>
+
+<div class="center-feedback">
+  <div class="feedback-card" aria-live="polite">
+    <div class="feedback-inner">
+
+      <!-- Level badge (replaces statusTitle text) -->
+      <span id="levelBadge" class="level-badge l3">Level 3</span>
+      <br>
+      <!-- Message below level -->
+      <span id="levelMsg" class="level-msg"></span>
+
+    </div>
+  </div>
+</div>
+
         </div>
 
         <div class="col-lg-4 d-flex flex-column gap-3">
@@ -898,8 +1086,8 @@
             </div>
             <div class="field-group">
               <label for="c_fatigue">Perceived fatigue (0–10)</label>
-              <input id="c_fatigue" type="range" min="0" max="10" value="5" required>
-              <div class="hint"><span id="c_fatigueLabel">5</span> / 10</div>
+              <input id="c_fatigue" type="range" min="0" max="10" value="0" required>
+              <div class="hint"><span id="c_fatigueLabel">0</span> / 10</div>
             </div>
           </div>
 
@@ -907,19 +1095,29 @@
             <h3 class="step-title">D. Emotion and Stress</h3>
             <p class="step-sub">Emotional check-in.</p>
             <div class="field-group"><label for="d_mood">Mood today</label>
-              <select id="d_mood" required>
-                <option value="" selected disabled>Select...</option>
-                <option value="good">Good</option>
-                <option value="neutral">Neutral</option>
-                <option value="sad">Sad</option>
-                <option value="scared">Scared</option>
-                <option value="angry">Angry</option>
-                <option value="tired">Tired</option>
-              </select>
+<select id="d_mood" required>
+  <option value="" selected disabled>Select...</option>
+  <option value="good">Good</option>
+  <option value="neutral">Neutral</option>
+  <option value="sad">Sad</option>
+  <option value="scared">Scared</option>
+  <option value="angry">Angry</option>
+  <option value="tired">Tired</option>
+  <option value="other">Other</option>
+</select>
             </div>
+            <div class="field-group hidden" id="d_moodOtherWrap">
+  <label for="d_moodOther">Please describe your mood</label>
+  <input
+    id="d_moodOther"
+    type="text"
+    placeholder="Describe your mood..."
+  >
+</div>
+
             <div class="field-group">
               <label for="d_anxiety">Worry/Anxiety (0-10)</label>
-              <input id="d_anxiety" type="range" min="0" max="10" value="5" required>
+              <input id="d_anxiety" type="range" min="0" max="10" value="0" required>
               <div class="hint"><span id="d_anxietyLabel">5</span> / 10</div>
             </div>
             <div class="field-group"><label for="d_hardMoment">Difficult moment today?</label>
@@ -930,7 +1128,7 @@
               </select>
             </div>
             <div class="field-group"><label for="d_note">Emotion note (optional)</label><textarea id="d_note"></textarea></div>
-            <div class="field-group"><label for="d_gsr">Stress sensor (optional)</label><input id="d_gsr" type="number" step="0.01"></div>
+            <div class="field-group d-none"><label for="d_gsr">Stress sensor (optional)</label><input id="d_gsr" type="number" step="0.01"></div>
           </div>
 
           <div class="survey-step" data-step="5">
@@ -1029,20 +1227,28 @@
     </div>
   </div>
 
-  <div class="debug-panel">
+  <div class="debug-panel d-none">
     <button class="btn-debug" style="background:#ef4444" id="test-reset" title="Reset day"><i class="bi bi-trash3-fill"></i></button>
     <button class="btn-debug" id="test-skip-1h" title="Skip +1 hour"><i class="bi bi-hourglass-split"></i></button>
     <button class="btn-debug" id="test-skip-3h" title="Skip +3 hours"><i class="bi bi-hourglass"></i></button>
   </div>
 
 <script type="module">
-  import { db, auth } from "/static/js/firebase/config.js";
-  import { doc, setDoc, getDoc, updateDoc, deleteField, serverTimestamp, deleteDoc }
+import { db, auth } from "/static/js/firebase/config.js";
+  import { doc, setDoc, getDoc, onSnapshot, updateDoc, deleteField, serverTimestamp, deleteDoc }
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
   import { onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const $ = (id) => document.getElementById(id);
+
+  // Clamp helpers (module-scope)
+//  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+//  const clampInt = (v, min, max) => {
+//    const n = Number.isFinite(+v) ? Math.trunc(+v) : min;
+//    return clamp(n, min, max);
+//  };
+
 
   let userSession = null, timeOffset = 0, currentStep = 1, cachedUserProfile = null;
   let cachedHistory7d = [];
@@ -1060,10 +1266,10 @@
     MED:   "/static/gifs/medication_alarm.gif",
     DRESS: "/static/gifs/dressing_alarm.gif"
   };
-  const REMINDER_DURATION_MS = 2400;
+  const REMINDER_DURATION_MS = 2200;
 
-  /* ✅ FIXED: alarm should re-trigger every 10 seconds forever */
-  const MISSION_ALARM_MS = 10_000;
+
+  const MISSION_ALARM_MS = 200_000;
 
   const INTERVALS = [
     { id: "09-12", startHr: 9,  endHr: 12, label: "09:00 - 12:00" },
@@ -1079,6 +1285,180 @@
     CUSTOM: "/static/img/missions/custom.png",
     INFO:   "/static/img/missions/custom.png"
   };
+    const NEW_USER_LOADING_GIF = "/static/gifs/loading.gif";
+
+
+/* -------------------- Character Level Engine -------------------- */
+// Stored on user profile: users/{uid}.characterLevelState
+// - Rolls over at 9am automatically because medicalDay changes at 9am (see getMedicalDayID()).
+// - Level up: every 3 completed missions today (3, 6, 9...) → +1 level (max 4).
+// - Level down: if 2 consecutive intervals end with 0 missions completed → -1 level (min 1).
+
+function defaultCharacterLevelState(medicalDay){
+  // New users: start at level 3 for the first day (but they still see loading.gif until they do something).
+  const base = 3;
+  return {
+    medicalDay,
+    level: base,
+    upgradeMilestones: 0,      // floor(completedToday / 3)
+    emptyIntervalsStreak: 0,   // count of consecutive ended intervals with 0 completion
+    evaluatedIntervals: []     // interval ids already evaluated today
+  };
+}
+
+function safeArray(x){ return Array.isArray(x) ? x : []; }
+
+function endedIntervalsForNow(now){
+  const hr = now.getHours();
+  const out = [];
+  for (const it of INTERVALS){
+    if (it.endHr <= hr) out.push(it);
+  }
+  return out;
+}
+
+function missionsCompletedInInterval(completedList, intervalId){
+  const prefix = `${intervalId}_`;
+  return safeArray(completedList).filter(x => String(x).startsWith(prefix)).length;
+}
+
+async function persistCharacterLevelState(stateOrUid, maybeLevel, reasonMeta = {}) {
+  // Backward-compatible signature:
+  // - persistCharacterLevelState(uid, nextLevel, meta)
+  // - persistCharacterLevelState(stateObj) where stateObj has { medicalDay, level, ... }
+  let uid, nextLevel, state;
+  if (typeof stateOrUid === "string") {
+    uid = stateOrUid;
+    nextLevel = maybeLevel;
+    state = null;
+  } else {
+    state = stateOrUid || {};
+    uid = userSession?.uid;
+    nextLevel = state.level;
+  }
+  if (!uid) return null;
+
+  const safeLevel = clampInt(nextLevel, 1, 4);
+  const idleGif = levelToIdleGif(safeLevel);
+
+  const characterLevelState = state && typeof state === "object"
+    ? { ...state, level: safeLevel, gif: idleGif, lastUpdatedAtMs: Date.now(), ...reasonMeta }
+    : { level: safeLevel, gif: idleGif, lastUpdatedAtMs: Date.now(), ...reasonMeta };
+
+  // Canonical status object to mirror everywhere
+  const characterStatus = { level: safeLevel, gif: idleGif, updatedAtMs: Date.now() };
+
+  // 1) users/{uid} field (backward compatibility)
+  await setDoc(doc(db, "users", uid), { characterLevelState, characterStatus }, { merge: true });
+
+  // 2) users/{uid}/meta/{docId} (used by other pages in this project)
+  await setDoc(doc(db, "users", uid, "meta", "characterLevelState"), characterLevelState, { merge: true });
+  await setDoc(doc(db, "users", uid, "meta", "characterStatus"), characterStatus, { merge: true });
+
+  // 3) Root collection: characterStatus/{uid}  ✅ (explicitly requested "document 'characterStatus'")
+  await setDoc(doc(db, "characterStatus", uid), characterStatus, { merge: true });
+
+  // 4) Daily snapshot: users/{uid}/daily_logs/{medicalDay}
+  // Store the same status inside today's daily log for history/report pages.
+  const dayId = (state && typeof state.medicalDay === "string" && state.medicalDay)
+    ? state.medicalDay
+    : (typeof getMedicalDayID === "function" ? getMedicalDayID(getNow()) : null);
+
+  if (dayId) {
+    await setDoc(
+      doc(db, "users", uid, "daily_logs", dayId),
+      { characterStatus, characterLevelState, lastUpdate: serverTimestamp() },
+      { merge: true }
+    );
+  }
+
+
+  cachedUserProfile = { ...(cachedUserProfile || {}), characterLevelState };
+  return { characterLevelState, characterStatus };
+}
+
+async function persistIntervalOutcome(medicalDay, intervalId, anyCompleted){
+  try{
+    const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
+    await setDoc(ref, {
+      intervalOutcome: {
+        [intervalId]: { anyCompleted: !!anyCompleted, evaluatedAtMs: Date.now() }
+      },
+      lastUpdate: serverTimestamp()
+    }, { merge:true });
+  } catch(e){
+    // optional, so ignore failures
+    console.warn("[Level] persistIntervalOutcome failed:", e);
+  }
+}
+
+async function ensureCharacterLevelUpToDate(medicalDay, logData, now){
+  // Load from cached profile first
+  const prof = cachedUserProfile || {};
+  let state = (prof.characterLevelState && typeof prof.characterLevelState === "object")
+    ? { ...prof.characterLevelState }
+    : null;
+
+  if (!state || typeof state.level !== "number"){
+    state = defaultCharacterLevelState(medicalDay);
+  }
+
+  // 9am rollover (medicalDay changes at 9am)
+  if (state.medicalDay !== medicalDay){
+    state = {
+      ...state,
+      medicalDay,
+      upgradeMilestones: 0,
+      emptyIntervalsStreak: 0,
+      evaluatedIntervals: []
+    };
+  }
+
+  const completed = safeArray(logData?.completedMissions);
+  const milestone = Math.floor(completed.length / 3);
+
+  // Level up for every +1 milestone reached today
+  if (milestone > Number(state.upgradeMilestones || 0)){
+    const diff = milestone - Number(state.upgradeMilestones || 0);
+    state.level = clamp(Number(state.level || 3) + diff, 1, 4);
+    state.upgradeMilestones = milestone;
+  }
+
+  // Level down if 2 consecutive ended intervals have 0 completion
+  const already = new Set(safeArray(state.evaluatedIntervals).map(String));
+  const ended = endedIntervalsForNow(now);
+
+  for (const it of ended){
+    const id = String(it.id);
+    if (already.has(id)) continue;
+
+    const done = missionsCompletedInInterval(completed, id);
+    const anyCompleted = done > 0;
+
+    if (anyCompleted){
+      state.emptyIntervalsStreak = 0;
+    } else {
+      state.emptyIntervalsStreak = Number(state.emptyIntervalsStreak || 0) + 1;
+      if (state.emptyIntervalsStreak >= 2){
+        state.level = clamp(Number(state.level || 3) - 1, 1, 4);
+        state.emptyIntervalsStreak = 0; // reset after downgrade
+      }
+    }
+
+    state.evaluatedIntervals = safeArray(state.evaluatedIntervals).concat([id]);
+    await persistIntervalOutcome(medicalDay, id, anyCompleted);
+  }
+
+  // Publish to globals
+  currentCharacterLevel = clamp(Number(state.level || 3), 1, 4);
+
+  // Keep cached profile in sync so subsequent calls are consistent
+  cachedUserProfile = { ...(cachedUserProfile || {}), characterLevelState: state };
+
+  await persistCharacterLevelState(state);
+  return state;
+}
+
 
   function missionPngSrc(missionId){
     const id = String(missionId || "");
@@ -1149,6 +1529,75 @@
   }
 
   /* -------------------- Character & Gifs -------------------- */
+
+  // Live character status sync (listens to Firestore document 'characterStatus')
+  let unsubscribeCharacterStatus = null;
+  let currentCharacterLevel = 3;
+
+  function fadeSwapGif(imgEl, newSrc){
+    // Backward-compatible wrapper (older parts of the file call fadeSwapGif)
+    // Uses the same smooth timing as swapGif.
+    if (!imgEl || !newSrc) return;
+    swapGif(imgEl, newSrc, { durationMs: 800 });
+  }
+
+  function renderLevelBadge(level){
+    const badge = document.getElementById("levelBadge");
+    const msg = document.getElementById("levelMsg");
+    if (!badge) return;
+    const lv = clampInt(level, 1, 4);
+    badge.textContent = `Level ${lv}`;
+    badge.classList.remove("l1","l2","l3","l4");
+    badge.classList.add(`l${lv}`);
+    if (msg){
+if (lv === 4) msg.textContent = "Wow! You did a fantastic job today! ";
+else if (lv === 3) msg.textContent = "Nice work! You’re on the right track ";
+else if (lv === 2) msg.textContent = "That’s okay—let’s try one little thing ";
+else msg.textContent = "No worries! Let’s do one mission together ";
+    }
+  }
+
+  function applyCharacterStatus(status){
+    if (!status || typeof status !== "object") return;
+    const level = clampInt(status.level ?? 3, 1, 4);
+    currentCharacterLevel = level;
+
+    const sprite = document.getElementById("characterSprite");
+    const srcFromDoc = (typeof status.gif === "string" && status.gif) ? status.gif : levelToIdleGif(level);
+    fadeSwapGif(sprite, srcFromDoc);
+    renderLevelBadge(level);
+  }
+
+  async function seedCharacterStatusIfMissing(uid){
+    try{
+      const rootRef = doc(db, "characterStatus", uid);
+      const rootSnap = await getDoc(rootRef);
+      if (rootSnap.exists()) return;
+
+      const userSnap = await getDoc(doc(db, "users", uid));
+      const userData = userSnap.exists() ? userSnap.data() : {};
+      const status = userData?.characterStatus || userData?.characterLevelState || null;
+
+      if (status && typeof status === "object"){
+        const lv = clampInt(status.level ?? 3, 1, 4);
+        const gif = status.gif || levelToIdleGif(lv);
+        await setDoc(rootRef, { level: lv, gif, updatedAtMs: Date.now() }, { merge: true });
+      } else {
+        await setDoc(rootRef, { level: 3, gif: levelToIdleGif(3), updatedAtMs: Date.now() }, { merge: true });
+      }
+    } catch(e){
+      console.warn("[characterStatus] seed failed:", e);
+    }
+  }
+
+  function subscribeCharacterStatus(uid){
+    if (unsubscribeCharacterStatus) { try{ unsubscribeCharacterStatus(); }catch(e){} }
+    const rootRef = doc(db, "characterStatus", uid);
+    unsubscribeCharacterStatus = onSnapshot(rootRef, (snap) => {
+      if (snap.exists()) applyCharacterStatus(snap.data());
+    }, (err) => console.warn("[characterStatus] onSnapshot error:", err));
+  }
+
   const STATUS_IDLE_GIF = {
     "Happy / Energized": "/static/gifs/character1.gif",
     "Neutral / Calm": "/static/gifs/character2.gif",
@@ -1156,7 +1605,22 @@
     "Concern / Warning": "/static/gifs/character4.gif"
   };
 
-  const COMPLETE_GIF = {
+
+
+// Character "level" uses the same 4 character gifs, but mapped to performance.
+// Level 4 = best = character1.gif, Level 1 = worst = character4.gif
+const LEVEL_IDLE_GIF = {
+  4: "/static/gifs/character1.gif", // Level 4 (best)
+  3: "/static/gifs/character2.gif", // Level 3
+  2: "/static/gifs/character3.gif", // Level 2
+  1: "/static/gifs/character4.gif"  // Level 1 (worst)
+};
+
+    function levelToIdleGif(level){
+      return LEVEL_IDLE_GIF[clampInt(level, 1, 4)] || LEVEL_IDLE_GIF[3];
+    }
+
+const COMPLETE_GIF = {
     WATER: "/static/gifs/hydration_complete.gif",
     MED: "/static/gifs/medication_complete.gif",
     DRESS: "/static/gifs/dressing_complete.gif",
@@ -1165,14 +1629,15 @@
 
   const ALARM_GIF = {
     WATER: "/static/gifs/hydration_alarm.gif",
-    MED:   "/static/gifs/medicaiton_alarm.gif",
+    MED:   "/static/gifs/medication_alarm.gif",
     DRESS: "/static/gifs/dressing_alarm.gif",
     CUSTOM:"/static/gifs/custom_alarm.gif"
   };
-  const ALARM_LOOP_MS = 1000;
+  const ALARM_LOOP_MS = 2400;
 
   let currentStatusLabel = "Neutral / Calm";
   let currentSelfScore = null;
+
 
   let isPlayingCompletion = false;
   let isPlayingReminder = false;
@@ -1184,13 +1649,146 @@
 
   let activeBasicsSet = new Set();
 
-  function setCharacterSrc(src) {
+
+  function swapGif(img, nextSrc, { durationMs = 2400, settleMs = 3300 } = {}) {
+    // Ultra-smooth double-buffer crossfade for the center character GIF.
+    // Works when the character box contains 2 stacked <img> layers:
+    //   #characterSprite (front) and #characterSpriteB (back)
+    if (!img || !nextSrc) return;
+
+    const box = img.closest(".character-box") || img.parentElement;
+    const a = document.getElementById("characterSprite");
+    const b = document.getElementById("characterSpriteB");
+
+    // If stack isn't present, fall back to simple fade swap (legacy)
+    if (!a || !b){
+      const current = img.getAttribute("data-current-src") || img.src || "";
+      if (current === nextSrc || current.endsWith(nextSrc)) return;
+      if (img._swapLock) return;
+      img._swapLock = true;
+      img.classList.add("is-fading");
+      window.setTimeout(() => {
+        img.src = nextSrc;
+        img.setAttribute("data-current-src", nextSrc);
+        window.requestAnimationFrame(() => {
+          img.classList.remove("is-fading");
+          window.setTimeout(() => { img._swapLock = false; }, 1100);
+        });
+      }, durationMs);
+      return;
+    }
+
+    // Choose current front/back
+    const front = a.classList.contains("is-front") ? a : b;
+    const back  = (front === a) ? b : a;
+
+    const current = front.getAttribute("data-current-src") || front.src || "";
+    if (current === nextSrc || current.endsWith(nextSrc)) return;
+
+    // Lock on container to avoid rapid flicker from multiple snapshot events
+    if (box && box._swapLock) return;
+    if (box) box._swapLock = true;
+
+    // Start "deep" transition
+    if (box) box.classList.add("is-swapping");
+
+    // Load new GIF into back layer first (prevents blank frame)
+    const finish = () => {
+      back.classList.add("is-front");
+      front.classList.remove("is-front");
+
+      back.setAttribute("data-current-src", nextSrc);
+
+      // release lock after transition settles
+      window.setTimeout(() => {
+        if (box) {
+          box._swapLock = false;
+          box.classList.remove("is-swapping");
+        }
+      }, Math.max(1200, settleMs));
+    };
+
+    // If already set, just crossfade
+    if ((back.getAttribute("data-pending-src") || "") === nextSrc){
+      finish();
+      return;
+    }
+
+    back.setAttribute("data-pending-src", nextSrc);
+
+    // Attach one-time load handler
+    const onLoad = () => {
+      back.removeEventListener("load", onLoad);
+      // slight delay to let first frame paint (avoids “flash”)
+      window.requestAnimationFrame(() => window.requestAnimationFrame(finish));
+    };
+
+    back.addEventListener("load", onLoad, { once: true });
+
+    // Trigger load
+    back.src = nextSrc;
+
+    // Safety: if load doesn't fire (cached / same URL edge), proceed anyway
+    window.setTimeout(() => {
+      if (back.classList.contains("is-front")) return;
+      finish();
+    }, Math.max(260, Math.min(1200, durationMs)));
+  }
+
+  function setCharacterSrc(src, opts = {}) {
     const img = $("characterSprite");
     if (!img) return;
-    img.src = `${src}`;
+    swapGif(img, `${src}`, opts);
   }
 
 const ALARM_TEXT_DURATION_MS = 2500;
+
+  const COMPLETION_TEXT_DURATION_MS = 3000;
+
+
+  // How long the *_complete.gif stays on screen (feel free to tweak)
+  const COMPLETION_HOLD_MS = 8000;
+
+function showCharacterText(message, duration = 2500){
+  const el = $("alarmTextOverlay");
+  if (!el) return;
+
+  el.textContent = message;
+  el.classList.remove("hidden");
+  el.classList.add("show");
+
+  setTimeout(() => {
+    el.classList.remove("show");
+    setTimeout(() => el.classList.add("hidden"), 250);
+  }, duration);
+}
+
+  function flashGifOverlay(title = "Mission completed!", sub = "Great job — keep going.", ms = 3000){
+    const overlay = document.getElementById("missionCompleteOverlay");
+    if (!overlay) return;
+
+    const t = overlay.querySelector(".gif-overlay-title");
+    const s = overlay.querySelector(".gif-overlay-sub");
+    if (t) t.textContent = title;
+    if (s) s.textContent = sub;
+
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+
+    window.clearTimeout(overlay.__hideTimer);
+    overlay.__hideTimer = window.setTimeout(() => {
+      overlay.classList.remove("show");
+      overlay.setAttribute("aria-hidden", "true");
+    }, ms);
+  }
+
+  // Utility: clamp & coerce to int (used by characterStatus updates)
+  function clampInt(v, min, max){
+    const n = Number.parseInt(v, 10);
+    const safe = Number.isFinite(n) ? n : 0;
+    return Math.max(min, Math.min(max, safe));
+  }
+
 
   function showAlarmText(message = "It’s time to do your mission"){
   const el = $("alarmTextOverlay");
@@ -1205,36 +1803,71 @@ const ALARM_TEXT_DURATION_MS = 2500;
     setTimeout(() => el.classList.add("hidden"), 250);
   }, ALARM_TEXT_DURATION_MS);
 }
+
+function showReturnText(message = "All set — let’s keep going"){
+  const el = $("returnTextOverlay");
+  if (!el) return;
+
+  el.textContent = message;
+  el.classList.remove("hidden");
+  el.classList.add("show");
+
+  setTimeout(() => {
+    el.classList.remove("show");
+    setTimeout(() => el.classList.add("hidden"), 250);
+  }, RETURN_TEXT_DURATION_MS);
+}
+
 function playAlarmOnce(type){
+  // Block if other animations are running
   if (isPlayingCompletion || isPlayingReminder) return;
 
   const t = (type === "WATER" || type === "MED" || type === "DRESS") ? type : "CUSTOM";
-  const gif = ALARM_GIF[t];
-  if (!gif) return;
+  const alarmGif = ALARM_GIF[t];
+  if (!alarmGif) return;
+
+  // Step 0) Start from current idle character
+  const idleLv = clamp(Number(currentCharacterLevel || 3), 1, 4);
+  const idleSrc = LEVEL_IDLE_GIF[idleLv] || LEVEL_IDLE_GIF[3];
 
   stopAlarmAnim();
   isPlayingAlarm = true;
 
-
+  // Step 1) Idle + "It’s time..." overlay
+  setCharacterSrc(idleSrc);
   showAlarmText("It’s time to do your mission");
 
-
+  // Step 2) Swap to alarm gif after the text finishes
   setTimeout(() => {
-    setCharacterSrc(gif);
+    setCharacterSrc(alarmGif);
 
+    // Step 3) After alarm gif loop, show "All set..." then return to idle
     alarmTimer = setTimeout(() => {
-      isPlayingAlarm = false;
-      setIdleCharacterByStatus(currentStatusLabel);
+      showReturnText("All set — let’s keep going");
+
+      setTimeout(() => {
+        isPlayingAlarm = false;
+        setIdleCharacterByLevel(currentCharacterLevel);
+      }, RETURN_TEXT_DURATION_MS);
+
     }, ALARM_LOOP_MS);
 
   }, ALARM_TEXT_DURATION_MS);
 }
 
-  function setIdleCharacterByStatus(label){
-    const idleSrc = STATUS_IDLE_GIF[label] || STATUS_IDLE_GIF["Neutral / Calm"];
-    setCharacterSrc(idleSrc);
-
+function setIdleCharacterByLevel(level){
+  // brand-new user → show loading.gif
+  if (isNewUserFromHistory(cachedHistory7d)) {
+    setCharacterSrc(NEW_USER_LOADING_GIF);
+    return;
   }
+
+  const lv = clamp(Number(level || 3), 1, 4);
+  const idleSrc = LEVEL_IDLE_GIF[lv] || LEVEL_IDLE_GIF[3];
+  setCharacterSrc(idleSrc);
+}
+
+
 
   function stopReminderAnim(){
     if (reminderTimer) clearTimeout(reminderTimer);
@@ -1246,21 +1879,32 @@ function playAlarmOnce(type){
     alarmTimer = null;
     isPlayingAlarm = false;
   }
+function playCharacterOnce(type) {
+  stopReminderAnim();
+  stopAlarmAnim();
+  if (characterTimer) clearTimeout(characterTimer);
 
-  function playCharacterOnce(type) {
-    stopReminderAnim();
-    stopAlarmAnim();
-    if (characterTimer) clearTimeout(characterTimer);
+  isPlayingCompletion = true;
 
-    isPlayingCompletion = true;
-    const src = COMPLETE_GIF[type] || COMPLETE_GIF.CUSTOM;
-    setCharacterSrc(src);
+  // 1️⃣ Text overlay (keep it visible while the GIF transitions)
+  showCharacterText("Mission completed!", COMPLETION_TEXT_DURATION_MS);
 
+  // 2️⃣ Idle → completion (slow, deep crossfade)
+  const completionSrc = COMPLETE_GIF[type] || COMPLETE_GIF.CUSTOM;
+  const idleSrc = (LEVEL_IDLE_GIF[currentCharacterLevel] || LEVEL_IDLE_GIF[3]);
+
+  // start swapping shortly after the text appears (feels like one animation)
+  setTimeout(() => {
+    setCharacterSrc(completionSrc, { durationMs: 2400, settleMs: 3300 });
+
+    // 3️⃣ Hold completion, then completion → idle (even slower return)
     characterTimer = setTimeout(() => {
       isPlayingCompletion = false;
-      setIdleCharacterByStatus(currentStatusLabel);
-    }, 2000);
-  }
+      setCharacterSrc(idleSrc, { durationMs: 2800, settleMs: 3600 });
+    }, COMPLETION_HOLD_MS);
+  }, 180);
+}
+
 
   function playReminderOnce(type){
     if (isPlayingCompletion || isPlayingAlarm) return;
@@ -1275,7 +1919,7 @@ function playAlarmOnce(type){
 
     reminderTimer = setTimeout(() => {
       isPlayingReminder = false;
-      setIdleCharacterByStatus(currentStatusLabel);
+      setIdleCharacterByLevel(currentCharacterLevel);
     }, REMINDER_DURATION_MS);
   }
 
@@ -1498,6 +2142,7 @@ function playAlarmOnce(type){
     try{
       const { fullId, medicalDay, type } = confirmState;
       closeConfirmModal();
+
       await finishMission(fullId, medicalDay, type);
     } catch(e){
       console.warn("[Confirm] failed:", e);
@@ -1510,11 +2155,23 @@ function playAlarmOnce(type){
     $("realtime-label").textContent = d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false });
     return d;
   }
+  function ymdLocal(d){
+    try { return d.toLocaleDateString("en-CA"); } catch(e) {}
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function getCalendarDayID(){
+    return ymdLocal(getNow());
+  }
+
   function getMedicalDayID() {
     const now = getNow();
     const medDate = new Date(now);
     if (now.getHours() < 9) medDate.setDate(medDate.getDate() - 1);
-    return medDate.toISOString().slice(0, 10);
+    return ymdLocal(medDate);
   }
   function lastNDaysFrom(baseDay, n){
     const days = [];
@@ -1714,6 +2371,8 @@ function playAlarmOnce(type){
 
   async function generateAndSaveCustom(medicalDay, intervalId, avoidTitles){
     cachedHistory7d = await fetchHistoryDays(7);
+    setIdleCharacterByLevel(currentCharacterLevel);
+
     let mission = await fetchCustomMission(1, avoidTitles);
     let key = String(mission.title || "").trim().toLowerCase();
     if (avoidTitles.has(key)) {
@@ -1725,12 +2384,17 @@ function playAlarmOnce(type){
 
   /* -------------------- Mission plan builder -------------------- */
 function buildBasicPoolForInterval(interval, medicalDay){
-  const pool = [{
-    id:"WATER",
-    title:"Hydration",
-    sub:"Drink 250ml Water", // This is the "detail"
-    icon:"bi-droplet-fill"
-  }];
+  const pool = [];
+
+  // Hydration appears in every interval EXCEPT 3pm–6pm (15–18)
+  if ((interval?.id || "") !== "15-18") {
+    pool.push({
+      id:"WATER",
+      title:"Hydration",
+      sub:"Drink 250ml Water",
+      icon:"bi-droplet-fill"
+    });
+  }
 
   const med = cachedUserProfile?.schedule?.medication || {};
   const medTimes = Array.isArray(med.times) ? med.times : [];
@@ -1740,7 +2404,7 @@ function buildBasicPoolForInterval(interval, medicalDay){
     pool.push({
       id:"MED",
       title:"Medication",
-      sub:`Take scheduled medication at ${t}`, // Detailed instruction
+      sub:`Take scheduled medication at ${t}`,
       icon:"bi-capsule"
     });
   }
@@ -1751,7 +2415,7 @@ function buildBasicPoolForInterval(interval, medicalDay){
     pool.push({
       id:"DRESS",
       title:"Dressing",
-      sub:`Check or change bandage (${dressDue.dueTime})`, // Detailed instruction
+      sub:`Check or change bandage (${dressDue.dueTime})`,
       icon:"bi-bandaid"
     });
   }
@@ -1899,11 +2563,12 @@ function pickNiceTitleByCompleteness(_, isRest = false) {
 }
 
   function updateCenterByCompleteness(pct, isRest=false){
-    if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) setIdleCharacterByStatus(currentStatusLabel);
-//    setCenterMessage(pickNiceTitleByCompleteness(pct, isRest));
-    $("statusTitle").innerHTML = pickNiceTitleByCompleteness(pct, isRest);
-
+  if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) {
+    setIdleCharacterByLevel(currentCharacterLevel);
   }
+  $("statusTitle").innerHTML = pickNiceTitleByCompleteness(pct, isRest);
+}
+
 
   /* -------------------- Sleep Stars -------------------- */
   function computeSleepStarsFromSurvey(surveyV2){
@@ -2240,7 +2905,7 @@ function pickNiceTitleByCompleteness(_, isRest = false) {
 /** * Synchronizes currently visible missions to Firestore
  * for Arduino/Hardware consumption.
  */
-async function syncActiveMissionsToFirestore(medicalDay, missions) {
+async function syncActiveMissionsToFirestore(medicalDay, intervalId, missions) {
   if (!userSession?.uid) return;
 
   // 1. Filter out nulls and 2. Map valid data
@@ -2248,16 +2913,28 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     .filter(m => m && m.title) // Ensure mission exists and has at least a title
     .map(m => ({
       id: m.id || "UNKNOWN",
+      fullId: intervalId ? `${intervalId}_${(m.id || "UNKNOWN")}` : (m.id || "UNKNOWN"),
       title: m.title,
       description: m.sub || "Check BioPal dashboard for details"
     }));
 
   try {
+    const calendarDay = getCalendarDayID();
+
     const ref = doc(db, "users", userSession.uid, "daily_logs", medicalDay);
     await setDoc(ref, {
       arduinoActiveMissions: arduinoPayload,
       arduinoLastSync: serverTimestamp()
     }, { merge: true });
+
+    // Also mirror into calendar day so dashboard.html (YYYY-MM-DD) always matches
+    if (calendarDay && calendarDay !== medicalDay) {
+      const ref2 = doc(db, "users", userSession.uid, "daily_logs", calendarDay);
+      await setDoc(ref2, {
+        arduinoActiveMissions: arduinoPayload,
+        arduinoLastSync: serverTimestamp()
+      }, { merge: true });
+    }
     // console.log("[Sync] Success:", arduinoPayload);
   } catch (e) {
     console.warn("[Sync] Firestore update failed:", e);
@@ -2289,12 +2966,20 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     const selfRes = await resolveTodayOrYesterdaySelfStatus(medicalDay, logData);
     currentStatusLabel = selfRes.label;
     currentSelfScore = selfRes.score;
+    await saveCharacterStatusToFirestore({
+  medicalDay,
+  label: currentStatusLabel,
+  score: currentSelfScore
+});
 
-    if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) {
-      setIdleCharacterByStatus(currentStatusLabel);
-    }
+// Character level depends on mission completions + interval streaks (not self-check mood).
+await ensureCharacterLevelUpToDate(medicalDay, logData, now);
 
-    setSelfCheckBannerBySurvey(surveyV2);
+if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) {
+  setIdleCharacterByLevel(currentCharacterLevel);
+}
+
+setSelfCheckBannerBySurvey(surveyV2);
 
     const sleepStars = computeSleepStarsFromSurvey(surveyV2);
     if (hasTodayCheckin) renderSleepStars(sleepStars.stars, sleepStars.msg);
@@ -2318,7 +3003,7 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
       alarmEngineList = [];
       container.appendChild(createInfoCard("Sleep Time","It’s sleep time now. Take a full rest — your body is working hard for you. We’ll continue tomorrow."));
       container.appendChild(createInfoCard("Gentle Reminder","If you’re still awake, a small sip of water is enough. No pressure — rest comes first."));
-      updateCenterByCompleteness(0, true);
+
       updateSensors();
       return;
     }
@@ -2338,9 +3023,9 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     const customActive = (customSaved && !completed.includes(toFullId(intervalId, customSaved.id))) ? customSaved : null;
     if (customActive) usedTitles.add(lowerTitle(customActive));
 
-    const onlyOneBasicThisInterval = (basicPool.length === 1);
+    const noMedDressThisInterval = !basicPool.some(m => m.id === "MED" || m.id === "DRESS");
     const isBeginningOfInterval = !!startedAt && (nowMs - startedAt) < (5 * 60 * 1000);
-    const allowCustomAtStart = onlyOneBasicThisInterval && isBeginningOfInterval;
+    const allowCustomAtStart = noMedDressThisInterval && isBeginningOfInterval;
 
     // If custom needs to be generated at interval start
     if (allowCustomAtStart && !hasCustomStored(logData, intervalId)) {
@@ -2365,6 +3050,9 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
         for (const m of currentMissions.slice(0, MAX_VISIBLE)) {
           container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
         }
+        if (currentMissions.slice(0, MAX_VISIBLE).length < MAX_VISIBLE) {
+          container.appendChild(createInfoCard("Next Mission", "Finish this mission — BioPal will generate the next one."));
+        }
 
         startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentMissions.slice(0, MAX_VISIBLE) });
 
@@ -2373,7 +3061,7 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
         replaceNode(ph, createInfoCard("Custom Mission", "Could not generate right now. Try refresh later."));
       }
 
-      updateCenterByCompleteness(calcIntervalPct(intervalId, basicPool, logData), false);
+
       updateSensors();
       return;
     }
@@ -2426,6 +3114,9 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
         for (const m of currentMissions.slice(0, MAX_VISIBLE)) {
           container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
         }
+        if (currentMissions.slice(0, MAX_VISIBLE).length < MAX_VISIBLE) {
+          container.appendChild(createInfoCard("Next Mission", "Finish this mission — BioPal will generate the next one."));
+        }
 
         startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentMissions.slice(0, MAX_VISIBLE) });
 
@@ -2434,7 +3125,7 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
         replaceNode(ph, createInfoCard("Custom Mission", "Could not generate right now. Try refresh later."));
       }
 
-      updateCenterByCompleteness(calcIntervalPct(intervalId, basicPool, logData), false);
+
       updateSensors();
       return;
     }
@@ -2452,15 +3143,18 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
       for (const m of currentShown) {
         container.appendChild(createMissionCard(m, intervalId, medicalDay, false));
       }
+      if (currentShown.length < MAX_VISIBLE) {
+        container.appendChild(createInfoCard("Next Mission", "Finish this mission — BioPal will generate the next one."));
+      }
 
-    await syncActiveMissionsToFirestore(medicalDay, currentShown);
+    await syncActiveMissionsToFirestore(medicalDay, intervalId, currentShown);
       // start the forever alarm engine using only currently shown missions
       startOrUpdateAlarmEngine({ medicalDay, intervalId, missions: currentShown });
 
     } else {
       // No active missions: clear blink + no alarm targets
 
-      await syncActiveMissionsToFirestore(medicalDay, []);
+      await syncActiveMissionsToFirestore(medicalDay, intervalId, []);
       clearMissionBlink();
       alarmEngineList = [];
 
@@ -2479,7 +3173,7 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     }
 
     const pct = calcIntervalPct(intervalId, basicPool, logData);
-    updateCenterByCompleteness(pct, false);
+
     updateSensors();
 
     if (opts.manualRefresh && revealPending) {
@@ -2523,6 +3217,15 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
       if (!list.includes(fullId)) {
         list.push(fullId);
 
+
+        // ✅ Update character level immediately using the NEW completion list
+        // so the idle GIF after the completion animation reflects the new level.
+        try{
+          await ensureCharacterLevelUpToDate(medicalDay, { ...(d||{}), completedMissions: list }, now);
+        } catch(e){
+          console.warn("[Level] ensure after completion failed:", e);
+        }
+
         const isBasic = (type === "WATER" || type === "MED" || type === "DRESS");
         let nextRevealAt = 0;
 
@@ -2556,6 +3259,49 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
           nextRevealAt: deleteField(),
           lastUpdate: serverTimestamp()
         }, { merge: true });
+
+        // Mirror completion to calendar day doc so dashboard.html stays in sync
+        const calendarDay = getCalendarDayID();
+        if (calendarDay && calendarDay !== medicalDay) {
+          const ref2 = doc(db, "users", userSession.uid, "daily_logs", calendarDay);
+          await setDoc(ref2, {
+            completedMissions: list,
+            intervalMeta,
+            nextRevealAt: deleteField(),
+            lastUpdate: serverTimestamp()
+          }, { merge: true });
+        }
+
+
+        // ✅ If there are NO medication/dressing missions this interval,
+        // keep exactly ONE custom mission active at a time.
+        // - Generate one custom at the start of the interval (handled in updateDashboard)
+        // - When the custom mission is completed, immediately generate the next one.
+        try{
+          if (interval && intervalId) {
+            const basicPoolNow = buildBasicPoolForInterval(interval, medicalDay);
+            const noMedDressNow = !basicPoolNow.some(m => m.id === "MED" || m.id === "DRESS");
+            const endMs = getIntervalEndDate(now, interval).getTime();
+            const timeOk = (Date.now() + 15000) < endMs; // avoid generating at the very end
+
+            if (noMedDressNow && timeOk) {
+              const dAfter = { ...(d||{}), completedMissions: list, intervalMeta };
+              const saved = getCustomSlot(dAfter, intervalId);
+              const customIsActive = !!(saved && !list.includes(`${intervalId}_${saved.id}`));
+
+              // If the completed mission was CUSTOM, and there is no active custom left, generate the next one.
+              if (type === "CUSTOM" && !customIsActive) {
+                const activeBasicsNow = basicPoolNow.filter(m => !list.includes(`${intervalId}_${m.id}`));
+                const usedTitlesNow = new Set(activeBasicsNow.map(lowerTitle));
+                if (saved) usedTitlesNow.add(lowerTitle(saved));
+
+                await generateAndSaveCustom(medicalDay, intervalId, usedTitlesNow);
+              }
+            }
+          }
+        } catch(e){
+          console.warn("[AutoCustomAfterComplete] failed:", e);
+        }
 
         if (nextRevealAt) {
           const mins = Math.max(1, Math.round((nextRevealAt - Date.now()) / 60000));
@@ -2696,6 +3442,8 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     showToast({ title:"Saved!", message:"Check-in recorded.", key:"checkin_saved" });
 
     cachedHistory7d = await fetchHistoryDays(7).catch(()=>[]);
+    setIdleCharacterByLevel(currentCharacterLevel);
+
     await updateDashboard();
   };
 
@@ -2796,6 +3544,8 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
       setReportLoadingUI();
 
       cachedHistory7d = await fetchHistoryDays(7);
+      setIdleCharacterByLevel(currentCharacterLevel);
+
       const payload = { profile: cachedUserProfile || {}, history: cachedHistory7d || [], medicalDay };
 
       const res = await fetch(API_CONDITION_REPORT_URL, {
@@ -2840,6 +3590,8 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
       await deleteDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay));
       showToast({ title:"Reset", message:"Today’s log cleared (debug).", key:"reset_today" });
       cachedHistory7d = await fetchHistoryDays(7);
+      setIdleCharacterByLevel(currentCharacterLevel);
+
       await updateDashboard({ debugReset:true });
     } catch(e){
       console.warn("[Debug reset] failed:", e);
@@ -2858,23 +3610,68 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     }, REMINDER_EVERY_MS);
   }
 
+/* -------------------- Character Level Loop -------------------- */
+// Needed so "2 empty intervals → level down" still applies even if the user stays on the page
+// and doesn't click anything. Runs lightweight checks every minute.
+let levelEngineTimer = null;
+
+async function refreshCharacterLevelOnly(){
+  if (!userSession) return;
+  try{
+    const now = getNow();
+    const medicalDay = getMedicalDayID();
+
+    const [pSnap, lSnap] = await Promise.all([
+      getDoc(doc(db, "users", userSession.uid)),
+      getDoc(doc(db, "users", userSession.uid, "daily_logs", medicalDay))
+    ]);
+
+    cachedUserProfile = pSnap.exists() ? (pSnap.data() || {}) : (cachedUserProfile || {});
+    const logData = lSnap.exists() ? (lSnap.data() || {}) : {};
+
+    await ensureCharacterLevelUpToDate(medicalDay, logData, now);
+
+    if (!isPlayingCompletion && !isPlayingReminder && !isPlayingAlarm) {
+      setIdleCharacterByLevel(currentCharacterLevel);
+    }
+  } catch(e){
+    console.warn("[Level] refreshCharacterLevelOnly failed:", e);
+  }
+}
+
+function startLevelEngineLoop(){
+  if (levelEngineTimer) clearInterval(levelEngineTimer);
+  levelEngineTimer = setInterval(refreshCharacterLevelOnly, 60 * 1000);
+}
+
+function stopLevelEngineLoop(){
+  if (levelEngineTimer) clearInterval(levelEngineTimer);
+  levelEngineTimer = null;
+}
+
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       $("logoutBtn").disabled = true;
       $("openSurveyBtn").disabled = true;
       setCenterMessage("Please sign in to continue.");
       stopAlarmEngine();
+      stopLevelEngineLoop();
       return;
     }
 
     userSession = user;
 
+    await seedCharacterStatusIfMissing(user.uid);
+    subscribeCharacterStatus(user.uid);
     $("logoutBtn").disabled = false;
     $("logoutBtn").onclick = async () => {
       try{
-        await signOut(auth);
-        stopAlarmEngine();
-        window.location.href = "/login";
+        if (typeof unsubscribeCharacterStatus === 'function') { try{ unsubscribeCharacterStatus(); }catch(e){} unsubscribeCharacterStatus=null; }
+      await signOut(auth);
+          stopAlarmEngine();
+          stopLevelEngineLoop();
+          window.location.href = "/login";
       } catch(e){
         console.warn("[Logout] failed:", e);
       }
@@ -2883,7 +3680,13 @@ async function syncActiveMissionsToFirestore(medicalDay, missions) {
     tickClock();
 
     cachedHistory7d = await fetchHistoryDays(7);
+    setIdleCharacterByLevel(currentCharacterLevel);
+
     await updateDashboard();
+
+    // keep character level correct at interval boundaries
+    await refreshCharacterLevelOnly();
+    startLevelEngineLoop();
 
     startReminderLoop();
 
@@ -2991,6 +3794,95 @@ window.addEventListener("load", async () => {
     }, remaining);
   }
 });
+
+  // ---- Character state helpers (1~4) ----
+function statusLabelToCharacterId(label){
+  switch (label) {
+    case "Happy / Energized":   return 1; // character1.gif
+    case "Neutral / Calm":      return 2; // character2.gif
+    case "Tired / Low Energy":  return 3; // character3.gif
+    case "Concern / Warning":   return 4; // character4.gif
+    default: return 2;
+  }
+}
+
+async function saveCharacterStatusToFirestore({ uid, statusId, statusLabel, score, level, gif }) {
+  if (!uid || typeof uid !== "string") {
+    console.warn("saveCharacterStatusToFirestore: missing uid", { uid });
+    return null;
+  }
+  try{
+    // Always derive gif from level to keep level<->gif consistent
+    const safeLevel = clampInt(level ?? currentCharacterLevel ?? 3, 1, 4);
+    const safeGif = levelToIdleGif(safeLevel);
+
+    const payload = {
+      id: Number.isFinite(+statusId) ? +statusId : null,
+      label: typeof statusLabel === "string" ? statusLabel : null,
+      score: (score === null || score === undefined) ? null : +score,
+      level: safeLevel,
+      gif: safeGif,
+      updatedAtMs: Date.now()
+    };
+
+    // 1) Store as a field on the user document (easy to inspect + reuse)
+    await setDoc(doc(db, "users", uid), { characterStatus: payload }, { merge: true });
+
+    // 2) Also mirror into a dedicated doc for any pages that prefer a standalone document
+    await setDoc(doc(db, "users", uid, "meta", "characterStatus"), payload, { merge: true });
+
+    return payload;
+  }catch(err){
+    console.error("saveCharacterStatusToFirestore failed:", err);
+    return null;
+  }
+}
+function syncRangeFill(el){
+  const min = Number(el.min || 0);
+  const max = Number(el.max || 100);
+  const val = Number(el.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  el.style.setProperty("--range-fill", `${pct}%`);
+}
+function saveMissionCompletion(mission) {
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  const history = JSON.parse(localStorage.getItem("missionHistory") || "[]");
+
+  history.push({
+    id: mission.id,
+    name: mission.name,
+    type: mission.type,          // Hydration / Medication / etc
+    status: "completed",
+    date: today,
+    completedAt: Date.now()
+  });
+
+  localStorage.setItem("missionHistory", JSON.stringify(history));
+}
+
+[fatigue, anxiety].forEach(r => {
+  if (!r) return;
+  syncRangeFill(r);
+  r.addEventListener("input", () => syncRangeFill(r));
+});
+
+const moodSelect = document.getElementById("d_mood");
+const moodOtherWrap = document.getElementById("d_moodOtherWrap");
+const moodOtherInput = document.getElementById("d_moodOther");
+
+if (moodSelect) {
+  moodSelect.addEventListener("change", () => {
+    if (moodSelect.value === "other") {
+      moodOtherWrap.classList.remove("hidden");
+      moodOtherInput.required = true;
+    } else {
+      moodOtherWrap.classList.add("hidden");
+      moodOtherInput.required = false;
+      moodOtherInput.value = "";
+    }
+  });
+}
 
 
 </script>
